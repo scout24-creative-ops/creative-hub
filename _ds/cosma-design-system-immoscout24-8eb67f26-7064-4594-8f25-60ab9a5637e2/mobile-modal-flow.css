@@ -1,0 +1,569 @@
+/* ============================================================================
+   COSMA — Mobile Modal Flow (bottom-sheet) shell
+   Source rules: cosma-mobile-modal-flow-rules.md
+
+   A reusable bottom-sheet modal for mobile multi-step flows: selections,
+   confirmations, filters, form steps, guided tasks.
+
+   Pair with colors_and_type.css (tokens + Make It Better fonts) and
+   fonts/is24-icons.css (icon font). Only the few tokens the rules introduce
+   that aren't already in colors_and_type.css are aliased below.
+   ============================================================================ */
+
+:root {
+  /* Aliases for tokens referenced by the rules, mapped to COSMA tokens */
+  --brand-teal: var(--teal-200);
+  --color-icon-button-default: var(--color-text-default);
+  --color-elevation-surface-overlay: var(--color-background-default);
+  --color-background-button-weak-pressed: var(--gray-400);
+
+  /* Modal type tokens (from the rules) */
+  --font-size-modal-title: 20px;
+  --line-height-modal-title: 30px;
+}
+
+/* ---------- Animations ---------- */
+@keyframes cosma-flow-backdrop-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cosma-flow-backdrop-out { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+@keyframes cosma-flow-sheet-in     { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes cosma-flow-sheet-out    { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+/* ---------- Backdrop ---------- */
+.cosma-flow-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  animation: cosma-flow-backdrop-in 400ms forwards;
+}
+.cosma-flow-backdrop::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+}
+.cosma-flow-backdrop.is-closing { animation: cosma-flow-backdrop-out 400ms forwards; }
+
+/* ---------- Modal surface (bottom sheet) ---------- */
+.cosma-flow-modal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: none;
+  max-height: 100vh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--border-radius-400) var(--border-radius-400) 0 0;
+  background: var(--color-background-default);
+  color: var(--color-text-default);
+  box-shadow: var(--elevation-top);
+  font-family: var(--font-family-body);
+  animation: cosma-flow-sheet-in 400ms forwards;
+}
+.cosma-flow-backdrop.is-closing .cosma-flow-modal { animation: cosma-flow-sheet-out 400ms forwards; }
+
+/* ---------- Header ---------- */
+.cosma-flow-header {
+  min-height: 57px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-200);
+  padding: var(--spacing-400) var(--spacing-400) var(--spacing-400) var(--spacing-600);
+  box-sizing: border-box;
+  text-align: left;
+  flex: 0 0 auto;
+}
+
+.cosma-flow-icon-button,
+.cosma-flow-back-placeholder {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
+.cosma-flow-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--border-radius-rounded);
+  background: transparent;
+  color: var(--color-icon-button-default);
+  cursor: pointer;
+  transition: background var(--animation-duration-fast, 150ms) ease;
+}
+.cosma-flow-icon-button:hover { background: var(--color-background-subtle); }
+.cosma-flow-icon-button:focus-visible {
+  outline: 2px solid var(--color-border-strong);
+  outline-offset: 2px;
+}
+.cosma-flow-icon-button .is24-icon { font-size: 24px; }
+
+.cosma-flow-title-group {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.cosma-flow-title-group.is-centered {
+  align-items: center;
+  text-align: center;
+}
+
+.cosma-flow-title {
+  min-height: 30px;
+  margin: 0;
+  color: var(--color-text-default);
+  font-family: var(--font-family-heading, var(--font-family-body));
+  font-size: var(--font-size-modal-title);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-modal-title);
+  letter-spacing: 0;
+}
+
+.cosma-flow-subtitle {
+  margin: 0;
+  color: var(--color-text-default);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body-medium);
+  letter-spacing: 0;
+}
+
+/* ---------- Progress ---------- */
+.cosma-flow-progress {
+  width: 100%;
+  height: 4px;
+  flex: 0 0 auto;
+  background: var(--gray-300);
+  overflow: hidden;
+}
+.cosma-flow-progress-bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 0 var(--border-radius-rounded) var(--border-radius-rounded) 0;
+  background: var(--brand-teal);
+  transition: width 200ms ease;
+}
+
+/* ---------- Content (scrolls) ---------- */
+.cosma-flow-content {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100dvh - 57px - 104px);
+  flex-direction: column;
+  gap: var(--spacing-600);
+  overflow: auto;
+  padding: 0 var(--spacing-600);
+  box-sizing: border-box;
+}
+.cosma-flow-content.no-footer {
+  padding-bottom: var(--spacing-800);
+  max-height: calc(100dvh - 57px);
+}
+
+.cosma-flow-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+}
+.cosma-flow-field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+}
+.cosma-flow-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+}
+
+.cosma-flow-option {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-300);
+  padding: var(--spacing-300) var(--spacing-400);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--border-radius-rounded);
+  background: var(--color-background-default);
+  color: var(--color-text-default);
+  font-family: var(--font-family-body);
+  font-size: var(--size-body-medium);
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.cosma-flow-option:hover { border-color: var(--color-border-strong); }
+.cosma-flow-option.is-selected {
+  border-color: var(--color-border-strong);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+}
+
+/* ---------- Footer (sticky) ---------- */
+.cosma-flow-footer {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column-reverse;
+  gap: var(--spacing-400);
+  padding: var(--spacing-400) var(--spacing-600) var(--spacing-800);
+  box-sizing: border-box;
+  background: var(--color-background-default);
+}
+.cosma-flow-footer.is-elevated { box-shadow: var(--elevation-top); }
+
+/* COSMA buttons are always fully rounded (pill) */
+.cosma-flow-button {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-400);
+  border-radius: var(--border-radius-rounded);
+  font-family: var(--font-family-body);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body-medium);
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.cosma-flow-button-primary {
+  border: 1px solid var(--color-background-button-default-default);
+  background: var(--color-background-button-default-default);
+  color: var(--color-text-button-inversive);
+}
+.cosma-flow-button-primary:hover {
+  background: var(--color-background-button-default-hovered);
+  border-color: var(--color-background-button-default-hovered);
+}
+.cosma-flow-button-primary:active {
+  background: var(--color-background-button-default-pressed);
+  border-color: var(--color-background-button-default-pressed);
+}
+
+.cosma-flow-button-secondary {
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-button-weak-default);
+  color: var(--color-text-button-default);
+}
+.cosma-flow-button-secondary:hover { background: var(--color-background-button-weak-hovered); }
+.cosma-flow-button-secondary:active { background: var(--color-background-button-weak-pressed); }
+
+.cosma-flow-button:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* ============================================================================
+   Mieter-Netzwerk flow content components
+   Source rules: cosma-mobile-mieter-netzwerk-flow-rules.md
+   ============================================================================ */
+
+/* Inline-pill scroller (e.g. room count chips) */
+.cosma-flow-chip-row {
+  display: flex;
+  gap: var(--spacing-200);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-100);
+}
+.cosma-flow-chip {
+  flex: 0 0 auto;
+  min-width: 48px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-100);
+  padding: var(--spacing-200) var(--spacing-400);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--border-radius-rounded);
+  background: var(--color-background-default);
+  color: var(--color-text-default);
+  font-family: var(--font-family-body);
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.cosma-flow-chip:hover { border-color: var(--color-border-strong); }
+.cosma-flow-chip.is-selected {
+  border-color: var(--color-border-strong);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+}
+
+/* Feedback / info callouts — weak surface */
+.cosma-flow-feedback,
+.cosma-flow-notification {
+  display: flex;
+  gap: var(--spacing-300);
+  padding: var(--spacing-400);
+  border-radius: var(--border-radius-200);
+  background: var(--color-background-subtle);
+  color: var(--color-text-default);
+  font-size: var(--size-body-small);
+  line-height: var(--line-height-body-small);
+}
+.cosma-flow-notification .is24-icon,
+.cosma-flow-feedback .is24-icon {
+  flex: 0 0 auto;
+  font-size: 20px;
+  color: var(--color-text-default);
+}
+
+/* Form fields */
+.cosma-flow-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-100);
+}
+.cosma-flow-field-label {
+  color: var(--color-text-default);
+  font-size: var(--size-body-small);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body-small);
+}
+.cosma-flow-input,
+.cosma-flow-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--border-radius-100);
+  background: var(--color-background-default);
+  color: var(--color-text-default);
+  font-family: var(--font-family-body);
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+}
+.cosma-flow-input {
+  height: 48px;
+  padding: 0 var(--spacing-300);
+}
+.cosma-flow-input.has-icon { padding-left: 44px; }
+.cosma-flow-input-wrap { position: relative; }
+.cosma-flow-input-wrap .is24-icon {
+  position: absolute;
+  left: var(--spacing-300);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.cosma-flow-textarea {
+  min-height: 112px;
+  padding: var(--spacing-300);
+  resize: vertical;
+}
+.cosma-flow-input:focus-visible,
+.cosma-flow-textarea:focus-visible {
+  outline: 2px solid var(--color-border-focused);
+  outline-offset: 1px;
+}
+.cosma-flow-caption {
+  color: var(--color-text-muted);
+  font-size: var(--size-body-small);
+  line-height: 16px;
+}
+
+/* Slider — COSMA component (matches Components · Slider) */
+.cosma-flow-slider { display: flex; flex-direction: column; gap: var(--spacing-200); }
+.cosma-flow-slider-value {
+  font-size: var(--size-body-large);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body-large);
+}
+.cosma-slider {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  touch-action: none;
+}
+.cosma-slider__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gray-300);
+  border-radius: 4px;
+  transform: translateY(-50%);
+}
+.cosma-slider__range {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 2;
+  height: 4px;
+  background: var(--color-border-button-strong-default, #333333);
+  border-radius: 4px;
+  transform: translateY(-50%);
+}
+.cosma-slider__thumb {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 100px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.17);
+  cursor: grab;
+  transform: translate(-50%, -50%);
+  transition: box-shadow 160ms ease;
+  touch-action: none;
+}
+.cosma-slider__thumb:hover,
+.cosma-slider__thumb--hover { box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.17); }
+.cosma-slider__thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.17), 0 0 0 7px var(--color-border-focused, #1677ff);
+}
+.cosma-slider__thumb--active {
+  cursor: grabbing;
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.17);
+}
+.cosma-slider__tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 5;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gray-1000);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+.cosma-slider__thumb--active .cosma-slider__tooltip { opacity: 1; }
+.cosma-slider__tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--gray-1000);
+}
+
+/* How-it-works numbered list */
+.cosma-flow-howto { display: flex; flex-direction: column; gap: var(--spacing-200); }
+.cosma-flow-howto-title {
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body-medium);
+}
+.cosma-flow-howto-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-100);
+}
+.cosma-flow-howto-list::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 38px;
+  bottom: 38px;
+  width: 4px;
+  background: var(--color-background-subtle);
+}
+.cosma-flow-howto-item {
+  position: relative;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-300);
+}
+.cosma-flow-howto-number {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-rounded);
+  background: var(--color-background-subtle);
+  color: var(--color-text-muted);
+  font-size: var(--size-body-large);
+  font-weight: var(--font-weight-bold);
+  z-index: 1;
+}
+.cosma-flow-howto-copy {
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+  color: var(--color-text-default);
+}
+
+/* Social proof row */
+.cosma-flow-social-proof {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  color: var(--color-text-muted);
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+}
+.cosma-flow-social-proof .is24-icon { font-size: 20px; }
+
+/* Success state */
+.cosma-flow-success {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-600);
+  text-align: center;
+  padding: var(--spacing-600) 0;
+}
+.cosma-flow-success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-teal);
+  color: var(--color-text-default);
+  font-size: 36px;
+}
+.cosma-flow-success-preview {
+  width: 100%;
+  border: 1px solid var(--color-border-weak);
+  border-radius: var(--border-radius-200);
+  overflow: hidden;
+  text-align: left;
+}
+.cosma-flow-success-thumb {
+  height: 120px;
+  background-image: repeating-linear-gradient(135deg, var(--color-background-subtle) 0 10px, var(--color-background-muted) 10px 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.cosma-flow-success-preview-body { padding: var(--spacing-300) var(--spacing-400); }

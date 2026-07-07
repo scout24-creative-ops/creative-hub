@@ -1,0 +1,59 @@
+/* ============================================================================
+   ImmoScout24 design tokens — derived from uploads/immoscout24.json
+   (declared "active source of truth"). COSMA's colors_and_type.css already
+   matches most values (sand = --gray-200 #FBF8F6, charcoal = --gray-1000 #333,
+   --brand-* = the LP palette). The one divergence we correct here: the brand
+   teal. COSMA's --teal-200 is the brighter "Cosma" teal #00FFD0; the token
+   source declares the brand teal as #3DF5DC, so we bind the hub to that.
+   ============================================================================ */
+
+:root {
+  /* — shared neutrals — */
+  --is24-charcoal: #333333;
+  --is24-white:    #ffffff;
+  --is24-sand:     #fbf8f6;
+  --is24-grey-1:   #f5f5f5;
+  --is24-grey-2:   #eaeaea;
+  --is24-grey-3:   #e0e0e0;
+  --is24-grey-4:   #c4c4c4;
+  --is24-grey-5:   #adadad;
+  --is24-grey-6:   #676767;
+
+  /* — brand palette (LP) — */
+  --is24-teal:        #3df5dc;
+  --is24-teal-hover:  #55e6cb;
+  --is24-orange:      #ff9626;
+  --is24-yellow:      #eff933;
+  --is24-blue:        #24e3ff;
+  --is24-purple:      #d5aaff;
+
+  /* — semantic — */
+  --is24-link:        #2267e8;
+  --is24-text-muted:  #6a6a69;
+  --is24-border-soft: #e0e0e0;
+  --is24-border-weak: #bdbbb9;
+
+  /* — radius (px) — */
+  --is24-radius-2: 2px;  --is24-radius-4: 4px;  --is24-radius-8: 8px;
+  --is24-radius-12: 12px; --is24-radius-16: 16px; --is24-radius-24: 24px;
+  --is24-radius-40: 40px; --is24-radius-pill: 999px;
+
+  /* — spacing (px) — */
+  --is24-space-100: 4px;  --is24-space-200: 8px;  --is24-space-300: 12px;
+  --is24-space-400: 16px; --is24-space-600: 24px; --is24-space-800: 32px;
+  --is24-space-1000: 40px; --is24-space-1500: 60px;
+}
+
+/* Bind the hub's teal usage to the brand teal (#3DF5DC) from the token source.
+   The hub references --teal-100/200/500; remapping them here, scoped to
+   .hub-app, recolours buttons, chips, category tints, badges and accents in
+   one place without touching the COSMA token file. */
+.hub-app {
+  --teal-100: color-mix(in srgb, var(--is24-teal) 26%, #ffffff);
+  --teal-200: var(--is24-teal);
+  --teal-500: color-mix(in srgb, var(--is24-teal) 72%, var(--is24-charcoal));
+
+  --hub-accent:       var(--is24-teal);
+  --hub-accent-hover: var(--is24-teal-hover);
+  --hub-accent-ink:   var(--is24-charcoal);
+}

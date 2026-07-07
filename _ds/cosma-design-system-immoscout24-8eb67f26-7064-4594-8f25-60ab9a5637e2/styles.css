@@ -1,0 +1,32 @@
+/* ============================================================================
+   COSMA Design System (ImmoScout24) — single entry point
+   Link this ONE file and you get the full system: tokens, typography,
+   the Make It Better web font, the IS24 icon font, and the reusable
+   layout/component templates.
+
+       <link rel="stylesheet" href="styles.css" />
+
+   Load order matters and is fixed below:
+     1. Foundation — design tokens, color themes, typography + @font-face.
+     2. Icon font — canonical IS24Icons @font-face, then the supplementary
+        icon-color fix (must come after the @font-face).
+     3. Templates / components — desktop + mobile shells built on the tokens.
+
+   NOT imported here (intentionally): the demo UI-kit CSS under
+   ui_kits/immoscout24/ and the internal Design-System-tab preview chrome in
+   preview/ — those are app/demo-scoped, not part of the public surface.
+   ============================================================================ */
+
+/* 1. Foundation: tokens, themes, typography, web fonts */
+@import "colors_and_type.css";
+
+/* 2. Icon font: canonical @font-face first, supplementary rules after */
+@import "fonts/is24-icons.css";
+@import "fonts/is24-icons-font.css";
+
+/* 3. Reusable templates & components */
+@import "desktop-page-template.css";
+@import "heyimmo-modal.css";
+@import "mobile-bottom-nav.css";
+@import "mobile-modal-flow.css";
+@import "mobile-web-template.css";

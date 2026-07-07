@@ -1,0 +1,348 @@
+/* ============================================================================
+   COSMA — Desktop Page Template (Header + Footer shell)
+   Source rules: cosma-desktop-layout-header-footer-rules.md
+   Figma: Desk 1440x1024 (Light Mode - DE) · node 1:8645
+
+   Every desktop page MUST use this shell:
+     header → main (content wrapper) → footer.
+
+   Pair this file with colors_and_type.css (tokens + Make It Better fonts) and
+   fonts/is24-icons.css (icon font). Layout-only tokens the rules introduce that
+   aren't in colors_and_type.css are declared below.
+   ============================================================================ */
+
+:root {
+  /* Layout tokens specific to the desktop shell */
+  --cosma-content-min: 942px;
+  --cosma-content-max: 1170px;
+
+  /* Surfaces referenced by the rules but not in colors_and_type.css */
+  --color-elevation-surface-raised: #fbf8f6;
+}
+
+/* ---------- Page frame ---------- */
+.cosma-desktop-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background-default);
+  color: var(--color-text-default);
+  font-family: var(--font-family-body);
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+}
+
+/* Optional browser chrome — include ONLY when presenting a browser mockup. */
+.cosma-browserbar {
+  height: 73px;
+  width: 100%;
+  flex: 0 0 auto;
+  background: linear-gradient(
+    to bottom,
+    #e0e0e0 0 36px,
+    #ffffff 36px 72px,
+    var(--color-border-default) 72px 73px
+  );
+}
+
+/* ---------- Header ---------- */
+.cosma-desktop-header {
+  width: 100%;
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-background-default);
+  border-bottom: 1px solid var(--color-border-default);
+  padding: var(--spacing-200) 0;
+}
+
+.cosma-header-inner {
+  width: 100%;
+  max-width: var(--cosma-content-max);
+  min-width: var(--cosma-content-min);
+  margin: 0 auto;
+  padding: 0 var(--spacing-600);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.cosma-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-1000);
+}
+
+.cosma-burger-menu {
+  width: 40px;
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-100);
+  padding: var(--spacing-200);
+  border: none;
+  border-radius: var(--border-radius-200);
+  color: var(--color-text-default);
+  font-family: var(--font-family-body);
+  font-size: var(--size-body-small);
+  line-height: var(--line-height-body-small);
+  background: var(--color-background-default);
+  cursor: pointer;
+  transition: background var(--animation-duration-fast) var(--animation-easing-standard);
+}
+.cosma-burger-menu:hover { background: var(--color-background-subtle); }
+.cosma-burger-menu .is24-icon { font-size: 24px; }
+
+.cosma-logo {
+  width: 137px;
+  height: 28px;
+  margin-top: 20px;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.cosma-header-nav {
+  display: flex;
+  gap: var(--spacing-400);
+  padding-top: var(--spacing-600);
+}
+
+.cosma-header-nav a {
+  color: var(--color-text-default);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cosma-header-nav a:hover { text-decoration: underline; }
+
+.cosma-header-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-400);
+  padding: 20px var(--spacing-400) 0;
+}
+
+.cosma-header-button {
+  min-width: 140px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-rounded);
+  padding: 5px 12px;
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body-medium);
+  white-space: nowrap;
+  text-decoration: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background var(--animation-duration-fast) var(--animation-easing-standard),
+              border-color var(--animation-duration-fast) var(--animation-easing-standard);
+}
+
+.cosma-header-button-primary {
+  background: var(--color-background-button-default-default);
+  color: var(--color-text-button-inversive);
+  border: 1px solid var(--color-background-button-default-default);
+}
+.cosma-header-button-primary:hover { background: var(--color-background-button-default-hovered); border-color: var(--color-background-button-default-hovered); }
+
+.cosma-header-button-secondary {
+  background: var(--color-background-default);
+  color: var(--color-text-button-default);
+  border: 1px solid var(--gray-850);
+}
+.cosma-header-button-secondary:hover { border-color: var(--color-border-strong); }
+
+.cosma-account-area {
+  width: 192px;
+  height: 70px;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-200);
+  text-decoration: none;
+}
+
+.cosma-account-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  margin-top: var(--spacing-400);
+  border-radius: 50%;
+  background: var(--color-background-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  overflow: hidden;
+}
+.cosma-account-avatar .is24-icon { font-size: 22px; }
+
+.cosma-account-copy {
+  max-width: 144px;
+  padding-top: var(--spacing-200);
+  color: var(--color-text-default);
+  display: flex;
+  flex-direction: column;
+}
+
+.cosma-account-meta {
+  font-size: 12px;
+  line-height: 17px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
+}
+
+.cosma-account-name {
+  max-width: 144px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+  font-weight: var(--font-weight-bold);
+}
+
+/* ---------- Main / content wrapper ---------- */
+.cosma-desktop-main {
+  flex: 1 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cosma-content-wrapper {
+  width: 100%;
+  max-width: var(--cosma-content-max);
+  min-width: var(--cosma-content-min);
+  padding: var(--spacing-1000) var(--spacing-600);
+  box-sizing: border-box;
+}
+
+.cosma-content-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1000);
+}
+
+/* PageHead pattern */
+.cosma-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-600);
+  flex-wrap: wrap;
+}
+.cosma-page-head-titles { flex: 1; min-width: 0; }
+.cosma-page-head-title {
+  margin: 0;
+  color: var(--color-text-default);
+  font-family: var(--font-family-heading);
+  font-size: var(--size-heading-large);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading-large);
+}
+.cosma-page-head-sub {
+  margin: var(--spacing-100) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body-medium);
+  max-width: 560px;
+}
+
+/* Section */
+.cosma-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+}
+
+.cosma-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-100);
+}
+
+.cosma-section-title {
+  margin: 0;
+  color: var(--color-text-default);
+  font-family: var(--font-family-heading);
+  font-size: var(--size-heading-medium);
+  font-weight: var(--font-weight-bold);
+  line-height: 36px;
+  letter-spacing: 0;
+}
+
+.cosma-section-subline {
+  margin: 0;
+  color: var(--color-text-default);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body-medium);
+  letter-spacing: 0;
+}
+
+/* ---------- Footer ---------- */
+.cosma-desktop-footer {
+  width: 100%;
+  flex: 0 0 auto;
+  background: var(--color-elevation-surface-raised);
+}
+
+.cosma-footer-inner {
+  width: 100%;
+  padding: var(--spacing-800) var(--spacing-600) var(--spacing-600);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-200);
+  overflow: hidden;
+}
+
+.cosma-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-200);
+  flex-wrap: wrap;
+}
+
+.cosma-footer-link {
+  color: var(--color-text-default);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body-small);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cosma-footer-link:hover { text-decoration: underline; }
+
+.cosma-footer-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--color-border-default);
+  flex: 0 0 auto;
+}
+
+.cosma-footer-copyright {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-200);
+  padding-top: var(--spacing-200);
+  color: var(--color-text-default);
+  font-size: var(--size-body-medium);
+  font-weight: var(--font-weight-regular);
+  line-height: 20px;
+  white-space: nowrap;
+}

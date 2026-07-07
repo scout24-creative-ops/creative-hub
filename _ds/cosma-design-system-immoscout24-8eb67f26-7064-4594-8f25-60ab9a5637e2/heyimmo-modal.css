@@ -1,0 +1,505 @@
+/* ============================================================================
+   COSMA — HeyImmo AI Assistant (mobile modal overlay)
+   Source rules: uploads/heyimmo-ai-assistant-mobile-modal-rules.md
+   Figma palm frame: 393×852 · modal visible height 788px
+
+   HeyImmo opens from the mobile navbar and overlays the current page as a
+   palm bottom-sheet. Header aura → legal → scrollable chat → sticky composer.
+
+   Pair with colors_and_type.css (tokens + Make It Better) and
+   fonts/is24-icons.css (icon font). Drawn against the palm-frame as positioning
+   context (position: absolute; inset: 0), exactly like Mobile Modal Flow.
+   ============================================================================ */
+
+/* ---------- Overlay + shell ---------- */
+.heyimmo-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.heyimmo-modal {
+  position: relative;
+  width: 100%;
+  height: 788px;
+  max-height: 100%;
+  background: var(--color-elevation-surface-default, #ffffff);
+  border-radius: var(--border-radius-200, 16px) var(--border-radius-200, 16px) 0 0;
+  overflow: hidden;
+  display: grid;
+  /* header · scrollable content · legal · composer */
+  grid-template-rows: 72px minmax(0, 1fr) auto auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .heyimmo-overlay { animation: heyimmo-fade 180ms ease-out; }
+  .heyimmo-modal   { animation: heyimmo-enter 220ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .heyimmo-overlay.is-closing { animation: heyimmo-fade 200ms ease-in reverse; }
+  .heyimmo-overlay.is-closing .heyimmo-modal { animation: heyimmo-exit 220ms ease-in forwards; }
+  @keyframes heyimmo-enter { from { transform: translateY(36px); opacity: 0.7; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes heyimmo-exit  { from { transform: translateY(0); } to { transform: translateY(100%); } }
+  @keyframes heyimmo-fade  { from { opacity: 0; } to { opacity: 1; } }
+}
+
+/* ---------- Header (aura + bar) ---------- */
+.heyimmo-header {
+  position: relative;
+  height: 72px;
+  border-radius: var(--border-radius-200, 16px) var(--border-radius-200, 16px) 0 0;
+  background: var(--color-elevation-surface-default, #ffffff);
+}
+
+/* Crisp gradient edge tracing the modal's rounded top corners. The modal's
+   overflow:hidden + 16px radius rounds the strip's top corners for us. */
+.heyimmo-aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  filter: blur(1px);
+  background: linear-gradient(
+    90deg,
+    rgb(0, 223, 255) 0%,
+    rgb(0, 255, 208) 28.675%,
+    rgb(245, 242, 0) 63.723%,
+    rgb(255, 144, 21) 100%
+  );
+}
+
+/* Inside the modal the sparkle mark is plain charcoal — the aura carries brand colour. */
+.heyimmo-modal .heyimmo-ai-glow { display: none; }
+
+.heyimmo-header-bar {
+  position: absolute;
+  inset: 8px 0 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200, 8px);
+  padding: 8px var(--spacing-400, 16px);
+  background: var(--color-elevation-surface-default, #ffffff);
+  border-radius: var(--border-radius-200, 16px) var(--border-radius-200, 16px) 0 0;
+}
+
+/* Official HeyImmo sparkle mark (white disc + 3 charcoal sparkles + brand glow) */
+.heyimmo-ai-icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+}
+.heyimmo-ai-icon .heyimmo-ai-glow {
+  position: absolute; top: 50%; left: 50%;
+  width: 30px; height: 30px; border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(from -45deg at 50% 50%,
+    #00dfff 0%, #00ffd0 28.7%, #f5f200 63.7%, #ff9015 100%);
+  filter: blur(4px) saturate(1.15);
+}
+.heyimmo-ai-icon svg { position: relative; display: block; width: 24px; height: 24px; }
+
+.heyimmo-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-large, 16px);
+  font-weight: var(--font-weight-regular, 400);
+  line-height: 26px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.heyimmo-title strong { font-weight: var(--font-weight-bold, 700); }
+
+.heyimmo-close {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--border-radius-rounded, 999px);
+  background: transparent;
+  color: var(--color-text-default, #333333);
+  cursor: pointer;
+}
+.heyimmo-close:hover { background: var(--color-background-button-weak-default, #eaeaea); }
+.heyimmo-close .is24-icon { font-size: 28px; }
+
+/* ---------- Legal disclaimer ---------- */
+.heyimmo-legal {
+  width: calc(100% - 32px);
+  max-width: 361px;
+  margin: 0 auto;
+  padding: var(--spacing-300, 12px) 0 var(--spacing-200, 8px);
+  color: var(--color-text-muted, #6a6a69);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-small, 12px);
+  font-weight: var(--font-weight-regular, 400);
+  line-height: 18px;
+  letter-spacing: 0;
+}
+.heyimmo-legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+/* ---------- Scrollable content ---------- */
+.heyimmo-content {
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--spacing-800, 32px) var(--spacing-400, 16px) var(--spacing-500, 24px);
+  background: var(--color-elevation-surface-default, #ffffff);
+  scroll-padding-bottom: 24px;
+}
+.heyimmo-content-inner {
+  width: 100%;
+  max-width: 361px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Start state ===== */
+.heyimmo-start {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--spacing-800, 32px);
+  padding-top: var(--spacing-400, 16px);
+}
+.heyimmo-start-title {
+  margin: 0;
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-heading, "Make It Better", Arial, sans-serif);
+  font-size: 34px;
+  font-weight: var(--font-weight-bold, 700);
+  line-height: 42px;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+.heyimmo-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-300, 12px);
+}
+.heyimmo-suggestion {
+  min-height: 64px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-300, 12px);
+  padding: var(--spacing-300, 12px) var(--spacing-500, 24px);
+  border: 0;
+  border-radius: var(--border-radius-1000, 40px);
+  background: var(--gray-300, #e8e5e3);
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: 15px;
+  font-weight: var(--font-weight-regular, 400);
+  line-height: 22px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+/* First suggestion is the warm "featured" off-white tone; the rest are a step darker grey. */
+.heyimmo-suggestion:first-child {
+  background: var(--gray-200, #fbf8f6);
+}
+.heyimmo-suggestion .heyimmo-ai-icon { width: 22px; height: 22px; flex: 0 0 22px; align-self: center; }
+.heyimmo-suggestion .heyimmo-ai-icon svg { width: 22px; height: 22px; }
+.heyimmo-suggestion:hover,
+.heyimmo-suggestion:focus-visible {
+  background: var(--gray-400, #dedcda);
+  outline: none;
+}
+
+/* ===== Chat message list ===== */
+.heyimmo-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-500, 24px);
+  padding-top: var(--spacing-200, 8px);
+}
+.heyimmo-message-user {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: var(--spacing-200, 8px) var(--spacing-500, 24px);
+  border-radius: var(--border-radius-1000, 40px);
+  background: var(--color-background-button-weak-default, #eaeaea);
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-medium, 14px);
+  line-height: 22px;
+}
+.heyimmo-message-assistant {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-400, 16px);
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-medium, 14px);
+  font-weight: var(--font-weight-regular, 400);
+  line-height: 22px;
+}
+.heyimmo-message-assistant strong { font-weight: var(--font-weight-bold, 700); }
+.heyimmo-message-assistant p { margin: 0; }
+.heyimmo-message-assistant p + p { margin-top: var(--spacing-300, 12px); }
+
+/* Assistant avatar — sparkle mark on a bordered disc */
+.heyimmo-avatar {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  margin-top: 1px;
+  border: 1px solid var(--color-border-weak, #d1cecd);
+  border-radius: var(--border-radius-rounded, 999px);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.heyimmo-avatar svg { width: 20px; height: 20px; display: block; }
+
+/* Loading row */
+.heyimmo-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-400, 16px);
+  color: var(--color-text-muted, #6a6a69);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-medium, 14px);
+  line-height: 22px;
+}
+.heyimmo-loading .heyimmo-avatar { animation: heyimmo-pulse 1.4s ease-in-out infinite; }
+.heyimmo-loading-text { position: relative; }
+.heyimmo-loading-text::after {
+  content: "";
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  animation: heyimmo-dots 1.4s steps(4, end) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .heyimmo-loading .heyimmo-avatar { animation: none; }
+  .heyimmo-loading-text::after { content: "…"; animation: none; }
+}
+@keyframes heyimmo-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes heyimmo-dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } 100% { content: ""; } }
+
+/* ---------- Composer footer ---------- */
+.heyimmo-composer {
+  justify-self: stretch;
+  background: var(--color-elevation-surface-default, #ffffff);
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+.heyimmo-composer-panel {
+  width: 100%;
+  border-top: 1px solid var(--color-border-default, #dedcda);
+  border-left: 1px solid var(--color-border-default, #dedcda);
+  border-right: 1px solid var(--color-border-default, #dedcda);
+  border-bottom: 0;
+  border-radius: var(--border-radius-600, 24px) var(--border-radius-600, 24px) 0 0;
+  background: var(--color-elevation-surface-default, #ffffff);
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.10);
+}
+
+/* Attachment preview row (sits above the text input) */
+.heyimmo-attachment-list {
+  display: none;
+  gap: var(--spacing-200, 8px);
+  padding: var(--spacing-300, 12px) var(--spacing-400, 16px) 0;
+}
+.heyimmo-composer[data-has-attachment="true"] .heyimmo-attachment-list { display: flex; }
+.heyimmo-attachment {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--color-border-weak, #d1cecd);
+  border-radius: var(--border-radius-100, 8px);
+  overflow: hidden;
+  background-image: repeating-linear-gradient(135deg,
+    var(--color-background-subtle, #f1efed) 0 8px,
+    var(--color-background-muted, #e7e4e1) 8px 16px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+.heyimmo-attachment-name {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 3px 5px;
+  font-family: var(--font-family-monospace, monospace);
+  font-size: 9px;
+  line-height: 1.2;
+  color: var(--color-text-default, #333333);
+  background: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.heyimmo-attachment[data-uploading="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.60);
+}
+.heyimmo-attachment-spinner {
+  position: absolute;
+  z-index: 2;
+  top: 50%; left: 50%;
+  width: 22px; height: 22px;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  display: none;
+}
+.heyimmo-attachment[data-uploading="true"] .heyimmo-attachment-spinner { display: block; animation: heyimmo-spin 0.8s linear infinite; }
+@keyframes heyimmo-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.heyimmo-attachment-remove {
+  position: absolute;
+  z-index: 3;
+  top: 2px; right: 2px;
+  width: 18px; height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--border-radius-rounded, 999px);
+  background: var(--color-elevation-surface-default, #ffffff);
+  color: var(--color-text-default, #333333);
+  cursor: pointer;
+  box-shadow: var(--elevation-10, 0 1px 3px rgba(0,0,0,0.18));
+}
+.heyimmo-attachment-remove .is24-icon { font-size: 12px; }
+.heyimmo-attachment[data-uploading="true"] .heyimmo-attachment-remove { display: none; }
+
+/* Text input */
+.heyimmo-input {
+  display: block;
+  width: 100%;
+  min-height: 54px;
+  max-height: 132px;
+  padding: var(--spacing-400, 16px);
+  border: 0;
+  resize: none;
+  background: transparent;
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-medium, 14px);
+  line-height: 22px;
+  box-sizing: border-box;
+}
+.heyimmo-input:focus { outline: none; }
+.heyimmo-input::placeholder { color: var(--color-text-muted, #6a6a69); opacity: 1; }
+
+/* Recording banner replaces the text input while recording */
+.heyimmo-recording {
+  display: none;
+  align-items: center;
+  gap: var(--spacing-300, 12px);
+  min-height: 54px;
+  padding: var(--spacing-400, 16px);
+  color: var(--color-text-default, #333333);
+  font-family: var(--font-family-body, "Make It Better", Arial, sans-serif);
+  font-size: var(--size-body-medium, 14px);
+  line-height: 22px;
+}
+.heyimmo-composer[data-recording="true"] .heyimmo-recording { display: flex; }
+.heyimmo-composer[data-recording="true"] .heyimmo-input { display: none; }
+.heyimmo-rec-dot {
+  width: 10px; height: 10px; flex: 0 0 10px;
+  border-radius: 50%;
+  background: var(--system-red-500, #e3001b);
+  animation: heyimmo-pulse 1.1s ease-in-out infinite;
+}
+.heyimmo-rec-wave {
+  flex: 1 1 auto;
+  height: 18px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--color-border-strong, #333) 0 2px,
+      transparent 2px 6px);
+  -webkit-mask-image: linear-gradient(90deg, #000 60%, transparent);
+          mask-image: linear-gradient(90deg, #000 60%, transparent);
+  opacity: 0.5;
+}
+
+/* Action row */
+.heyimmo-composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-200, 8px) var(--spacing-100, 4px);
+}
+.heyimmo-action-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200, 8px);
+}
+.heyimmo-icon-action {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--border-radius-rounded, 999px);
+  background: transparent;
+  color: var(--color-text-default, #333333);
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+.heyimmo-icon-action:hover { background: var(--color-background-button-weak-default, #eaeaea); }
+.heyimmo-icon-action:focus-visible { outline: 2px solid var(--color-border-strong, #333); outline-offset: 2px; }
+.heyimmo-icon-action .is24-icon { font-size: 24px; }
+.heyimmo-icon-action[hidden] { display: none; }
+
+/* Labelled placeholder for glyphs missing from the IS24 font (mic / stop) */
+.heyimmo-icon-action.is-placeholder {
+  border: 1px dashed var(--color-border-default, #dedcda);
+  border-radius: var(--border-radius-rounded, 999px);
+}
+.heyimmo-icon-action.is-placeholder .heyimmo-ph-label {
+  font-family: var(--font-family-monospace, monospace);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #6a6a69);
+}
+.heyimmo-stop-recording.is-placeholder {
+  border-color: var(--system-red-500, #e3001b);
+}
+.heyimmo-stop-recording.is-placeholder .heyimmo-ph-label { color: var(--system-red-500, #e3001b); }
+
+/* Send — filled charcoal IconButtonRounded when active */
+.heyimmo-send {
+  background: var(--color-background-button-weak-default, #eaeaea);
+  color: var(--color-text-muted, #6a6a69);
+}
+.heyimmo-send .is24-icon { font-size: 18px; }
+.heyimmo-send[data-active="true"] {
+  background: var(--color-background-button-default-default, #333333);
+  color: var(--color-text-button-inversive, #ffffff);
+}
+.heyimmo-send[data-active="true"]:hover { background: var(--color-background-button-default-hovered, #4a4a4a); }
+.heyimmo-send:disabled { cursor: default; }

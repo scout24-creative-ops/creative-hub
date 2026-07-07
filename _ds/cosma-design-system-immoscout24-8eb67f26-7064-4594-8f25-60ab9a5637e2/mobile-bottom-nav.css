@@ -1,0 +1,156 @@
+/* ============================================================================
+   COSMA — Mobile Bottom Navbar
+   Source rules: uploads/mobile-bottom-navbar-rules.md
+   Figma: Palm 393 · node 2:2763
+
+   Fixed palm navigation: 62px nav row + 34px iPhone home bar = 96px shell.
+   Five equal-width items: Suchen, Meine Immos, Inserieren, Nachrichten, HeyImmo.
+   HeyImmo is a <button> that opens the assistant overlay and keeps its AI glow.
+
+   In palm-frame / stage mockups the shell is position:absolute inside the
+   relatively-positioned frame; in production swap to position:fixed with
+   env(safe-area-inset-bottom). Reserve 96px of bottom padding on page content.
+   Pair with colors_and_type.css (tokens) and fonts/is24-icons.css (glyphs).
+   ============================================================================ */
+
+.cosma-mobile-bottom-shell {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background-default, #ffffff);
+}
+
+.cosma-mobile-bottom-nav {
+  height: 62px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-inline: var(--spacing-300, 12px);
+  border-top: 1px solid var(--color-border-weak, #d1cecd);
+  background: var(--color-background-default, #ffffff);
+}
+
+.cosma-bottom-nav-item {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 62px;
+  padding: 0 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-weak, #6a6a69);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: var(--font-family-body);
+  cursor: pointer;
+}
+
+.cosma-bottom-nav-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: -8px;
+  padding: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.cosma-bottom-nav-label {
+  max-width: 100%;
+  color: currentColor;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.7px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cosma-bottom-nav-item.is-active { color: var(--color-text-default, #333333); }
+.cosma-bottom-nav-item.is-active .cosma-bottom-nav-label { font-weight: 700; }
+
+/* Nav labels never underline (override the global a:hover underline) */
+.cosma-bottom-nav-item,
+.cosma-bottom-nav-item:hover,
+.cosma-bottom-nav-item:hover .cosma-bottom-nav-label { text-decoration: none; }
+
+.cosma-bottom-nav-item:focus-visible {
+  outline: 2px solid var(--color-border-strong, #333333);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+.cosma-bottom-nav-item:active .cosma-bottom-nav-icon {
+  background: var(--gray-500, #d7d4d2);
+  border-radius: 999px;
+}
+
+/* Unread badge — attached to the icon area */
+.cosma-bottom-nav-badge {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--system-red-500, #f5222d);
+  border: 1.5px solid var(--color-background-default, #fff);
+}
+
+/* iPhone home bar */
+.cosma-mobile-homebar {
+  height: 34px;
+  position: relative;
+  background: var(--color-background-default, #fff);
+}
+.cosma-mobile-home-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 144px;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 100px;
+  background: #000000;
+}
+
+/* HeyImmo assistant item — AI sparkle mark with brand glow */
+.cosma-heyimmo-nav-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.cosma-heyimmo-nav-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 30% 30%, #eff933 0%, #00ffd0 40%, #00dfff 70%, transparent 100%);
+  filter: blur(10px);
+  opacity: 0.85;
+}
+.cosma-heyimmo-nav-icon svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 24px;
+  height: 24px;
+}

@@ -1,0 +1,19 @@
+/* The @font-face for 'IS24Icons' lives in fonts/is24-icons.css (the canonical
+   declaration, pointing at ./is24-icons.woff). This file only carries the
+   supplementary icon-color fix + Storybook gallery sizing, so load it AFTER
+   is24-icons.css. */
+
+/* This is a manual fix for color instagram icons - without this the instagram icon is black and white */
+.is24-icon-instagram {
+  color: transparent;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  background: -webkit-radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+/* This is for increasing the font-size in the icons gallery in storybook */
+.storybook-icon-gallery [class^="is24-icon-"],
+.storybook-icon-gallery [class*=" is24-icon-"] {
+  font-size: 24px;
+}

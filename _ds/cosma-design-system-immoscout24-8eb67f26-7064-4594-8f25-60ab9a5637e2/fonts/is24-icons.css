@@ -1,0 +1,240 @@
+/* IS24 Icon Font — exported from the COSMA frontend-core repo (IcoMoon-generated).
+   Use a span with `class="is24-icon is24-icon-<name>"`, or just the `is24-icon-<name>` class. */
+
+@font-face {
+  font-family: 'IS24Icons';
+  src: url('./is24-icons.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.is24-icon,
+[class^="is24-icon-"],
+[class*=" is24-icon-"] {
+  font-family: 'IS24Icons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+}
+
+/* A small, hand-picked subset of the ~200-icon set. The full glyph table lives
+   in fonts/is24-icons-codepoints.json — point Storybook or your own CSS at it
+   for the rest. */
+
+.is24-icon-search:before          { content: "\e955"; }
+.is24-icon-search-glyph:before    { content: "\e954"; }
+.is24-icon-heart-favorite:before  { content: "\e928"; }
+.is24-icon-heart-Favorite-glyph:before { content: "\e927"; }
+.is24-icon-save-search:before     { content: "\e953"; }
+.is24-icon-save-search-heart:before { content: "\ea0a"; }
+.is24-icon-menu-burger-menu:before{ content: "\e92f"; }
+.is24-icon-profile:before         { content: "\e946"; }
+.is24-icon-message:before         { content: "\e937"; }
+.is24-icon-message-email:before   { content: "\e931"; }
+.is24-icon-message-unread:before  { content: "\e935"; }
+.is24-icon-telephone:before       { content: "\e960"; }
+.is24-icon-telephone-glyph:before { content: "\e95d"; }
+.is24-icon-chat:before            { content: "\e9e0"; }
+.is24-icon-share:before           { content: "\e959"; }
+.is24-icon-share-glyph:before     { content: "\e958"; }
+.is24-icon-edit:before            { content: "\e923"; }
+.is24-icon-edit-glyph:before      { content: "\e922"; }
+.is24-icon-delete:before          { content: "\e91e"; }
+.is24-icon-trash:before           { content: "\ea25"; }
+.is24-icon-add:before             { content: "\e903"; }
+.is24-icon-add-glyph:before       { content: "\e902"; }
+.is24-icon-cancel:before          { content: "\e911"; }
+.is24-icon-cancel-glyph:before    { content: "\e910"; }
+.is24-icon-accept:before          { content: "\e901"; }
+.is24-icon-accept-glyph:before    { content: "\e900"; }
+.is24-icon-chevron-up:before      { content: "\e917"; }
+.is24-icon-chevron-down:before    { content: "\e914"; }
+.is24-icon-chevron-left:before    { content: "\e915"; }
+.is24-icon-chevron-right:before   { content: "\e916"; }
+.is24-icon-arrow-up:before        { content: "\e90a"; }
+.is24-icon-arrow-down:before      { content: "\e907"; }
+.is24-icon-arrow-left:before      { content: "\e908"; }
+.is24-icon-arrow-right:before     { content: "\e909"; }
+.is24-icon-filter-glyph:before    { content: "\ea0b"; }
+.is24-icon-info:before            { content: "\e92b"; }
+.is24-icon-info-glyph:before      { content: "\e92a"; }
+.is24-icon-info1:before           { content: "\ea14"; }
+.is24-icon-warning:before         { content: "\e967"; }
+.is24-icon-warning-glyph:before   { content: "\e966"; }
+.is24-icon-error:before           { content: "\e925"; }
+.is24-icon-error-glyph:before     { content: "\e924"; }
+.is24-icon-caution:before         { content: "\e913"; }
+.is24-icon-caution-glyph:before   { content: "\e912"; }
+.is24-icon-question-mark:before   { content: "\e948"; }
+.is24-icon-question-mark-glyph:before { content: "\e947"; }
+.is24-icon-positive-check:before  { content: "\e943"; }
+.is24-icon-settings:before        { content: "\e957"; }
+.is24-icon-settings-glyph:before  { content: "\e956"; }
+.is24-icon-dashboard:before       { content: "\e91b"; }
+.is24-icon-dashboard-glyph:before { content: "\e91a"; }
+.is24-icon-notification-alert:before { content: "\e93a"; }
+.is24-icon-notification-alert-glyph:before { content: "\e939"; }
+
+/* Real estate domain icons */
+.is24-icon-home:before            { content: "\e9ec"; }
+.is24-icon-house:before           { content: "\e9ed"; }
+.is24-icon-property:before        { content: "\e9bf"; }
+.is24-icon-apartment-house:before { content: "\e9d8"; }
+.is24-icon-apartment-option:before{ content: "\e96d"; }
+.is24-icon-apartment-option-glyph:before { content: "\e96c"; }
+.is24-icon-building-apartment:before { content: "\e97a"; }
+.is24-icon-building-apartment-glyph:before { content: "\e975"; }
+.is24-icon-building-business:before { content: "\e97a"; }
+.is24-icon-building-new-apartment-building:before { content: "\e97b"; }
+.is24-icon-building-new-building:before { content: "\e97c"; }
+.is24-icon-building-single-family-house:before { content: "\e97f"; }
+.is24-icon-building-semi-detached-house:before { content: "\e97e"; }
+.is24-icon-building-two-family-house:before { content: "\e981"; }
+.is24-icon-building-prefab-house:before { content: "\e97d"; }
+.is24-icon-building-bungalow:before { content: "\e978"; }
+.is24-icon-building-assembled-house:before { content: "\e977"; }
+.is24-icon-terrace-house:before   { content: "\ea04"; }
+.is24-icon-new-apartment-building:before { content: "\e9f5"; }
+.is24-icon-house-attic:before     { content: "\e993"; }
+.is24-icon-house-basement:before  { content: "\e994"; }
+.is24-icon-house-ground-floor:before { content: "\e995"; }
+.is24-icon-house-loft:before      { content: "\e998"; }
+.is24-icon-house-maisonette:before{ content: "\e999"; }
+.is24-icon-ground-floor:before    { content: "\e9eb"; }
+.is24-icon-balcony:before         { content: "\e971"; }
+.is24-icon-balcony-glyph:before   { content: "\e970"; }
+.is24-icon-garden:before          { content: "\e98f"; }
+.is24-icon-garden-glyph:before    { content: "\e98e"; }
+.is24-icon-fitted-kitchen:before  { content: "\e98d"; }
+.is24-icon-fitted-kitchen-glyph:before { content: "\e98c"; }
+.is24-icon-elevator:before        { content: "\e987"; }
+.is24-icon-car-park:before        { content: "\e983"; }
+.is24-icon-key:before             { content: "\e9a1"; }
+.is24-icon-room-size:before       { content: "\ea00"; }
+.is24-icon-number-of-rooms:before { content: "\e9b4"; }
+.is24-icon-living-space-option:before { content: "\e9f0"; }
+.is24-icon-price:before           { content: "\ea1d"; }
+.is24-icon-price-check:before     { content: "\e9fc"; }
+.is24-icon-price-map:before       { content: "\e9bc"; }
+.is24-icon-price-per-squaremeter:before { content: "\e9bd"; }
+.is24-icon-financing:before       { content: "\e98a"; }
+.is24-icon-financing-option:before{ content: "\e989"; }
+.is24-icon-calculator:before      { content: "\e982"; }
+.is24-icon-location:before        { content: "\e9a8"; }
+.is24-icon-location-glyph:before  { content: "\e9a7"; }
+.is24-icon-location-pin:before    { content: "\e9f1"; }
+.is24-icon-pin:before             { content: "\ea1c"; }
+.is24-icon-pin-glyph:before       { content: "\ea1b"; }
+.is24-icon-map:before             { content: "\e9aa"; }
+.is24-icon-map-glyph:before       { content: "\e9a9"; }
+.is24-icon-navigation:before      { content: "\e9f4"; }
+.is24-icon-geo-location:before    { content: "\e990"; }
+.is24-icon-radius-search:before   { content: "\e9c3"; }
+.is24-icon-radius-search-glyph:before { content: "\e9c2"; }
+.is24-icon-move-in:before         { content: "\e9ac"; }
+.is24-icon-move-out:before        { content: "\e9ad"; }
+.is24-icon-moving:before          { content: "\e9b0"; }
+.is24-icon-moving-planner:before  { content: "\e9af"; }
+.is24-icon-document-empty:before  { content: "\e9e6"; }
+.is24-icon-application-documents:before { content: "\e96e"; }
+.is24-icon-pdf:before             { content: "\ea4b"; }
+.is24-icon-camera:before          { content: "\e9df"; }
+.is24-icon-camera-option:before   { content: "\e9de"; }
+.is24-icon-picture:before         { content: "\e9fa"; }
+.is24-icon-video:before           { content: "\ea41"; }
+.is24-icon-virtualtour:before     { content: "\ea42"; }
+.is24-icon-mouse-navigation-360:before { content: "\ea3b"; }
+.is24-icon-eye-check:before       { content: "\ea4f"; }
+.is24-icon-eye-slash:before       { content: "\ea50"; }
+.is24-icon-password-show:before   { content: "\e93c"; }
+.is24-icon-password-hide:before   { content: "\e93b"; }
+.is24-icon-rating-star-empty:before { content: "\ea56"; }
+.is24-icon-rating-star-half:before { content: "\ea57"; }
+.is24-icon-rating-star-full:before { content: "\ea58"; }
+.is24-icon-dealer:before          { content: "\ea43"; }
+.is24-icon-offer:before           { content: "\ea4d"; }
+.is24-icon-premium:before         { content: "\ea3d"; }
+.is24-icon-premium-2:before       { content: "\ea3c"; }
+.is24-icon-immo-ad:before         { content: "\e99e"; }
+.is24-icon-statistics:before      { content: "\e9d0"; }
+.is24-icon-statistic-with-arrow-up:before { content: "\e9ce"; }
+.is24-icon-stopwatch:before       { content: "\ea03"; }
+.is24-icon-time:before            { content: "\ea23"; }
+.is24-icon-time-glyph:before      { content: "\ea22"; }
+.is24-icon-calendar:before        { content: "\e90f"; }
+.is24-icon-calendar-check:before  { content: "\e90d"; }
+.is24-icon-calendar-x:before      { content: "\e90e"; }
+.is24-icon-download:before        { content: "\e91f"; }
+.is24-icon-upload:before          { content: "\e965"; }
+.is24-icon-attach:before          { content: "\e90b"; }
+.is24-icon-paperclip:before       { content: "\e9f7"; }
+.is24-icon-paperplane:before      { content: "\e9f8"; }
+.is24-icon-printer:before         { content: "\e945"; }
+.is24-icon-envelope:before        { content: "\e9ea"; }
+.is24-icon-lock:before            { content: "\e92e"; }
+.is24-icon-lock-glyph:before      { content: "\e92c"; }
+.is24-icon-unlock-glyph:before    { content: "\e961"; }
+.is24-icon-data-security:before   { content: "\ea49"; }
+.is24-icon-service-security-check:before { content: "\ea4c"; }
+.is24-icon-write-message:before   { content: "\e969"; }
+.is24-icon-list-view-compare:before { content: "\e9a6"; }
+.is24-icon-quote-open:before      { content: "\e9fe"; }
+.is24-icon-quote-close:before     { content: "\e9fd"; }
+.is24-icon-plus:before            { content: "\e9fb"; }
+.is24-icon-minus:before           { content: "\e9f2"; }
+.is24-icon-link:before            { content: "\e9ef"; }
+.is24-icon-percent:before         { content: "\e9f9"; }
+.is24-icon-percent1:before        { content: "\ea1a"; }
+.is24-icon-percent-glyph:before   { content: "\ea19"; }
+.is24-icon-targeting:before       { content: "\ea21"; }
+.is24-icon-bulls-eye:before       { content: "\e9dd"; }
+.is24-icon-distance:before        { content: "\e9e5"; }
+.is24-icon-travel-time:before     { content: "\e9d1"; }
+.is24-icon-public-transport-subway:before { content: "\ea36"; }
+.is24-icon-public-transport-option:before { content: "\e9c1"; }
+.is24-icon-restaurant:before      { content: "\ea37"; }
+.is24-icon-bar:before             { content: "\ea33"; }
+.is24-icon-cup:before             { content: "\e9e4"; }
+.is24-icon-cappucino:before       { content: "\ea10"; }
+.is24-icon-schools:before         { content: "\e9c5"; }
+.is24-icon-education:before       { content: "\ea12"; }
+.is24-icon-kindergarden-day-care:before { content: "\e9a2"; }
+.is24-icon-grocery:before         { content: "\e991"; }
+.is24-icon-shopping-basket:before { content: "\ea01"; }
+.is24-icon-cinema:before          { content: "\ea11"; }
+.is24-icon-doctors:before         { content: "\e985"; }
+.is24-icon-hospital:before        { content: "\ea35"; }
+.is24-icon-building-pharmacy:before { content: "\ea34"; }
+.is24-icon-gas-pump:before        { content: "\ea38"; }
+.is24-icon-tree:before            { content: "\ea53"; }
+.is24-icon-fuel-efficient-tree:before { content: "\ea3a"; }
+.is24-icon-water:before           { content: "\ea54"; }
+.is24-icon-solar-potential:before { content: "\e9cd"; }
+.is24-icon-solar-potential-glyph:before { content: "\e9cc"; }
+.is24-icon-married-couple:before  { content: "\ea39"; }
+.is24-icon-persons:before         { content: "\e942"; }
+.is24-icon-person-with-checkmark:before { content: "\e9b9"; }
+.is24-icon-household-size:before  { content: "\e99b"; }
+.is24-icon-facebook:before        { content: "\ea2b"; }
+.is24-icon-instagram:before       { content: "\ea2c"; }
+.is24-icon-linkedin:before        { content: "\ea2d"; }
+.is24-icon-twitter:before         { content: "\ea2f"; }
+.is24-icon-whatsapp:before        { content: "\ea30"; }
+.is24-icon-xing:before            { content: "\ea31"; }
+.is24-icon-youtube:before         { content: "\ea32"; }
+.is24-icon-rss:before             { content: "\ea2e"; }
+
+/* Insta gets a colored gradient via background-clip */
+.is24-icon-instagram {
+  color: transparent;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}

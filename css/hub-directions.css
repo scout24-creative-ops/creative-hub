@@ -1,0 +1,40 @@
+/* ============================================================================
+   AI Marketing Creation Hub — Warm direction tuning + responsive
+   Warm: warm surfaces, hand-drawn highlighters, photography.
+   ============================================================================ */
+
+/* ---- highlighter image ---- */
+.hub-app[data-direction="b"] { --hl-img: url("../assets/hl/underline-01.svg"); }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 1080px) {
+  :root { --hub-pad: 28px; --hub-section-gap: 80px; }
+  .why-grid, .guard-grid, .metric-grid, .show-grid { grid-template-columns: repeat(2, 1fr); }
+  .agent-grid { grid-template-columns: repeat(2, 1fr); }
+  .cat-grid { grid-template-columns: repeat(3, 1fr); }
+  .tut-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero__grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero__media { max-width: 520px; }
+  .hero__chip--tl { left: 0; }
+  .hero__chip--br { right: 0; }
+  .start-grid { grid-template-columns: 1fr; gap: 36px; }
+  .fb-panel { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .hub-nav { display: none; }
+}
+
+@media (max-width: 680px) {
+  :root { --hub-pad: 20px; --hub-section-gap: 64px; }
+  .hub-strip__right { display: none; }
+  .why-grid, .guard-grid, .metric-grid, .show-grid, .agent-grid, .cat-grid, .tut-grid, .start-steps { grid-template-columns: 1fr; }
+  .modal__facts { grid-template-columns: 1fr; }
+  .hero { padding-top: 40px; }
+  .hero__chip { display: none; }
+  .hero h1 { font-size: clamp(36px, 11vw, 52px); }
+  .modal__foot { flex-direction: column; }
+  .modal__foot .btn { width: 100%; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .sec-head__lead, .hero__copy { font-size: 16px; }
+}

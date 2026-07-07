@@ -1,0 +1,717 @@
+/* ============================================================================
+   COSMA Design System — Colors, Type & Foundations
+   Extracted from Scout24 / frontend-core (is24-corecss + @is24/cosma-design-tokens)
+
+   Two themes ship in COSMA:
+     • "cosma" — the current Scout24/IS24 brand (TEAL primary). DEFAULT.
+     • "core"  — the legacy theme (orange/blue). Available as a fallback below.
+
+   The semantic vars (--color-text-default, --color-background-default, ...)
+   reflect the canonical light-mode tokens from @is24/cosma-design-tokens —
+   that npm package was not present in the codebase, so a handful of values
+   below are interpolated from the LESS primitives and how they're used in
+   components (e.g. .real-estate-card, .button-rounded). Flag any drift in PR
+   review and substitute the real token file when available.
+   ============================================================================ */
+
+/* ---------- Web fonts ---------- */
+@font-face {
+  font-family: "Make It Better";
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url("./fonts/MakeItBetter-Light.woff2") format("woff2"),
+       url("./fonts/MakeItBetter-Light.woff") format("woff"),
+       url("./fonts/MakeItBetter-Light.otf") format("opentype");
+}
+@font-face {
+  font-family: "Make It Better";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/MakeItBetter-Regular.woff2") format("woff2"),
+       url("./fonts/MakeItBetter-Regular.woff") format("woff"),
+       url("./fonts/MakeItBetter-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Make It Better";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fonts/MakeItBetter-Bold.woff2") format("woff2"),
+       url("./fonts/MakeItBetter-Bold.woff") format("woff"),
+       url("./fonts/MakeItBetter-Bold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Make It Better";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("./fonts/MakeItBetter-XBold.woff2") format("woff2"),
+       url("./fonts/MakeItBetter-XBold.woff") format("woff"),
+       url("./fonts/MakeItBetter-XBold.otf") format("opentype");
+}
+/* ============================================================================
+   1. PRIMITIVES — raw palette (color.less)
+   ============================================================================ */
+:root {
+  /* Gray scale — official COSMA warm neutral ramp */
+  --gray-100: #ffffff;
+  --gray-200: #fbf8f6; /* Warm Off White — raised surface */
+  --gray-250: #f1efed; /* Weak surface */
+  --gray-300: #e8e5e3;
+  --gray-400: #dedcda;
+  --gray-500: #d7d4d2;
+  --gray-600: #d1cecd;
+  --gray-650: #bdbbb9;
+  --gray-700: #b1afae;
+  --gray-750: #a3a2a1;
+  --gray-800: #868484;
+  --gray-850: #6a6a69;
+  --gray-900: #484848;
+  --gray-950: #3d3d3d;
+  --gray-1000: #333333; /* Charcoal — primary text */
+  --gray-1100: #272727;
+  --gray-1200: #1b1b1b; /* Dark mode bg */
+  --gray-1300: #111111;
+  --gray-1400: #000000;
+
+  /* Brand colors — expressive, reserved for branded moments (not functional UI) */
+  --brand-teal:   #3df5dc;
+  --brand-orange: #ff9626;
+  --brand-yellow: #eff933;
+  --brand-blue:   #24e3ff;
+  --brand-purple: #d5aaff;
+
+  /* Teal — Cosma brand */
+  --teal-25: #e7fdf1;
+  --teal-50: #d9fff8;
+  --teal-100: #99ffec;
+  --teal-200: #00ffd0; /* ★ BRAND PRIMARY */
+  --teal-300: #00f2c6;
+  --teal-400: #00d9b1;
+  --teal-500: #00bf9c;
+  --teal-600: #00b392;
+  --teal-700: #00997d;
+  --teal-800: #008c72;
+  --teal-900: #00735e;
+
+  /* Cyan */
+  --cyan-50: #e0f7f8;
+  --cyan-100: #b2ebee;
+  --cyan-200: #80dee4;
+  --cyan-300: #4dd0da;
+  --cyan-400: #25c5d2;
+  --cyan-500: #00bbcc;
+  --cyan-600: #00abba;
+  --cyan-700: #0096a0;
+  --cyan-800: #008289; /* primary in some old contexts */
+  --cyan-900: #035f5f;
+
+  /* Blue */
+  --blue-25:  #eef5ff;
+  --blue-100: #d3ecff;
+  --blue-200: #a6d6ff;
+  --blue-300: #7abdff;
+  --blue-350: #6098ff;
+  --blue-400: #59a5ff;
+  --blue-500: #237fff;
+  --blue-600: #2267e8; /* link */
+  --blue-700: #1148b7;
+  --blue-800: #0b3293;
+  --blue-900: #06237a;
+  --blue-1200: #1d222b; /* dark-mode bg */
+
+  /* Green — validation positive */
+  --green-100: #d4f9f2;
+  --green-200: #aaf2e5;
+  --green-300: #80ecd8;
+  --green-400: #55e6cb;
+  --green-500: #2bdfbe;
+  --green-600: #00d9b1;
+  --green-700: #00b594;
+  --green-800: #009176;
+  --green-900: #006d59;
+  --green-1000: #00483b;
+  --green-1100: #00241e;
+
+  /* Orange — validation warning, legacy brand */
+  --orange-100: #fef9d3;
+  --orange-200: #fdf2a8;
+  --orange-300: #fbe77c;
+  --orange-400: #f7db5a;
+  --orange-500: #f2ca26;
+  --orange-600: #d0a91b;
+  --orange-700: #ae8913;
+  --orange-800: #8c6b0c;
+  --orange-900: #745507;
+  /* legacy IS24 brand orange (theme-core) */
+  --orange-legacy: #ff6600;
+  --orange-legacy-hover: #eb6c00;
+
+  /* Red — validation error */
+  --red-100: #fbe1de;
+  --red-200: #f7c3be;
+  --red-300: #f3a59e;
+  --red-400: #ef877d;
+  --red-500: #eb695d;
+  --red-600: #e74b3c;
+  --red-700: #c13f32;
+  --red-800: #9a3228;
+  --red-900: #74261e;
+  --red-1000: #4d1914;
+  --red-1100: #270d0a;
+
+  /* ----------------------------------------------------------------------
+     System ramps — semantic UI feedback (info / success / warning / danger)
+     and a distinct chart orange. ADDITIVE: these are new primitives; no
+     existing palette token is changed. Sourced from cosma-design-tokens /
+     is24-corecss 9.0.0 (the COSMA light/dark mapping).
+     ---------------------------------------------------------------------- */
+  --system-blue-100: #e6f4ff;
+  --system-blue-200: #bae0ff;
+  --system-blue-300: #91caff;
+  --system-blue-400: #69b1ff;
+  --system-blue-500: #4096ff;
+  --system-blue-600: #1677ff;
+  --system-blue-700: #0958d9;
+  --system-blue-800: #003eb3;
+  --system-blue-900: #002c8c;
+  --system-blue-1000: #001d66;
+
+  --system-green-100: #f6ffed;
+  --system-green-200: #d9f7be;
+  --system-green-300: #b7eb8f;
+  --system-green-400: #95de64;
+  --system-green-500: #73d13d;
+  --system-green-600: #52c41a;
+  --system-green-700: #389e0d;
+  --system-green-800: #237804;
+  --system-green-900: #135200;
+  --system-green-1000: #092b00;
+
+  --system-yellow-100: #fffbe6;
+  --system-yellow-200: #fff1b8;
+  --system-yellow-300: #ffe58f;
+  --system-yellow-400: #ffd666;
+  --system-yellow-500: #ffc53d;
+  --system-yellow-600: #faad14;
+  --system-yellow-700: #d48806;
+  --system-yellow-800: #ad6800;
+  --system-yellow-900: #874d00;
+  --system-yellow-1000: #613400;
+
+  --system-red-100: #fff1f0;
+  --system-red-200: #ffccc7;
+  --system-red-300: #ffa39e;
+  --system-red-400: #ff7875;
+  --system-red-500: #ff4d4f;
+  --system-red-600: #f5222d;
+  --system-red-700: #cf1322;
+  --system-red-800: #a8071a;
+  --system-red-900: #820014;
+  --system-red-1000: #5c0011;
+
+  /* Distinct brand orange ramp (chart category 3) */
+  --system-orange-100: #fbeada;
+  --system-orange-200: #f7d4b6;
+  --system-orange-300: #f3bf91;
+  --system-orange-400: #eea96c;
+  --system-orange-500: #ea9448;
+  --system-orange-600: #e67e23;
+  --system-orange-700: #c0691d;
+  --system-orange-800: #995417;
+  --system-orange-900: #733f12;
+  --system-orange-1000: #4d2a0c;
+}
+
+/* ============================================================================
+   2. SEMANTIC TOKENS — light theme (the canonical .colors-light() from cosma-design-tokens).
+   ============================================================================ */
+:root,
+.colors-light,
+[data-color-scheme="light"] {
+  /* — Brand — */
+  --color-brand: var(--teal-200);            /* bright "Cosma" teal */
+  --color-brand-strong: var(--teal-400);
+
+  /* — Backgrounds — */
+  --color-background-default: #ffffff;
+  --color-background-subtle:  var(--gray-200);
+  --color-background-muted:   var(--gray-300);
+  --color-background-inverted:var(--gray-1000);
+  --color-background-brand:   var(--teal-200);
+  --color-background-brand-weak: var(--teal-50);
+  --color-background-scrim:   rgba(0, 0, 0, 0.8);
+
+  /* — Text — */
+  --color-text-default:     var(--gray-1000);     /* #333 */
+  --color-text-strong:      #1a1a1a;
+  --color-text-muted:       #757575;
+  --color-text-disabled:    var(--gray-750);
+  --color-text-inversive:   #ffffff;
+  --color-text-link:        var(--blue-600);
+  --color-text-link-visited:#663366;
+  --color-text-danger:      var(--red-600);
+  --color-text-success:     var(--green-600);
+  --color-text-warning:     var(--orange-700);
+
+  /* — Borders / Dividers — */
+  --color-border-default:  var(--gray-400);
+  --color-border-weak:     var(--gray-300);
+  --color-border-strong:   var(--gray-1000);
+  --color-border-focused:  var(--blue-600);
+
+  /* — Buttons (rounded, current spec) — */
+  --color-background-button-default-default: var(--gray-1000);
+  --color-background-button-default-hovered: var(--gray-900);
+  --color-background-button-default-pressed: var(--gray-1100);
+  --color-background-button-weak-default:    var(--gray-200);
+  --color-background-button-weak-hovered:    var(--gray-300);
+  --color-background-button-inversive-default: #ffffff;
+  --color-background-button-inversive-hovered: var(--gray-200);
+  --color-background-button-inversive-pressed: var(--gray-300);
+  --color-background-button-disabled:        var(--gray-300);
+  --color-background-button-brand-default:   var(--teal-200);
+  --color-background-button-brand-hovered:   var(--teal-300);
+  --color-background-button-brand-pressed:   var(--teal-400);
+  --color-background-button-danger-strong-default:  var(--red-600);
+  --color-background-button-danger-strong-hovered:  var(--red-700);
+  --color-background-button-danger-strong-pressed:  var(--red-800);
+  --color-background-button-danger-weak-default:  var(--red-100);
+  --color-background-button-danger-weak-hovered:  var(--red-200);
+  --color-background-button-danger-weak-pressed:  var(--red-300);
+  --color-background-button-success-weak-default: var(--green-100);
+  --color-background-button-success-weak-hovered: var(--green-200);
+  --color-background-button-success-weak-pressed: var(--green-300);
+  --color-border-button-strong-default: var(--gray-1000);
+  --color-border-button-strong-hovered: var(--gray-1000);
+  --color-border-button-strong-active:  var(--gray-1000);
+  --color-border-button-weak-default:   var(--gray-400);
+  --color-border-button-weak-hovered:   var(--gray-1000);
+  --color-border-button-disabled:       var(--gray-500);
+  --color-text-button-default:   var(--gray-1000);
+  --color-text-button-inversive: #ffffff;
+  --color-text-button-charcoal:  var(--gray-1000);
+  --color-text-button-disabled:  var(--gray-750);
+  --color-text-button-danger:    var(--red-600);
+  --color-text-button-success:   var(--green-700);
+
+  /* — Validation — */
+  --color-validation-error:        var(--red-500);
+  --color-validation-error-light:  var(--red-100);
+  --color-validation-info:         var(--blue-500);
+  --color-validation-info-light:   var(--blue-100);
+  --color-validation-warning:      var(--orange-500);
+  --color-validation-warning-light:var(--orange-100);
+  --color-validation-positive:     var(--green-500);
+  --color-validation-positive-light: var(--green-100);
+
+  /* — Feedback surfaces & borders (system ramp) — */
+  --color-background-info:         var(--system-blue-700);
+  --color-background-info-weak:    var(--system-blue-100);
+  --color-background-success:      var(--system-green-700);
+  --color-background-success-weak: var(--system-green-100);
+  --color-background-danger:       var(--system-red-700);
+  --color-background-danger-weak:  var(--system-red-100);
+  --color-background-warning:      var(--system-yellow-700);
+  --color-background-warning-weak: var(--system-yellow-100);
+  --color-border-information: var(--system-blue-800);
+  --color-border-success:     var(--system-green-700);
+  --color-border-warning:     var(--system-yellow-700);
+  --color-border-danger:      var(--system-red-700);
+  --color-text-info:          var(--system-blue-700);
+
+  /* — Links — */
+  --color-link-default: var(--gray-1000);
+  --color-link-weak:    var(--gray-850);
+  --color-link-blue:    var(--system-blue-600);
+
+  /* — Icons — */
+  --color-icon-default:   var(--gray-1000);
+  --color-icon-weak:      var(--gray-850);
+  --color-icon-weakest:   var(--gray-700);
+  --color-icon-inversive: var(--gray-100);
+  --color-icon-info:      var(--system-blue-700);
+  --color-icon-success:   var(--system-green-700);
+  --color-icon-warning:   var(--system-yellow-800);
+  --color-icon-danger:    var(--system-red-700);
+
+  /* — Charts (assign sequentially, category 1 → 7) — */
+  --color-charts-category1-default: var(--green-600);
+  --color-charts-category1-weak:    var(--green-100);
+  --color-charts-category2-default: var(--blue-600);
+  --color-charts-category2-weak:    var(--blue-100);
+  --color-charts-category3-default: var(--system-orange-600);
+  --color-charts-category3-weak:    var(--system-orange-100);
+  --color-charts-category4-default: var(--orange-500);
+  --color-charts-category4-weak:    var(--orange-100);
+  --color-charts-category5-default: var(--red-600);
+  --color-charts-category5-weak:    var(--red-100);
+  --color-charts-category6: var(--gray-850);
+  --color-charts-category7: var(--gray-1000);
+}
+
+/* ============================================================================
+   2b. DARK THEME — semantic remaps per the COSMA light/dark mapping.
+   Base palette tokens are UNCHANGED; only semantic tokens are remapped here,
+   so any component built on semantic tokens flips automatically when you put
+   `.colors-dark` on a container (or <html>). `.colors-light` is the default.
+   ============================================================================ */
+.colors-dark,
+[data-color-scheme="dark"] {
+  /* — Backgrounds / surfaces — */
+  --color-background-default:    var(--gray-1100);
+  --color-background-subtle:     var(--gray-1000);
+  --color-background-muted:      var(--gray-900);
+  --color-background-inverted:   var(--gray-100);
+  --color-background-brand:      var(--teal-200);
+  --color-background-brand-weak: var(--teal-900);
+  --color-background-scrim:      rgba(0, 0, 0, 0.8);
+
+  /* — Text — */
+  --color-text-default:   var(--gray-200);
+  --color-text-strong:    #ffffff;
+  --color-text-muted:     var(--gray-650);
+  --color-text-disabled:  var(--gray-800);
+  --color-text-inversive: var(--gray-1000);
+  --color-text-link:      var(--blue-350);
+  --color-text-danger:    var(--red-400);
+  --color-text-success:   var(--green-400);
+  --color-text-warning:   var(--orange-400);
+  --color-text-info:      var(--system-blue-400);
+
+  /* — Links — */
+  --color-link-default: var(--gray-100);
+  --color-link-weak:    var(--gray-500);
+  --color-link-blue:    var(--system-blue-300);
+
+  /* — Borders — */
+  --color-border-default: var(--gray-900);
+  --color-border-weak:    var(--gray-850);
+  --color-border-strong:  var(--gray-100);
+  --color-border-focused: var(--system-blue-400);
+
+  /* — Buttons — */
+  --color-background-button-default-default: var(--gray-100);
+  --color-background-button-default-hovered: var(--gray-300);
+  --color-background-button-default-pressed: var(--gray-400);
+  --color-background-button-weak-default:    var(--gray-900);
+  --color-background-button-weak-hovered:    var(--gray-850);
+  --color-background-button-inversive-default: var(--gray-1100);
+  --color-background-button-inversive-hovered: var(--gray-1000);
+  --color-background-button-inversive-pressed: var(--gray-900);
+  --color-background-button-disabled:        var(--gray-800);
+  --color-background-button-brand-default:   var(--teal-200);
+  --color-background-button-brand-hovered:   var(--teal-300);
+  --color-background-button-brand-pressed:   var(--teal-400);
+  --color-background-button-danger-strong-default: var(--system-red-500);
+  --color-background-button-danger-strong-hovered: var(--system-red-400);
+  --color-background-button-danger-strong-pressed: var(--system-red-600);
+  --color-background-button-danger-weak-default: var(--system-red-1000);
+  --color-background-button-danger-weak-hovered: var(--system-red-900);
+  --color-background-button-danger-weak-pressed: var(--system-red-800);
+  --color-background-button-success-weak-default: var(--system-green-1000);
+  --color-background-button-success-weak-hovered: var(--system-green-900);
+  --color-background-button-success-weak-pressed: var(--system-green-800);
+  --color-border-button-strong-default: var(--gray-100);
+  --color-border-button-strong-hovered: var(--gray-100);
+  --color-border-button-strong-active:  var(--gray-100);
+  --color-border-button-weak-default:   var(--gray-900);
+  --color-border-button-weak-hovered:   var(--gray-100);
+  --color-border-button-disabled:       var(--gray-800);
+  --color-text-button-default:   var(--gray-100);
+  --color-text-button-inversive: var(--gray-1000);
+  --color-text-button-disabled:  var(--gray-900);
+  --color-text-button-danger:    var(--system-red-400);
+  --color-text-button-success:   var(--system-green-400);
+
+  /* — Validation (legacy names) — */
+  --color-validation-error:    var(--red-400);
+  --color-validation-info:     var(--blue-400);
+  --color-validation-warning:  var(--orange-400);
+  --color-validation-positive: var(--green-400);
+
+  /* — Feedback surfaces & borders (weak variants stay light per mapping) — */
+  --color-background-info:    var(--system-blue-600);
+  --color-background-success: var(--system-green-400);
+  --color-background-danger:  var(--system-red-400);
+  --color-background-warning: var(--system-yellow-400);
+  --color-border-information: var(--system-blue-400);
+  --color-border-success:     var(--system-green-400);
+  --color-border-warning:     var(--system-yellow-400);
+  --color-border-danger:      var(--system-red-400);
+
+  /* — Icons — */
+  --color-icon-default:   var(--gray-100);
+  --color-icon-weak:      var(--gray-500);
+  --color-icon-inversive: var(--gray-1000);
+  --color-icon-info:      var(--system-blue-400);
+  --color-icon-success:   var(--system-green-400);
+  --color-icon-warning:   var(--system-yellow-400);
+  --color-icon-danger:    var(--system-red-400);
+
+  /* — Charts — */
+  --color-charts-category1-default: var(--green-500);
+  --color-charts-category1-weak:    var(--green-1000);
+  --color-charts-category2-default: var(--blue-500);
+  --color-charts-category2-weak:    var(--blue-900);
+  --color-charts-category3-default: var(--system-orange-500);
+  --color-charts-category3-weak:    var(--system-orange-1000);
+  --color-charts-category4-default: var(--orange-400);
+  --color-charts-category4-weak:    var(--orange-900);
+  --color-charts-category5-default: var(--red-400);
+  --color-charts-category5-weak:    var(--red-1000);
+}
+
+/* Toggle helpers — make the container itself adopt its theme's base surface. */
+.colors-light,
+.colors-dark {
+  background-color: var(--color-background-default);
+  color: var(--color-text-default);
+}
+
+/* ============================================================================
+   3. SPACING & SIZES (from variables/spacing.less + cosma-design-tokens scale)
+   ============================================================================ */
+:root {
+  /* Modular spacing scale (matches --spacing-100..--spacing-900 from cosma-design-tokens, palm sizes) */
+  --spacing-100: 4px;
+  --spacing-200: 8px;
+  --spacing-300: 12px;
+  --spacing-400: 16px;
+  --spacing-600: 24px;
+  --spacing-800: 32px;
+  --spacing-1000: 40px;
+  --spacing-1500: 60px;
+  --spacing-2000: 80px;
+
+  /* Border radius */
+  --border-radius-50:   2px;
+  --border-radius-100:  4px;
+  --border-radius-200:  8px;
+  --border-radius-300:  12px;
+  --border-radius-400:  16px;
+  --border-radius-600:  24px;
+  --border-radius-1000: 40px;
+  --border-radius-rounded: 999px;
+
+  /* Elevation (mirrors the elevation tokens used in COSMA components) */
+  --elevation-0:  0px 4px 8px 0px rgba(0, 0, 0, 0.10);
+  --elevation-10: 0px 1px 2px 0px rgba(0, 0, 0, 0.04);
+  --elevation-20: 0px 2px 4px 0px rgba(0, 0, 0, 0.08);
+  --elevation-30: 0px 4px 8px 0px rgba(0, 0, 0, 0.10);
+  --elevation-40: 0px 8px 16px 0px rgba(0, 0, 0, 0.12);
+  --elevation-50: 0px 16px 24px 0px rgba(0, 0, 0, 0.14);
+  --elevation-60: 0px 24px 32px 0px rgba(0, 0, 0, 0.16);
+  --elevation-70: 0px 32px 48px 0px rgba(0, 0, 0, 0.20);
+
+  --elevation-top:   0px -4px 8px 0px rgba(0, 0, 0, 0.10);
+  --elevation-left:  -4px 0px 8px 0px rgba(0, 0, 0, 0.10);
+  --elevation-right: 4px 0px 8px 0px rgba(0, 0, 0, 0.10);
+  --elevation-down:  0px 4px 8px 0px rgba(0, 0, 0, 0.10);
+
+  /* Motion */
+  --animation-duration-fast: 120ms;   /* @kind other */
+  --animation-duration-normal: 200ms; /* @kind other */
+  --animation-duration-slow: 320ms;   /* @kind other */
+  --animation-easing-standard: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --animation-easing-enter:    cubic-bezier(0, 0, 0, 1);   /* @kind other */
+  --animation-easing-exit:     cubic-bezier(0.4, 0, 1, 1);  /* @kind other */
+
+  /* Opacity — a transparency scale. COSMA uses alpha sparingly:
+     10% for the teal focus halo, 80% for the modal scrim. */
+  --opacity-0:   0;      /* @kind other */
+  --opacity-10:  0.10;   /* @kind other */
+  --opacity-20:  0.20;   /* @kind other */
+  --opacity-40:  0.40;   /* @kind other */
+  --opacity-60:  0.60;   /* @kind other */
+  --opacity-80:  0.80;   /* @kind other */
+  --opacity-100: 1;      /* @kind other */
+
+  /* Gradients — intentionally rare. COSMA rejects decorative gradient
+     backgrounds; gradients exist only as image-legibility scrims and the
+     Instagram brand glyph. Primary surfaces stay flat. */
+  --gradient-image-scrim-bottom: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 60%); /* @kind other */
+  --gradient-image-scrim-top:    linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 55%); /* @kind other */
+  --gradient-brand-instagram:    linear-gradient(45deg, #feda75 0%, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5 100%); /* @kind other */
+}
+
+/* ============================================================================
+   4. TYPOGRAPHY — families, raw vars, and semantic classes
+   ============================================================================ */
+:root {
+  /* New canonical names */
+  --font-family-body:      "Make It Better", "Verdana", "DejaVu Sans", "Arial", "Helvetica", sans-serif;
+  --font-family-heading:   "Make It Better", "Tahoma", "Geneva", "Arial", sans-serif;
+  --font-family-monospace: monospace, sans-serif;
+
+  /* Backwards-compatible aliases (used across older preview cards & components) */
+  --font-family-standard:  var(--font-family-body);
+  --font-family-headlines: var(--font-family-heading);
+  --font-family-display:   var(--font-family-heading);
+  --font-family-mono:      ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+
+  /* Font weights */
+  --font-weight-regular: 400;
+  --font-weight-bold:    700;
+  --font-weight-x-bold:  800;
+
+  /* Body font sizes */
+  --size-body-small:  12px;
+  --size-body-medium: 14px;
+  --size-body-large:  16px;
+  --size-body-hint:   12px;
+
+  /* Heading font sizes · palm / mobile */
+  --size-heading-xxsmall: 12px;
+  --size-heading-xsmall:  18px;
+  --size-heading-small:   20px;
+  --size-heading-medium:  24px;
+  --size-heading-large:   28px;
+  --size-heading-xlarge:  32px;
+
+  /* Body line heights (absolute) */
+  --line-height-body-small:  18px;
+  --line-height-body-medium: 22px;
+  --line-height-body-large:  26px;
+
+  /* Heading line heights · palm */
+  --line-height-heading-xxsmall: 18px;
+  --line-height-heading-xsmall:  28px;
+  --line-height-heading-small:   30px;
+  --line-height-heading-medium:  34px;
+  --line-height-heading-large:   36px;
+  --line-height-heading-xlarge:  40px;
+}
+
+@media (min-width: 669px) {
+  :root {
+    /* Heading font sizes · lap and up */
+    --size-heading-xxsmall: 12px;
+    --size-heading-xsmall:  18px;
+    --size-heading-small:   20px;
+    --size-heading-medium:  26px;
+    --size-heading-large:   34px;
+    --size-heading-xlarge:  48px;
+
+    /* Heading line heights · lap and up */
+    --line-height-heading-xsmall: 28px;
+    --line-height-heading-small:  30px;
+    --line-height-heading-medium: 36px;
+    --line-height-heading-large:  44px;
+    --line-height-heading-xlarge: 58px;
+  }
+}
+
+/* ---------- Element baseline ---------- */
+html {
+  font-size: 62.5%; /* root = 10px, lets COSMA's rem-based scale resolve */
+}
+body {
+  font-family: var(--font-family-standard);
+  font-size: var(--size-body-medium);
+  line-height: var(--line-height-body-medium);
+  color: var(--color-text-default);
+  background-color: var(--color-background-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Semantic helper classes ---------- */
+.font-heading-xlarge-bold,
+h1 {
+  font-family: var(--font-family-headlines);
+  font-size: var(--size-heading-xlarge);
+  line-height: var(--line-height-heading-xlarge);
+  font-weight: 700;
+  color: var(--color-text-default);
+  margin: 0 0 0.4em;
+}
+.font-heading-large-bold,
+h2 {
+  font-family: var(--font-family-headlines);
+  font-size: var(--size-heading-large);
+  line-height: var(--line-height-heading-large);
+  font-weight: 700;
+  color: var(--color-text-default);
+  margin: 0 0 0.4em;
+}
+.font-heading-medium-bold,
+h3 {
+  font-family: var(--font-family-headlines);
+  font-size: var(--size-heading-medium);
+  line-height: var(--line-height-heading-medium);
+  font-weight: 700;
+  color: var(--color-text-default);
+  margin: 0 0 0.4em;
+}
+.font-heading-small-bold,
+h4 {
+  font-family: var(--font-family-headlines);
+  font-size: var(--size-heading-small);
+  line-height: var(--line-height-heading-small);
+  font-weight: 700;
+  color: var(--color-text-default);
+  margin: 0 0 0.4em;
+}
+.font-heading-xsmall-bold,
+h5 {
+  font-family: var(--font-family-headlines);
+  font-size: var(--size-heading-xsmall);
+  line-height: var(--line-height-heading-xsmall);
+  font-weight: 700;
+  color: var(--color-text-default);
+  margin: 0 0 0.4em;
+}
+.font-heading-xlarge-regular { font-size: var(--size-heading-xlarge); line-height: var(--line-height-heading-xlarge); font-weight: 400; }
+.font-heading-large-regular  { font-size: var(--size-heading-large);  line-height: var(--line-height-heading-large);  font-weight: 400; }
+.font-heading-medium-regular { font-size: var(--size-heading-medium); line-height: var(--line-height-heading-medium); font-weight: 400; }
+.font-heading-small-regular  { font-size: var(--size-heading-small);  line-height: var(--line-height-heading-small);  font-weight: 400; }
+.font-heading-xsmall-regular { font-size: var(--size-heading-xsmall); line-height: var(--line-height-heading-xsmall); font-weight: 400; }
+
+.font-body-large-light    { font-size: var(--size-body-large);  line-height: var(--line-height-body-large);  font-weight: 100; }
+.font-body-large-regular  { font-size: var(--size-body-large);  line-height: var(--line-height-body-large);  font-weight: 400; }
+.font-body-large-bold     { font-size: var(--size-body-large);  line-height: var(--line-height-body-large);  font-weight: 700; }
+.font-body-large-xbold    { font-size: var(--size-body-large);  line-height: var(--line-height-body-large);  font-weight: 800; }
+.font-body-medium-light   { font-size: var(--size-body-medium); line-height: var(--line-height-body-medium); font-weight: 100; }
+.font-body-medium-regular { font-size: var(--size-body-medium); line-height: var(--line-height-body-medium); font-weight: 400; }
+.font-body-medium-bold    { font-size: var(--size-body-medium); line-height: var(--line-height-body-medium); font-weight: 700; }
+.font-body-medium-xbold   { font-size: var(--size-body-medium); line-height: var(--line-height-body-medium); font-weight: 800; }
+.font-body-small-light    { font-size: var(--size-body-small);  line-height: var(--line-height-body-small);  font-weight: 100; }
+.font-body-small-regular  { font-size: var(--size-body-small);  line-height: var(--line-height-body-small);  font-weight: 400; }
+.font-body-small-bold     { font-size: var(--size-body-small);  line-height: var(--line-height-body-small);  font-weight: 700; }
+.font-body-small-xbold    { font-size: var(--size-body-small);  line-height: var(--line-height-body-small);  font-weight: 800; }
+.font-hint                { font-size: var(--size-body-hint); line-height: 1.5; color: var(--color-text-muted); }
+
+/* Links */
+a, .link {
+  color: var(--color-text-link);
+  text-decoration: none;
+  transition: color var(--animation-duration-normal) var(--animation-easing-standard);
+}
+a:hover, .link:hover {
+  color: var(--color-text-strong);
+  text-decoration: underline;
+}
+a:visited { color: var(--color-text-link-visited); }
+a:focus-visible {
+  outline: 2px solid var(--color-border-focused);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ============================================================================
+   5. LEGACY ("core") THEME — orange/blue, optional override
+   Wrap any subtree in [data-theme="core"] to fall back to the old IS24 brand.
+   ============================================================================ */
+[data-theme="core"] {
+  --color-brand:               var(--orange-legacy);
+  --color-background-brand:    var(--orange-legacy);
+  --color-background-button-default-default: var(--orange-legacy);
+  --color-background-button-default-hovered: var(--orange-legacy-hover);
+  --color-text-button-default: #ffffff;
+  /* Brand mandate: Make It Better everywhere, even in the legacy theme */
+  --font-family-standard: "Make It Better", "Verdana", "DejaVu Sans", "Arial", "Helvetica", sans-serif;
+  --font-family-headlines: "Make It Better", "Tahoma", "Geneva", "Arial", sans-serif;
+}
