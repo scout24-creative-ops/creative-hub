@@ -565,30 +565,6 @@
       photo: R("photoTutorialVideoEndcardEditorPoster", "assets/photos/tutorial-video-endcard-editor-poster.jpg"),
       videoUrl: RV("videoTutorialVideoEndcardEditor", "assets/tutorial-video-endcard-editor.mp4"),
     },
-    {
-      id: "t3",
-      agent: "Brand Assistant",
-      title: "Learn Brand Assistant in 3 Minutes",
-      duration: "3 min",
-      level: "Beginner",
-      photo: R("photoP114", "assets/photos/p-114.jpg"),
-    },
-    {
-      id: "t4",
-      agent: "Email Builder",
-      title: "Assemble an email from reusable modules",
-      duration: "4 min",
-      level: "Intermediate",
-      photo: R("photoP049", "assets/photos/p-049.jpg"),
-    },
-    {
-      id: "t5",
-      agent: "Illustration Assistant",
-      title: "Learn Illustration Assistant in 3 Minutes",
-      duration: "3 min",
-      level: "Beginner",
-      photo: R("photoP121", "assets/photos/p-121.jpg"),
-    },
   ];
 
   const TUTORIAL_FORMAT = [

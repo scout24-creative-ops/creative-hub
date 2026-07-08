@@ -258,6 +258,7 @@ function DTutorialModal({ agent, onClose }) {
   const d = DHUB.getAgentDetail(agent);
   const tint = D_TINT[agent.categories[0]] || "var(--is24-teal)";
   const video = (d.tutorials || [])[0];
+  const hasTutorialVideo = !!(video && video.videoUrl && video.photo);
   const steps = DHUB.TUTORIAL_FORMAT || [];
   const [playing, setPlaying] = React.useState(false);
   // The preview server can't stream large MP4s (no range requests), so fetch
@@ -266,7 +267,7 @@ function DTutorialModal({ agent, onClose }) {
   const [blobSrc, setBlobSrc] = React.useState(null);
   const [loadingVideo, setLoadingVideo] = React.useState(false);
   const startPlayback = () => {
-    if (!video || !video.videoUrl) return;
+    if (!hasTutorialVideo) return;
     if (video.videoUrl.startsWith("blob:") || blobSrc) { setPlaying(true); return; }
     setLoadingVideo(true);
     fetch(video.videoUrl)
@@ -277,7 +278,7 @@ function DTutorialModal({ agent, onClose }) {
   React.useEffect(() => () => { if (blobSrc) URL.revokeObjectURL(blobSrc); }, [blobSrc]);
   // Prefetch the video into a blob as soon as the modal opens so play is instant.
   React.useEffect(() => {
-    if (!video || !video.videoUrl || video.videoUrl.startsWith("blob:")) return;
+    if (!hasTutorialVideo || video.videoUrl.startsWith("blob:")) return;
     let cancelled = false;
     fetch(video.videoUrl)
       .then((r) => r.blob())
@@ -311,23 +312,18 @@ function DTutorialModal({ agent, onClose }) {
         </div>
 
         <div className="dv-modal__body">
-          {video &&
+          {hasTutorialVideo &&
           <div className="dv-modal__sec">
               <h3><DI name="video" size={15} /> Watch the walkthrough</h3>
-              <div className={`dv-tut ${playing && video.videoUrl ? "is-playing" : ""}`}>
+              <div className={`dv-tut ${playing ? "is-playing" : ""}`}>
                 <div className="dv-tut__media">
-                  {playing && video.videoUrl ?
+                  {playing ?
                   <video className="dv-tut__video" src={blobSrc || video.videoUrl} poster={video.photo} controls autoPlay playsInline /> :
                   <React.Fragment>
                     <img src={video.photo} alt="" />
-                    {video.videoUrl ?
                     <button className={`dv-tut__play ${loadingVideo ? "is-loading" : ""}`} onClick={startPlayback} disabled={loadingVideo} aria-label="Play tutorial video">
                       <span className="ring">{loadingVideo ? <DI name="stopwatch" size={20} /> : <DI name="arrow-right" size={20} />}</span>
-                    </button> :
-                    agent.link ?
-                    <a className="dv-tut__play" href={agent.link} target="_blank" rel="noreferrer" aria-label="Watch the walkthrough">
-                      <span className="ring"><DI name="arrow-right" size={20} /></span>
-                    </a> : null}
+                    </button>
                   </React.Fragment>
                   }
                 </div>
