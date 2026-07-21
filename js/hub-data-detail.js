@@ -318,6 +318,90 @@
         "Anything you can't trace back to a source",
       ],
     },
+    "ui-mockup-builder": {
+      bestFor: "Turning approved UI screens into polished, on-brand mockup imagery for product stories, launch materials and presentations.",
+      helps: [
+        "Place UI in realistic phones, laptops, screens and posters",
+        "Build spatial floating-UI compositions with cards and panels",
+        "Create brand and out-of-home contexts, from billboards to lightboxes",
+        "Keep the uploaded UI, logos, teal brand colour and hierarchy readable",
+      ],
+      use: [
+        "Turning final UI screens into product or marketing visuals",
+        "Choosing the right device, composition or environment for a story",
+        "Exploring a premium visual direction before production starts",
+        "Visualising out-of-home placements for a concept or presentation",
+      ],
+      avoid: [
+        "Redesigning the interface or rewriting the supplied UI copy",
+        "Changing logos, brand colours or critical product details",
+        "Using confidential, personal or unapproved screen content",
+        "Final production artwork without format, legal and brand checks",
+      ],
+    },
+    "slide-deck-studio": {
+      bestFor: "Turning a rough idea, conversation or source document into a structured, on-brand PowerPoint deck that is ready to refine and export.",
+      helps: [
+        "Extract the key messages from a brief, report or working document",
+        "Shape a clear storyline for the audience and meeting purpose",
+        "Create suitable title, data, comparison, decision and next-step slides",
+        "Apply the Scout24 or ImmoScout24 brand consistently across the deck",
+      ],
+      use: [
+        "Creating a first deck from an idea, conversation or source document",
+        "Turning a detailed report into a concise stakeholder narrative",
+        "Preparing strategy updates, reviews, proposals and workshop materials",
+        "Generating an editable PowerPoint starting point for further review",
+      ],
+      avoid: [
+        "Exporting without checking the facts, data and final storyline",
+        "Making final business decisions or recommendations on its own",
+        "Inventing numbers, claims or details that are not in the source",
+        "Replacing the final content, brand or leadership sign-off",
+      ],
+    },
+    "email-builder": {
+      bestFor: "Creating clear, on-brand marketing emails from reusable modules and templates — ready for content and CRM review.",
+      helps: [
+        "Turn a campaign brief into a structured email draft",
+        "Build messages from approved modules and reusable patterns",
+        "Create subject-line, copy and content variations to review",
+        "Keep hierarchy, calls to action and brand tone consistent",
+      ],
+      use: [
+        "Creating recurring CRM, campaign and lifecycle email drafts",
+        "Adapting an approved email structure for a new message",
+        "Exploring copy and module combinations before build",
+        "Preparing a clear hand-off for content, CRM or production teams",
+      ],
+      avoid: [
+        "Creating new modules or templates outside the approved system",
+        "Sending without CRM, legal, accessibility and rendering checks",
+        "Making unapproved pricing, product or performance claims",
+        "Using customer or audience data that has not been approved",
+      ],
+    },
+    "ae-expression": {
+      bestFor: "Helping motion designers write, understand and debug After Effects expressions and rigs with less trial and error.",
+      helps: [
+        "Write expressions for common motion and animation tasks",
+        "Diagnose an expression that is broken, slow or behaving unexpectedly",
+        "Explain existing expression logic in plain language",
+        "Create reusable starting points for controlled motion systems",
+      ],
+      use: [
+        "Building or refining an After Effects expression or rig",
+        "Debugging a specific error, relationship or animation behaviour",
+        "Learning how an expression works before adapting it",
+        "Creating a tested starting point for repeatable motion work",
+      ],
+      avoid: [
+        "Using generated code without testing it in the target project",
+        "Replacing motion-design judgement, timing or craft decisions",
+        "Assuming compatibility across every After Effects version or plugin",
+        "Delivering final motion assets without a production review",
+      ],
+    },
   };
 
   function detailFor(agent) {
