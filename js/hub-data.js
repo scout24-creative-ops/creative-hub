@@ -105,7 +105,7 @@
       target: ["Product", "Marketing", "Sales", "Leadership"],
       audience: ["All Marketing", "Content", "Brand"],
       tags: ["Presentation", "Storytelling", "PowerPoint"],
-      link: null,
+      link: "https://sandbox-slidedeck-studio.scout24.com/",
     },
     {
       id: "ui-mockup-builder",
