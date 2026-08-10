@@ -1,5 +1,5 @@
 /* ============================================================================
-   Hub Tweaks — brand logo controls (treatment, lockup, header theme, footer).
+   Hub Tweaks , brand logo controls (treatment, lockup, header theme, footer).
    Renders into its own root; applies choices as data-* on .hub-app so the
    CSS in hub-base.css does the visual work. Driven by the Tweaks toolbar.
    ============================================================================ */

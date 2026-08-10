@@ -1,5 +1,5 @@
 /* ============================================================================
-   Concept B — per-agent detail enrichment.
+   Concept B , per-agent detail enrichment.
    Adds "When to use / When not to use / Best for" plus matched tutorials and
    examples to every agent, derived from its category with curated overrides
    for the most-used agents. Honest, scalable: no invented stats per agent.
@@ -8,7 +8,7 @@
 (function () {
   const HUB = window.HUB;
 
-  /* Category-level guidance — genuinely useful defaults so every agent has a
+  /* Category-level guidance , genuinely useful defaults so every agent has a
      meaningful detail page even before bespoke copy is written. */
   const CAT_GUIDE = {
     create: {
@@ -196,7 +196,7 @@
       ],
     },
     "script-storyboard": {
-      bestFor: "Kickstarting scriptwriting — from vague request to structured creative direction.",
+      bestFor: "Kickstarting scriptwriting , from vague request to structured creative direction.",
       helps: [
         "Turn a business message into a clear video concept",
         "Draft scripts tailored to the audience and goal",
@@ -231,13 +231,13 @@
       ],
       avoid: [
         "Generating final assets (it writes prompts, not images)",
-        "Brand sign-off — outputs still need a review",
+        "Brand sign-off , outputs still need a review",
         "Models it hasn't been briefed on yet",
         "Replacing a proper creative brief",
       ],
     },
     "video-endcard-editor": {
-      bestFor: "Adding the correct brand endcard to a finished video — no editing skills needed.",
+      bestFor: "Adding the correct brand endcard to a finished video , no editing skills needed.",
       helps: [
         "Add the right abbinder to the end of any video",
         "Pick the correct endcard for each format automatically",
@@ -361,7 +361,7 @@
       ],
     },
     "email-builder": {
-      bestFor: "Creating clear, on-brand marketing emails from reusable modules and templates — ready for content and CRM review.",
+      bestFor: "Creating clear, on-brand marketing emails from reusable modules and templates , ready for content and CRM review.",
       helps: [
         "Turn a campaign brief into a structured email draft",
         "Build messages from approved modules and reusable patterns",

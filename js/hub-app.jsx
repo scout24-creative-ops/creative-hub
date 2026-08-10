@@ -1,7 +1,7 @@
 /* ============================================================================
-   App root — hosts BOTH concepts and a floating A/B toggle.
+   App root , hosts BOTH concepts and a floating A/B toggle.
      · Concept A (AppA): the full single-scroll hub (original).
-     · Concept B (AppB): agent-first flow — Home → Agent Library → Agent Detail.
+     · Concept B (AppB): agent-first flow , Home → Agent Library → Agent Detail.
    The chosen concept persists in localStorage so a refresh keeps it.
    ============================================================================ */
 const {
@@ -10,7 +10,7 @@ const {
   AgentModal,
   BHeader, BHome, BLibrary, BAgentDetail, BFooter,
   CHeader, CHome, CAgentDetail, CFooter,
-  DHeader, DHome, DTutorialModal, DFooter,
+  DHeader, DHome, DNewsArticle, DKnowledgeUpdates, DTutorialModal, DFooter, HubAIAssistant,
 } = window;
 
 function useReveal(dep) {
@@ -49,7 +49,7 @@ function useReveal(dep) {
 
 /* ----------------------------------------------------------- Concept A */
 function AppA() {
-  const dir = "b"; // Warm — the only visual direction
+  const dir = "b"; // Warm , the only visual direction
   const [filter, setFilter] = React.useState("all");
   const [modalAgent, setModalAgent] = React.useState(null);
   useReveal(filter);
@@ -146,18 +146,124 @@ function AppC() {
 }
 
 /* ----------------------------------------------------------- Concept D */
-function AppD() {
-  const [tutorialAgent, setTutorialAgent] = React.useState(null);
-  useReveal("d");
+const D_NEWS_TITLES = {
+  "gpt-5-6-for-immoscout24": "GPT‑5.6 for ImmoScout24 teams",
+  "campaign-creation-at-scout24": "From Weeks to Minutes: AI campaign creation at Scout24",
+};
 
-  const goHome = () => window.scrollTo({ top: 0, behavior: "smooth" });
+function dViewFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  const newsPage = params.get("news");
+  if (D_NEWS_TITLES[newsPage]) return { section: "news", pageKey: `news::${newsPage}`, title: D_NEWS_TITLES[newsPage] };
+  if (newsPage) return { section: "home", pageKey: null, title: "Home" };
+  if (params.get("knowledge") === "updates") return { section: "knowledge", pageKey: "knowledge::updates", title: "AI & Marketing Updates" };
+  if (params.get("studio") === "agents") return { section: "create", pageKey: null, title: "All Agents" };
+  const mediaPage = params.get("media-library");
+  if (!mediaPage) return { section: "home", pageKey: null, title: "Home" };
+  if (mediaPage === "overview") return { section: "assets", pageKey: "hub::69", title: "Media Library" };
+  const labels = { images: "Images", immopics: "ImmoPics", highlighter: "Highlighter", icons: "Icons", logos: "Logos", templates: "Templates" };
+  return labels[mediaPage]
+    ? { section: "assets", pageKey: `media-library::${mediaPage}`, title: labels[mediaPage] }
+    : { section: "home", pageKey: null, title: "Home" };
+}
+
+function dSyncLocation(nextView, mode = "push") {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("news");
+  url.searchParams.delete("studio");
+  url.searchParams.delete("knowledge");
+  if (nextView.section !== "assets") url.searchParams.delete("media-library");
+  if (nextView.section === "news") url.searchParams.set("news", (nextView.pageKey || "news::gpt-5-6-for-immoscout24").split("::")[1]);
+  if (nextView.section === "create") url.searchParams.set("studio", "agents");
+  if (nextView.section === "knowledge") url.searchParams.set("knowledge", "updates");
+  window.history[`${mode}State`]({ ...(window.history.state || {}), hubRoute: true }, "", url);
+}
+
+function AppD() {
+  const askHubEnabled = false;
+  const [language, setLanguage] = React.useState(() => window.HubLanguage.getLanguage());
+  const [tutorialAgent, setTutorialAgent] = React.useState(null);
+  const [assistantOpen, setAssistantOpen] = React.useState(false);
+  const [assistantPrompt, setAssistantPrompt] = React.useState("");
+  const [view, setView] = React.useState(dViewFromLocation);
+  const [navigationOpen, setNavigationOpen] = React.useState(false);
+  useReveal(`d:${view.section}:${view.pageKey || "index"}`);
+
+  React.useEffect(() => {
+    const onPopState = () => { setView(dViewFromLocation()); window.scrollTo({ top: 0, behavior: "auto" }); };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+  React.useEffect(() => {
+    const title = view.section === "news"
+      ? `${D_NEWS_TITLES[(view.pageKey || "news::gpt-5-6-for-immoscout24").split("::")[1]] || "Creative Hub News"} · Creative Hub`
+      : view.section === "create"
+        ? "All Agents · Creative Hub"
+        : view.section === "knowledge"
+          ? "AI & Marketing Updates · Creative Hub"
+        : "AI Marketing Creation Hub · Creative Studio";
+    document.title = window.HubLanguage.translate(title, language);
+    if (!["news", "create", "knowledge"].includes(view.section)) return undefined;
+    const focusTimer = window.setTimeout(() => document.querySelector("main h1[tabindex='-1']")?.focus({ preventScroll: true }), 40);
+    return () => window.clearTimeout(focusTimer);
+  }, [view.section, view.pageKey, language]);
+
+  const changeLanguage = React.useCallback((nextLanguage) => {
+    const next = window.HubLanguage.setLanguage(nextLanguage);
+    setLanguage(next);
+  }, []);
+
+  const goHome = () => {
+    const next = { section: "home", pageKey: null, title: "Home" };
+    dSyncLocation(next);
+    setView(next);
+    window.scrollTo({ top: 0, behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
+  const goSection = (section, page) => {
+    const destination = section === "brand" && !page
+      ? { key: "hub::56", label: "Brand Overview", source: "hub" }
+      : section === "assets" && !page
+        ? { key: "hub::69", label: "Media Library", source: "hub" }
+        : page;
+    const next = { section, pageKey: destination?.key || null, title: destination?.label || (section.charAt(0).toUpperCase() + section.slice(1)) };
+    dSyncLocation(next);
+    setView(next);
+    window.scrollTo({ top: 0, behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
+  const leaveNews = () => {
+    if (window.history.state?.hubRoute) window.history.back();
+    else goHome();
+  };
   const openTutorial = (a) => setTutorialAgent(a);
+  const openAssistant = (prompt = "") => {
+    setAssistantPrompt(typeof prompt === "string" ? prompt : "");
+    setAssistantOpen(true);
+  };
+  const closeAssistant = () => {
+    setAssistantOpen(false);
+    setAssistantPrompt("");
+  };
 
   return (
-    <div className="hub-app" data-direction="b" data-concept="d">
-      <DHeader goHome={goHome} />
-      <DHome onTutorial={openTutorial} />
-      <DFooter goHome={goHome} />
+    <div className={`hub-app${navigationOpen ? " is-nav-open" : ""}`} data-direction="b" data-concept="d">
+      <DHeader goHome={goHome} goSection={goSection} activeSection={view.section} activePageKey={view.pageKey} onNavigationChange={setNavigationOpen} language={language} onLanguageChange={changeLanguage} />
+      {view.section === "home" || view.section === "create"
+        ? <DHome onTutorial={openTutorial} showStudio={view.section === "create"} onOpenStudio={() => goSection("create")} onOpenAssistant={openAssistant} askHubEnabled={askHubEnabled} onOpenNews={(articleId = "gpt-5-6-for-immoscout24") => goSection("news", { key: `news::${articleId}`, label: D_NEWS_TITLES[articleId] || "Creative Hub News" })} />
+        : view.section === "news"
+          ? <DNewsArticle articleId={(view.pageKey || "news::gpt-5-6-for-immoscout24").split("::")[1]} onBack={leaveNews} onOpenStudio={() => goSection("create")} />
+          : view.section === "knowledge"
+            ? <DKnowledgeUpdates onOpenArticle={(articleId) => goSection("news", { key: `news::${articleId}`, label: D_NEWS_TITLES[articleId] || "Creative Hub News" })} />
+            : <DEmptyPage section={view.section} pageKey={view.pageKey} title={view.title} onNavigate={goSection} />}
+      <DFooter goHome={goHome} goSection={goSection} />
+      {askHubEnabled && <HubAIAssistant
+        open={assistantOpen}
+        onOpen={() => openAssistant("")}
+        onClose={closeAssistant}
+        onNavigate={goSection}
+        onTutorial={openTutorial}
+        context={{ section: view.section, title: view.title }}
+        initialPrompt={assistantPrompt}
+      />}
       {tutorialAgent && <DTutorialModal agent={tutorialAgent} onClose={() => setTutorialAgent(null)} />}
     </div>
   );

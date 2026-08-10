@@ -1,5 +1,5 @@
 /* ============================================================================
-   Concept B — agent-first experience.
+   Concept B , agent-first experience.
    Flow: Home → Agent Library → Agent Detail Page. Simplified navigation,
    reduced duplication: tutorials, examples, guardrails and feedback now live
    on the agent detail page that each card opens.
@@ -452,7 +452,7 @@ function BAgentDetail({ agent, goLibrary, goAgent }) {
               <div><b>{agent.owner}</b><span>Owner &amp; sparring contact</span></div>
             </div>
             {sent ? (
-              <div className="adp-fb-sent"><BI name="accept-glyph" size={18} /> Thanks — Creative Studio will be in touch.</div>
+              <div className="adp-fb-sent"><BI name="accept-glyph" size={18} /> Thanks , Creative Studio will be in touch.</div>
             ) : (
               <div className="adp-fb">
                 <button className="adp-fb-btn" onClick={() => setSent(true)}><BI name="chat" size={16} /> Give feedback on this agent</button>

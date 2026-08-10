@@ -1,5 +1,5 @@
 /* ============================================================================
-   Concept C — the gallery.
+   Concept C , the gallery.
    A deliberately simple, editorial experience whose single job is the overview
    of agents that actually exist on the platform. No marketing scaffolding, no
    status/percentage badges, no target-user labels. Just: see every agent, open
@@ -25,7 +25,7 @@ function CHeader({ goHome }) {
   return (
     <header className="cv-header">
       <div className="wrap cv-header__inner">
-        <a className="hub-brand" href="#" onClick={(e) => { e.preventDefault(); goHome(); }} aria-label="ImmoScout24 — back to all agents">
+        <a className="hub-brand" href="#" onClick={(e) => { e.preventDefault(); goHome(); }} aria-label="ImmoScout24 , back to all agents">
           <span className="hub-logo hub-logo--header" role="img" aria-label="ImmoScout24"></span>
           <span className="hub-brand__div" />
           <span className="hub-brand__studio">

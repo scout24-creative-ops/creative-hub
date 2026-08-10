@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AI Marketing Creation Hub · Creative Studio</title>
+<link rel="icon" href="assets/logo-immoscout24-vertical.svg" type="image/svg+xml" />
 
 <!-- Resources referenced from JS code (lifted for standalone bundling) -->
 <meta name="ext-resource-dependency" content="assets/photos/hero.jpg" data-resource-id="photoHero" />
@@ -38,7 +39,11 @@
 <link rel="stylesheet" href="css/hub-directions.css" />
 <link rel="stylesheet" href="css/hub-vb.css" />
 <link rel="stylesheet" href="css/hub-vc.css" />
-<link rel="stylesheet" href="css/hub-vd.css" />
+<link rel="stylesheet" href="css/hub-vd.css?v=20260807-header-nowrap-1" />
+  <link rel="stylesheet" href="css/hub-home-v2.css?v=20260810-separated-header-1" />
+<link rel="stylesheet" href="css/hub-secondary-v2.css?v=20260810-knowledge-ticker-1" />
+<link rel="stylesheet" href="css/hub-ai-assistant.css?v=20260804-ai-layer-4" />
+<link rel="stylesheet" href="css/hub-responsive-safety.css?v=20260806-responsive-pass-2" />
 </head>
 <body style="font-family: &quot;Make It Better&quot;">
 <div id="root"></div>
@@ -49,20 +54,27 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
 <!-- data first (plain JS) -->
-<script src="js/hub-data.js"></script>
+<script src="js/hub-data.js?v=20260804-remove-six-agents-1"></script>
 <script src="js/hub-data-detail.js"></script>
+<script src="js/frontify-import.js"></script>
+<script src="js/frontify-layout.js?v=20260803-frontify-fidelity-3"></script>
+<script src="js/hub-search-index.js?v=20260804-ai-layer-4"></script>
+<script src="js/hub-language-detail-de.js?v=20260807-full-page-i18n-3"></script>
+<script src="js/hub-language.js?v=20260807-full-page-i18n-3"></script>
 
 <!-- tweaks shell (exports useTweaks + controls to window) -->
 <script type="text/babel" src="tweaks-panel.jsx"></script>
 
 <!-- components, then sections, then app (babel) -->
 <script type="text/babel" src="js/hub-components.jsx"></script>
+<script type="text/babel" src="js/hub-frontify.jsx?v=20260805-knowledge-updates-1"></script>
+<script type="text/babel" src="js/hub-ai-assistant.jsx?v=20260804-ai-layer-4"></script>
 <script type="text/babel" src="js/hub-sections-a.jsx"></script>
 <script type="text/babel" src="js/hub-sections-b.jsx"></script>
 <script type="text/babel" src="js/hub-sections-vb.jsx"></script>
 <script type="text/babel" src="js/hub-sections-vc.jsx"></script>
-<script type="text/babel" src="js/hub-sections-vd.jsx"></script>
-<script type="text/babel" src="js/hub-app.jsx"></script>
+  <script type="text/babel" src="js/hub-sections-vd.jsx?v=20260810-knowledge-ticker-1"></script>
+<script type="text/babel" src="js/hub-app.jsx?v=20260807-full-page-i18n-3"></script>
 <script type="text/babel" src="js/hub-tweaks.jsx"></script>
 </body>
 </html>

@@ -1,0 +1,33 @@
+/* Final responsive guardrails ------------------------------------------------
+   These rules sit after every Hub stylesheet so long copy, imported media and
+   compact controls stay inside the viewport without changing the page design. */
+html, body, #root, .hub-app { max-width: 100%; overflow-x: clip; }
+
+.hub-app *, .hub-app *::before, .hub-app *::after { min-width: 0; }
+.hub-app img, .hub-app picture, .hub-app video, .hub-app iframe, .hub-app canvas { max-width: 100%; height: auto; }
+.hub-app h1, .hub-app h2, .hub-app h3, .hub-app p, .hub-app li, .hub-app dd, .hub-app td, .hub-app th, .hub-app a, .hub-app button { overflow-wrap: break-word; }
+
+@media (max-width: 860px) {
+  .frontify-page, .brand-page, .knowledge2, .studio2, .news2 { max-width: 100%; overflow-x: clip; }
+  .frontify-page table, .brand-page table { display: block; max-width: 100%; overflow-x: auto; }
+  .frontify-page pre, .brand-page pre { max-width: 100%; overflow-x: auto; white-space: pre-wrap; }
+  .dv-nav__submenu { max-width: calc(100vw - 16px); }
+  .home2-pick-list article > div:last-child { flex-wrap: wrap; justify-content: flex-start; }
+  .home2-section-heading--unlabelled > div { width: 100%; }
+  .home2-section-heading--unlabelled h2 { max-width: min(13ch, 100%); }
+}
+
+@media (max-width: 560px) {
+  .home2-update-card__buttons, .home2-pick-list article > div:last-child, .news2-cta button, .knowledge2-update > button { width: 100%; }
+  .home2-pick-list article { grid-template-columns: 1fr; }
+  .home2-pick-list article > div:last-child { grid-column: 1; }
+  .home2-pick-list article > div:last-child > * { flex: 1 1 auto; }
+  .knowledge2-update > button { justify-content: center; }
+  .studio2-controls { width: calc(100% - (var(--home2-pad) * 2)); }
+}
+
+@media (max-width: 380px) {
+  .home2-slide__copy h1, .home2-slide__copy h2 { font-size: clamp(34px, 10vw, 40px); }
+  .knowledge2-tabs button, .studio2-filters button { padding-inline: 12px; }
+  .dv-menu-toggle { padding-inline: 9px; }
+}
