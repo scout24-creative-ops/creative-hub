@@ -682,7 +682,6 @@ function DAgentCatalog({ agents, filter, setFilter, q, setQ, cats, counts, onTut
         </div>
         <div className="studio2-hero__intro">
           <p>Browse every published Creative Studio agent, from presentation and imagery tools to automation, adaptation and brand guidance.</p>
-          <dl><div><dt>Published tools</dt><dd>{D_AGENTS.length}</dd></div><div><dt>Ways to work</dt><dd>{cats.length}</dd></div></dl>
         </div>
       </div>
     </section>
