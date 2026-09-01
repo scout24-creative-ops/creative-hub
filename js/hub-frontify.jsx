@@ -95,8 +95,6 @@ function buildHubNavigation() {
       ...["Playbooks", "Best Practices", "Tutorials", "Marketing Academy", "AI Academy", "Case Studies", "FAQs", "Research"].map(fPlaceholder),
     ],
     community: [
-      fGroup("Community"),
-      ...["Request Assets", "Feedback", "Release Notes", "Teams Directory"].map(fPlaceholder),
       fGroup("Contact & legal"),
       fExisting("home", "Contact us"),
       fExisting("home", "Terms of Use"),
