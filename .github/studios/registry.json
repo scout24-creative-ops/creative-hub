@@ -102,10 +102,11 @@
         "de": "Freigegebene Workflows und Richtlinien für Sprengnetter-Produkte entwickeln."
       },
       "owner": {
-        "name": "Unassigned",
-        "team": "Creative Studio"
+        "name": "Eve",
+        "github": "evevogelein-s24",
+        "team": "Sprengnetter, News and Brand"
       },
-      "scope": ["sprengnetter", "sprengnetter-products"],
+      "scope": ["sprengnetter", "sprengnetter-products", "news", "brand"],
       "status": "planned"
     }
   ]
