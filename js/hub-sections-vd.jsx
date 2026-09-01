@@ -397,7 +397,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
   const menuToggleRef = React.useRef(null);
   const triggerRefs = React.useRef({});
   const nav = DFrontify.buildHubNavigation();
-  const disabledSections = new Set(["brand", "assets", "community"]);
+  const disabledSections = new Set(["assets"]);
   const brandOverview = { key: "hub::56", label: "Brand Overview", source: "hub" };
   const mediaOverview = { key: "hub::69", label: "Media Library", source: "hub" };
   const openMenu = (id) => {
@@ -1433,8 +1433,8 @@ function DTutorialModal({ agent, onClose }) {
 
 /* ---------------------------------------------------------------- Footer */
 function DFooter({ goHome, goSection }) {
-  const footerNav = [['home','Homepage'],['create','AI Studio'],['knowledge','Knowledge']];
-  const footerComing = [['brand','Brand'],['assets','Assets'],['community','Community']];
+  const footerNav = [['home','Homepage'],['create','AI Studio'],['brand','Brand'],['knowledge','Knowledge'],['community','Community']];
+  const footerComing = [['assets','Assets']];
   const footerPages = [
     ['Terms of Use', 'resources', 'home::Terms of Use'],
     ['Datenschutz', 'resources', 'home::Datenschutzerklärung'],

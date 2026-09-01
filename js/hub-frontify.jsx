@@ -655,7 +655,7 @@ function FMediaLibraryOverview({ onNavigate }) {
       <div className="wrap ml-overview-hero__inner">
         <div className="ml-overview-hero__copy">
           <span className="ml-eyebrow">ImmoScout24 brand assets</span>
-          <h1>Media Library.</h1>
+          <h1 tabIndex="-1">Media Library.</h1>
           <p>Everything you need to create unmistakably ImmoScout24 work—organised, searchable and ready to explore.</p>
           <span className="ml-overview-hero__stat">{total.toLocaleString("en-GB")} assets recorded across the live library</span>
         </div>
@@ -845,7 +845,7 @@ function FMediaLibrarySection({ sectionId, library, onNavigate }) {
     <FMediaLibraryNav active={section.id} onNavigate={onNavigate} />
     <header className="ml-library-hero" style={{ "--ml-tint": section.tint }}>
       <div className="wrap ml-library-hero__inner">
-        <div><span className="ml-eyebrow">Media Library</span><h1>{section.label}</h1><p>{section.blurb}</p></div>
+        <div><span className="ml-eyebrow">Media Library</span><h1 tabIndex="-1">{section.label}</h1><p>{section.blurb}</p></div>
         <div className="ml-library-hero__meta"><strong>{section.recordedCount.toLocaleString("en-GB")}</strong><span>assets recorded in Frontify</span></div>
       </div>
     </header>
@@ -1176,7 +1176,7 @@ function MFMediaLibraryOverview({ onNavigate }) {
   return <main className="mf-page mf-overview">
     <MFMediaLibraryNav active={null} onNavigate={onNavigate} />
     <header className="wrap mf-overview__head">
-      <h1>Media Library</h1>
+      <h1 tabIndex="-1">Media Library</h1>
     </header>
     <section className="wrap mf-overview__categories" aria-label="Asset categories">
       <div className="mf-category-grid">
@@ -1595,7 +1595,7 @@ function MFIconLibrary({ onNavigate }) {
   return <main className="mf-page mf-library mf-library--icons mi-page">
     <MFMediaLibraryNav active="icons" onNavigate={onNavigate} />
     <header className="wrap mf-library__head mi-head">
-      <div><span>Media Library</span><h1>Icons</h1><p>Browse one design per card. Icons preview at the 24px standard; open a design to choose another source and download the original SVG or a transparent PNG.</p></div>
+      <div><span>Media Library</span><h1 tabIndex="-1">Icons</h1><p>Browse one design per card. Icons preview at the 24px standard; open a design to choose another source and download the original SVG or a transparent PNG.</p></div>
       <div className="mf-library__count"><strong>{(catalogState.data?.fileCount || section.recordedCount).toLocaleString("en-GB")}</strong><span>full SVG originals</span><small>{designs.length.toLocaleString("en-GB")} icon designs</small></div>
     </header>
 
@@ -1790,7 +1790,7 @@ function MFMediaLibrarySection({ sectionId, library, onNavigate }) {
     <header className="wrap mf-library__head">
       <div>
         <span>Media Library</span>
-        <h1>{section.label}</h1>
+        <h1 tabIndex="-1">{section.label}</h1>
         <p>{section.blurb}</p>
       </div>
       <div className="mf-library__count"><strong>{section.recordedCount.toLocaleString("en-GB")}</strong><span>assets in the source library</span><small>{assets.length.toLocaleString("en-GB")} previews available here</small></div>
@@ -1876,7 +1876,7 @@ function FMediaLibraryTemplates({ onNavigate }) {
   const page = pages.find((item) => item.title === activeTitle) || pages[0];
   return <main className="ml-page ml-page--templates">
     <MFMediaLibraryNav active="templates" onNavigate={onNavigate} />
-    <header className="wrap mf-library__head mf-library__head--templates"><div><span>Media Library</span><h1>Templates</h1><p>Ready-to-use templates for presentations, email signatures, stationery and social channels.</p></div><div className="mf-library__count"><strong>{pages.length}</strong><span>published template pages</span></div></header>
+    <header className="wrap mf-library__head mf-library__head--templates"><div><span>Media Library</span><h1 tabIndex="-1">Templates</h1><p>Ready-to-use templates for presentations, email signatures, stationery and social channels.</p></div><div className="mf-library__count"><strong>{pages.length}</strong><span>published template pages</span></div></header>
     <div className="wrap ml-template-layout">
       <aside className="ml-template-nav" aria-label="Template pages">{pages.map((item) => <button type="button" className={item.title === page?.title ? "is-active" : ""} aria-current={item.title === page?.title ? "page" : undefined} onClick={() => setActiveTitle(item.title)} key={item.title}>{item.title}</button>)}</aside>
       <article className="ml-template-document">
@@ -1939,7 +1939,7 @@ function FLookFeelPage({ onNavigate }) {
 
     <section className="lf-intro">
       <div className="lf-copy lf-copy--display">
-        <h1>A brand that feels<br />like home.</h1>
+        <h1 tabIndex="-1">A brand that feels<br />like home.</h1>
       </div>
       <div className="lf-copy lf-copy--body">
         <p>At ImmoScout24, we believe that a brand should feel as authentic and welcoming as the homes we help people find. Our visual identity is more than just design – it’s an invitation: to explore, to trust, and to feel at home.</p>
@@ -2067,7 +2067,7 @@ function FBrandOverview({ onNavigate }) {
     </section>
 
     <section className="bh-intro">
-      <h1>The home of our brand.</h1>
+      <h1 tabIndex="-1">The home of our brand.</h1>
       <p>A home is more than just four walls – it’s a journey. Whether buying, selling, renting, or owning, ImmoScout24 is the trusted partner that guides people through every step on their way to finding home. And just as we make this experience seamless and intuitive for our users, this platform provides everything you need to activate and express our brand.</p>
     </section>
 
@@ -2130,7 +2130,7 @@ function FBrandStrategyOverview({ onNavigate }) {
     </section>
     <section className="bs-hero">
       <div className="bs-wrap">
-        <h1>Brand Strategy</h1>
+        <h1 tabIndex="-1">Brand Strategy</h1>
         <p>ImmoScout24 is the all-in-one platform that simplifies the real estate journey for all. We centralize services for seekers, owners, and agents, making the process simple and convenient.</p>
       </div>
     </section>
@@ -2247,7 +2247,7 @@ function FGuidelinesOverview({ onNavigate }) {
   const toneOfVoice = fExisting("guidelines", "Tone of Voice (DE)", "Tone of Voice");
 
   return <main className="gh-page">
-    <h1 className="sr-only">Guidelines</h1>
+    <h1 className="sr-only" tabIndex="-1">Guidelines</h1>
     <section className="gh-hero" aria-label="ImmoScout24 Guidelines">
       <FGuidelinesHomeVideo file="guidelines-hero.mp4" posterFile="guidelines-hero-poster.png" label="ImmoScout24 Guidelines introduction" className="gh-hero__video" eager />
     </section>
@@ -2443,7 +2443,7 @@ function HubFrontifyPage({ section, pageKey, title, onNavigate }) {
       <article className="hf-content">
         <header className="hf-content__head">
           {!isSourceDocument && <span className="hf-kicker">{hasSource ? "Hub resource" : "Hub structure"}</span>}
-          <h1>{pageKey ? displayTitle : section}</h1>
+          <h1 tabIndex="-1">{pageKey ? displayTitle : section}</h1>
           {!isSourceDocument && pageKey && hasSource && updated && <div className="hf-meta"><span>Updated {updated}</span></div>}
         </header>
 
