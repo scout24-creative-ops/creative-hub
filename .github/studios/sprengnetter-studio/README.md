@@ -1,6 +1,12 @@
 # Sprengnetter Studio
 
-Sprengnetter Studio is a planned product workspace for approved Sprengnetter-product workflows and guidance. Ownership has not yet been assigned.
+Sprengnetter Studio is a planned product workspace owned by [evevogelein-s24](https://github.com/evevogelein-s24) for approved Sprengnetter-product workflows and guidance.
+
+## Scope
+
+- Sprengnetter Studio and Sprengnetter products
+- News
+- Brand
 
 It uses the shared brand-neutral Studio framework and is not imported by the Creative Hub webpage.
 

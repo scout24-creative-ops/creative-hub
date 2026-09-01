@@ -9,7 +9,7 @@ This registry records Studio assignments in GitHub without publishing their shel
 | Professionals Studio | Peter | [`PeterSijtsma`](https://github.com/PeterSijtsma) | Professionals and professional products | Planned |
 | Homeowner Studio | Nadja | [`ndc4scout24`](https://github.com/ndc4scout24) | Homeowner products | Planned |
 | Seeker Studio | Marcus | [`md-at-is24`](https://github.com/md-at-is24) | Seeker products | Planned |
-| Sprengnetter Studio | Unassigned | — | Sprengnetter products | Planned |
+| Sprengnetter Studio | Eve | [`evevogelein-s24`](https://github.com/evevogelein-s24) | Sprengnetter products, News and Brand | Planned |
 
 After accepting a repository invitation, each owner can clone the repository and generate their registered environment:
 
