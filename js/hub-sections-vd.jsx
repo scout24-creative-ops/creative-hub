@@ -392,16 +392,26 @@ function dMenuGroups(items) {
 
 function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigationChange, language, onLanguageChange }) {
   const [open, setOpen] = React.useState(null);
+  const [sectionDrawerDismissed, setSectionDrawerDismissed] = React.useState(false);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const headerRef = React.useRef(null);
   const menuToggleRef = React.useRef(null);
   const triggerRefs = React.useRef({});
   const nav = DFrontify.buildHubNavigation();
   const disabledSections = new Set(["assets"]);
+  const persistentSections = new Set(["brand", "community"]);
+  const persistentSection = persistentSections.has(activeSection) && !sectionDrawerDismissed ? activeSection : null;
+  const drawerSection = open || persistentSection;
   const brandOverview = { key: "hub::56", label: "Brand Overview", source: "hub" };
   const mediaOverview = { key: "hub::69", label: "Media Library", source: "hub" };
   const openMenu = (id) => {
-    if (id === "brand") goSection("brand", brandOverview);
+    if (persistentSections.has(id)) {
+      setSectionDrawerDismissed(false);
+      setOpen(null);
+      setMobileNavOpen(false);
+      goSection(id, id === "brand" ? brandOverview : undefined);
+      return;
+    }
     if (id === "assets") {
       goSection("assets", mediaOverview);
       setOpen(null);
@@ -409,22 +419,21 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
     }
     setOpen(id);
   };
-  const toggleMenu = (id) => { if (open === id && !(id === "brand" && activeSection === "brand")) setOpen(null); else openMenu(id); };
+  const toggleMenu = (id) => { if (open === id) setOpen(null); else openMenu(id); };
   const closeDrawer = (restoreFocus = true) => {
-    if (!open || (open === "brand" && activeSection === "brand")) return;
-    const trigger = triggerRefs.current[open];
+    if (!drawerSection) return;
+    const trigger = triggerRefs.current[drawerSection];
     setOpen(null);
+    if (persistentSections.has(drawerSection)) setSectionDrawerDismissed(true);
     if (restoreFocus) window.requestAnimationFrame(() => trigger?.focus());
   };
-  React.useEffect(() => { onNavigationChange?.(Boolean(open)); }, [open, onNavigationChange]);
+  React.useEffect(() => { onNavigationChange?.(Boolean(drawerSection)); }, [drawerSection, onNavigationChange]);
   React.useEffect(() => () => onNavigationChange?.(false), [onNavigationChange]);
   React.useEffect(() => {
     const closeOnEscape = (event) => {
       if (event.key !== "Escape") return;
-      if (open && !(open === "brand" && activeSection === "brand")) {
-        const trigger = triggerRefs.current[open];
-        setOpen(null);
-        window.requestAnimationFrame(() => trigger?.focus());
+      if (drawerSection) {
+        closeDrawer(true);
         return;
       }
       if (mobileNavOpen) {
@@ -434,7 +443,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
     };
     const closeOutside = (event) => {
       if (headerRef.current?.contains(event.target)) return;
-      if (open && !(open === "brand" && activeSection === "brand")) setOpen(null);
+      if (open) setOpen(null);
       if (mobileNavOpen) setMobileNavOpen(false);
     };
     window.addEventListener("keydown", closeOnEscape);
@@ -443,18 +452,20 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
       window.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("pointerdown", closeOutside);
     };
-  }, [open, mobileNavOpen, activeSection]);
+  }, [drawerSection, open, mobileNavOpen]);
   React.useEffect(() => {
-    if (open === "brand") setOpen(null);
+    setSectionDrawerDismissed(false);
+    setMobileNavOpen(false);
+    setOpen(null);
   }, [activeSection]);
   React.useEffect(() => {
     setMobileNavOpen(false);
     setOpen(null);
-  }, [activeSection, activePageKey]);
+  }, [activePageKey]);
   return (
-    <header className={`dv-header${activeSection === "home" ? " is-home-overlay" : ""}${mobileNavOpen ? " is-mobile-nav-open" : ""}${open ? " has-section-drawer" : ""}`} ref={headerRef} onBlur={(event) => {
+    <header className={`dv-header${activeSection === "home" ? " is-home-overlay" : ""}${mobileNavOpen ? " is-mobile-nav-open" : ""}${drawerSection ? " has-section-drawer" : ""}`} ref={headerRef} onBlur={(event) => {
       if (event.currentTarget.contains(event.relatedTarget)) return;
-      if (open && !(open === "brand" && activeSection === "brand")) setOpen(null);
+      if (open) setOpen(null);
       if (mobileNavOpen) setMobileNavOpen(false);
     }}>
       <button className="dv-brand dv-brand--separate" type="button" onClick={() => { setOpen(null); setMobileNavOpen(false); goHome(); }} aria-label="ImmoScout24 , back to the Hub homepage">
@@ -465,7 +476,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
         <nav className="dv-nav" id="dv-main-navigation" aria-label="Main navigation">
           {[['create','Create / AI Studio'],['brand','Brand'],['assets','Assets'],['knowledge','Knowledge'],['community','Community']].map(([id, label]) => {
             const menuId = `dv-nav-menu-${id}`;
-            const isOpen = open === id;
+            const isOpen = drawerSection === id;
             const groups = dMenuGroups(nav[id]);
             const isDisabled = disabledSections.has(id);
             const opensDirectly = id === "create" || id === "knowledge";
@@ -498,7 +509,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
               {isOpen && !opensDirectly && !isDisabled && <aside className="dv-nav__submenu" id={menuId} aria-label={`${label} navigation`}>
                 <div className="dv-nav__drawer-head">
                   <div><span>Navigation</span><strong>{label}</strong></div>
-                  {!(id === "brand" && activeSection === "brand") && <button className="dv-nav__drawer-close" type="button" onClick={() => closeDrawer(true)} aria-label={`Close ${label} navigation`}><DI name="cancel" size={15}/></button>}
+                  <button className="dv-nav__drawer-close" type="button" onClick={() => closeDrawer(true)} aria-label={`Close ${label} navigation`}><DI name="cancel" size={15}/></button>
                 </div>
                 <div className="dv-nav__drawer-scroll">
                   {groups.map((group) => <section className="dv-nav__drawer-links" aria-labelledby={`${menuId}-${group.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`} key={group.label}>
