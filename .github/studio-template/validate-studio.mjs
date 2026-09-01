@@ -133,15 +133,38 @@ function scanRepositoryBoundary() {
   return errors;
 }
 
+function validateRegistry() {
+  const registryPath = path.join(repositoryRoot, ".github", "studios", "registry.json");
+  if (!fs.existsSync(registryPath)) return ["Studio registry is missing."];
+  const registry = JSON.parse(fs.readFileSync(registryPath, "utf8"));
+  const errors = [];
+  if (registry.schemaVersion !== 1) errors.push("Studio registry schemaVersion must be 1.");
+  if (!Array.isArray(registry.studios)) return [...errors, "Studio registry studios must be an array."];
+  const ids = new Set();
+  registry.studios.forEach((studio, index) => {
+    const field = `registry.studios[${index}]`;
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(studio.id || "")) errors.push(`${field}.id must be a lowercase URL-safe slug.`);
+    if (ids.has(studio.id)) errors.push(`${field}.id must be unique.`);
+    ids.add(studio.id);
+    localized(studio.name, `${field}.name`, errors);
+    localized(studio.purpose, `${field}.purpose`, errors);
+    if (!isObject(studio.owner) || !studio.owner.name || !studio.owner.team || !/^[A-Za-z0-9-]+$/.test(studio.owner.github || "")) errors.push(`${field}.owner requires name, team and a GitHub username.`);
+    if (!Array.isArray(studio.scope) || !studio.scope.length || studio.scope.some((scope) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scope))) errors.push(`${field}.scope requires URL-safe entries.`);
+    if (!workflowStates.slice(1).includes(studio.status)) errors.push(`${field}.status is invalid.`);
+  });
+  return errors;
+}
+
 function runSelfTest() {
   const placeholderPath = path.join(templateDirectory, "studio-manifest.placeholder.json");
   const manifest = JSON.parse(fs.readFileSync(placeholderPath, "utf8"));
   const developmentErrors = validateManifest(manifest, { manifestPath: placeholderPath });
   const releaseErrors = validateManifest(manifest, { release: true, manifestPath: placeholderPath });
   const boundaryErrors = scanRepositoryBoundary();
+  const registryErrors = validateRegistry();
   if (developmentErrors.length) return developmentErrors;
   if (!releaseErrors.length) return ["Placeholder fixture unexpectedly passed release validation."];
-  return boundaryErrors;
+  return [...boundaryErrors, ...registryErrors];
 }
 
 const args = process.argv.slice(2);

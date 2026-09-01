@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "studios": [
+    {
+      "id": "motion-studio",
+      "name": {
+        "en": "Motion Studio",
+        "de": "Motion Studio"
+      },
+      "purpose": {
+        "en": "Create and maintain motion guidelines.",
+        "de": "Motion-Richtlinien erstellen und pflegen."
+      },
+      "owner": {
+        "name": "Henrik",
+        "github": "ScoutBoyDesign",
+        "team": "Motion Guidelines"
+      },
+      "scope": ["motion-guidelines"],
+      "status": "planned"
+    },
+    {
+      "id": "one-system-studio",
+      "name": {
+        "en": "One System Studio",
+        "de": "One System Studio"
+      },
+      "purpose": {
+        "en": "Develop the shared Brand, Assets and One System workspace.",
+        "de": "Den gemeinsamen Arbeitsbereich für Marke, Assets und One System entwickeln."
+      },
+      "owner": {
+        "name": "Alex",
+        "github": "alexpenk",
+        "team": "Brand, Assets and One System"
+      },
+      "scope": ["brand", "assets", "one-system-studio"],
+      "status": "planned"
+    }
+  ]
+}
