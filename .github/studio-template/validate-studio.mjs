@@ -150,6 +150,12 @@ function validateRegistry() {
     localized(studio.purpose, `${field}.purpose`, errors);
     if (!isObject(studio.owner) || !studio.owner.name || !studio.owner.team) errors.push(`${field}.owner requires name and team.`);
     if (studio.owner?.github !== undefined && !/^[A-Za-z0-9-]+$/.test(studio.owner.github)) errors.push(`${field}.owner.github must be a valid GitHub username when provided.`);
+    if (studio.maintainers !== undefined) {
+      if (!Array.isArray(studio.maintainers) || !studio.maintainers.length) errors.push(`${field}.maintainers must be a non-empty array when provided.`);
+      else studio.maintainers.forEach((maintainer, maintainerIndex) => {
+        if (!isObject(maintainer) || !maintainer.name || !/^[A-Za-z0-9-]+$/.test(maintainer.github || "")) errors.push(`${field}.maintainers[${maintainerIndex}] requires name and a valid GitHub username.`);
+      });
+    }
     if (!Array.isArray(studio.scope) || !studio.scope.length || studio.scope.some((scope) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scope))) errors.push(`${field}.scope requires URL-safe entries.`);
     if (!workflowStates.slice(1).includes(studio.status)) errors.push(`${field}.status is invalid.`);
   });
