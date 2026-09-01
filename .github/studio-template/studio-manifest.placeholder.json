@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "contentStatus": "placeholder",
+  "identity": {
+    "id": "studio-template",
+    "name": {
+      "en": "[Development placeholder] Studio name",
+      "de": "[Entwicklungsplatzhalter] Studioname"
+    },
+    "logo": {
+      "src": "./assets/product-logo.svg",
+      "alt": {
+        "en": "[Development placeholder] Product logo",
+        "de": "[Entwicklungsplatzhalter] Produktlogo"
+      }
+    },
+    "description": {
+      "en": "[Development placeholder] Add the approved product introduction.",
+      "de": "[Entwicklungsplatzhalter] Freigegebene Produkteinführung ergänzen."
+    },
+    "owner": {
+      "name": "[Development placeholder] Owner",
+      "team": "[Development placeholder] Team"
+    },
+    "status": "in-development",
+    "version": "0.0.0",
+    "updatedAt": "2026-09-01"
+  },
+  "primaryWorkflow": {
+    "name": {
+      "en": "[Development placeholder] Primary workflow",
+      "de": "[Entwicklungsplatzhalter] Primärer Workflow"
+    },
+    "description": {
+      "en": "[Development placeholder] Explain the approved workflow outcome.",
+      "de": "[Entwicklungsplatzhalter] Freigegebenes Workflow-Ergebnis erläutern."
+    },
+    "steps": [],
+    "availability": "empty",
+    "availabilityMessage": {
+      "en": "This workflow has not been configured.",
+      "de": "Dieser Workflow wurde noch nicht konfiguriert."
+    }
+  },
+  "guidelines": {
+    "locales": ["en", "de"],
+    "overview": {
+      "en": "[Development placeholder] Add the approved guideline overview.",
+      "de": "[Entwicklungsplatzhalter] Freigegebene Richtlinienübersicht ergänzen."
+    },
+    "sections": [
+      { "id": "overview", "title": { "en": "Overview", "de": "Übersicht" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "audience-jobs", "title": { "en": "Audience and jobs", "de": "Zielgruppen und Aufgaben" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "principles", "title": { "en": "Principles", "de": "Prinzipien" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "language-terminology", "title": { "en": "Language and terminology", "de": "Sprache und Terminologie" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "visual-system", "title": { "en": "Visual system", "de": "Visuelles System" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "components-interaction", "title": { "en": "Components and interaction", "de": "Komponenten und Interaktion" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "templates-output-specifications", "title": { "en": "Templates and output specifications", "de": "Vorlagen und Ausgabespezifikationen" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "ai-automation-rules", "title": { "en": "AI and automation rules", "de": "Regeln für KI und Automatisierung" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "quality-assurance", "title": { "en": "Quality assurance", "de": "Qualitätssicherung" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" },
+      { "id": "ownership-changelog", "title": { "en": "Ownership and changelog", "de": "Verantwortung und Änderungsprotokoll" }, "summary": { "en": "[Development placeholder] Add summary.", "de": "[Entwicklungsplatzhalter] Zusammenfassung ergänzen." }, "blocks": [], "updatedAt": "2026-09-01" }
+    ]
+  },
+  "templates": [],
+  "relatedTools": [],
+  "theme": {
+    "tokenSet": "neutral"
+  }
+}

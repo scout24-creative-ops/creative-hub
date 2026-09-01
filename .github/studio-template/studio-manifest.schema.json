@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://creative-hub.local/schemas/studio-manifest-v1.json",
+  "title": "Creative Hub Studio manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contentStatus",
+    "identity",
+    "primaryWorkflow",
+    "guidelines",
+    "templates",
+    "relatedTools",
+    "theme"
+  ],
+  "$defs": {
+    "localizedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "de"],
+      "properties": {
+        "en": { "type": "string", "minLength": 1 },
+        "de": { "type": "string", "minLength": 1 }
+      }
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "team"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "team": { "type": "string", "minLength": 1 },
+        "contact": { "type": "string", "minLength": 1 }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "openMode"],
+      "properties": {
+        "url": { "type": "string", "minLength": 1 },
+        "openMode": { "enum": ["same-tab", "new-tab"] },
+        "environment": { "enum": ["test", "production"] },
+        "label": { "$ref": "#/$defs/localizedText" }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "contentStatus": { "enum": ["placeholder", "approved"] },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "logo", "description", "owner", "status", "version", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "logo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src", "alt"],
+          "properties": {
+            "src": { "type": "string", "minLength": 1 },
+            "alt": { "$ref": "#/$defs/localizedText" }
+          }
+        },
+        "description": { "$ref": "#/$defs/localizedText" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "status": { "enum": ["planned", "in-development", "testing", "available", "paused", "retired"] },
+        "version": { "type": "string", "minLength": 1 },
+        "updatedAt": { "type": "string", "format": "date" }
+      }
+    },
+    "primaryWorkflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "description", "steps", "availability", "availabilityMessage"],
+      "properties": {
+        "name": { "$ref": "#/$defs/localizedText" },
+        "description": { "$ref": "#/$defs/localizedText" },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+              "label": { "$ref": "#/$defs/localizedText" },
+              "description": { "$ref": "#/$defs/localizedText" }
+            }
+          }
+        },
+        "availability": { "enum": ["empty", "planned", "in-development", "testing", "available", "paused", "retired"] },
+        "availabilityMessage": { "$ref": "#/$defs/localizedText" },
+        "launchLabel": { "$ref": "#/$defs/localizedText" },
+        "launchTarget": { "$ref": "#/$defs/action" }
+      }
+    },
+    "guidelines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locales", "overview", "sections"],
+      "properties": {
+        "locales": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "enum": ["en", "de"] }
+        },
+        "overview": { "$ref": "#/$defs/localizedText" },
+        "sections": {
+          "type": "array",
+          "minItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "summary", "blocks", "updatedAt"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "$ref": "#/$defs/localizedText" },
+              "summary": { "$ref": "#/$defs/localizedText" },
+              "blocks": { "type": "array" },
+              "updatedAt": { "type": "string", "format": "date" }
+            }
+          }
+        }
+      }
+    },
+    "templates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "description", "formats", "dimensions", "availability", "version", "owner", "lastReviewedAt"]
+      }
+    },
+    "relatedTools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "description", "status"]
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokenSet"],
+      "properties": {
+        "tokenSet": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+name: Studio starter-kit checks
+
+on:
+  pull_request:
+    paths:
+      - ".github/studio-template/**"
+      - ".github/workflows/studio-template-check.yml"
+      - ".github/pull_request_template.md"
+      - "CONTRIBUTING.md"
+      - "README.md"
+      - ".gitignore"
+  push:
+    branches: [main]
+    paths:
+      - ".github/studio-template/**"
+      - ".github/workflows/studio-template-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate repository-only Studio starter kit
+        run: node .github/studio-template/validate-studio.mjs --self-test
