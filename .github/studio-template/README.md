@@ -23,6 +23,13 @@ This creates:
 
 `.studio-workspaces/` is ignored by Git so every colleague can work in an independent environment without publishing unfinished Studio content or changing the live Hub.
 
+Registered Studio IDs also apply their assigned owner, purpose and scope from [`.github/studios/registry.json`](../studios/registry.json). The current registered environments are:
+
+```sh
+node .github/studio-template/create-studio.mjs motion-studio
+node .github/studio-template/create-studio.mjs one-system-studio
+```
+
 Use `--destination` to place the workspace elsewhere:
 
 ```sh

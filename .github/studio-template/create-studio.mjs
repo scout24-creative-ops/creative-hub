@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const templateDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(templateDirectory, "../..");
+const registryPath = path.join(repositoryRoot, ".github", "studios", "registry.json");
 const args = process.argv.slice(2);
 const studioId = args.find((value) => !value.startsWith("--"));
 const destinationFlag = args.indexOf("--destination");
@@ -29,9 +30,30 @@ if (fs.existsSync(destination)) {
 }
 
 const manifest = JSON.parse(fs.readFileSync(path.join(templateDirectory, "studio-manifest.placeholder.json"), "utf8"));
+const registry = fs.existsSync(registryPath)
+  ? JSON.parse(fs.readFileSync(registryPath, "utf8"))
+  : { studios: [] };
+const registration = registry.studios.find((studio) => studio.id === studioId);
 manifest.identity.id = studioId;
 manifest.identity.updatedAt = new Date().toISOString().slice(0, 10);
 manifest.guidelines.sections.forEach((section) => { section.updatedAt = manifest.identity.updatedAt; });
+if (registration) {
+  manifest.identity.name = registration.name;
+  manifest.identity.description = registration.purpose;
+  manifest.identity.owner = {
+    name: registration.owner.name,
+    team: registration.owner.team,
+    contact: `https://github.com/${registration.owner.github}`,
+  };
+  manifest.identity.status = registration.status;
+  manifest.primaryWorkflow.name = registration.name;
+  manifest.primaryWorkflow.description = registration.purpose;
+  manifest.primaryWorkflow.availability = registration.status;
+  manifest.primaryWorkflow.availabilityMessage = {
+    en: `${registration.name.en} is registered and ready for local development.`,
+    de: `${registration.name.de} ist registriert und bereit für die lokale Entwicklung.`,
+  };
+}
 
 fs.mkdirSync(path.join(destination, "src"), { recursive: true });
 fs.mkdirSync(path.join(destination, "assets"), { recursive: true });
@@ -42,4 +64,5 @@ fs.writeFileSync(path.join(destination, "studio-manifest.json"), `${JSON.stringi
 fs.writeFileSync(path.join(destination, "README.md"), `# ${studioId}\n\nThis is an isolated local Studio workspace generated from the Creative Hub starter kit.\n\n## Validate\n\n\u0060\u0060\u0060sh\nnode ${path.relative(destination, path.join(templateDirectory, "validate-studio.mjs"))} studio-manifest.json\n\u0060\u0060\u0060\n\nUse \u0060--release\u0060 only after all content is approved and every marked placeholder has been removed.\n`);
 
 console.log(`Created Studio workspace: ${destination}`);
+if (registration) console.log(`Applied registered ownership for @${registration.owner.github}.`);
 console.log("The default .studio-workspaces directory is ignored by Git.");

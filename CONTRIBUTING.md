@@ -16,6 +16,8 @@ The reusable Studio starter kit is isolated in `.github/studio-template/`. Nothi
    node .github/studio-template/create-studio.mjs <studio-id>
    ```
 
+   Registered Studio IDs automatically apply the assignment stored in `.github/studios/registry.json`.
+
 4. Work inside `.studio-workspaces/<studio-id>/` in your own environment.
 5. Validate during development:
 
