@@ -66,8 +66,9 @@
         "de": "Freigegebene Workflows und Richtlinien für Homeowner-Produkte entwickeln."
       },
       "owner": {
-        "name": "Unassigned",
-        "team": "Creative Studio"
+        "name": "Nadja",
+        "github": "ndc4scout24",
+        "team": "Homeowner Studio"
       },
       "scope": ["homeowner", "homeowner-products"],
       "status": "planned"
@@ -83,19 +84,10 @@
         "de": "Freigegebene Workflows und Richtlinien für Seeker-Produkte entwickeln."
       },
       "owner": {
-        "name": "Marcus and Nadja",
+        "name": "Marcus",
+        "github": "md-at-is24",
         "team": "Seeker Studio"
       },
-      "maintainers": [
-        {
-          "name": "Marcus",
-          "github": "md-at-is24"
-        },
-        {
-          "name": "Nadja",
-          "github": "ndc4scout24"
-        }
-      ],
       "scope": ["seeker", "seeker-products"],
       "status": "planned"
     },

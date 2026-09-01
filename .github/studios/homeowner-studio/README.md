@@ -1,6 +1,6 @@
 # Homeowner Studio
 
-Homeowner Studio is a planned product workspace for approved homeowner-product workflows and guidance. Ownership has not yet been assigned.
+Homeowner Studio is a planned product workspace owned by [ndc4scout24](https://github.com/ndc4scout24) for approved homeowner-product workflows and guidance.
 
 It uses the shared brand-neutral Studio framework and is not imported by the Creative Hub webpage.
 
