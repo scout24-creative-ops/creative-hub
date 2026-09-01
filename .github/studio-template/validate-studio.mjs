@@ -148,7 +148,8 @@ function validateRegistry() {
     ids.add(studio.id);
     localized(studio.name, `${field}.name`, errors);
     localized(studio.purpose, `${field}.purpose`, errors);
-    if (!isObject(studio.owner) || !studio.owner.name || !studio.owner.team || !/^[A-Za-z0-9-]+$/.test(studio.owner.github || "")) errors.push(`${field}.owner requires name, team and a GitHub username.`);
+    if (!isObject(studio.owner) || !studio.owner.name || !studio.owner.team) errors.push(`${field}.owner requires name and team.`);
+    if (studio.owner?.github !== undefined && !/^[A-Za-z0-9-]+$/.test(studio.owner.github)) errors.push(`${field}.owner.github must be a valid GitHub username when provided.`);
     if (!Array.isArray(studio.scope) || !studio.scope.length || studio.scope.some((scope) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scope))) errors.push(`${field}.scope requires URL-safe entries.`);
     if (!workflowStates.slice(1).includes(studio.status)) errors.push(`${field}.status is invalid.`);
   });
