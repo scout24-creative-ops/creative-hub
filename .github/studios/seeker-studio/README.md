@@ -2,10 +2,9 @@
 
 Seeker Studio is a planned product workspace for approved seeker-product workflows and guidance.
 
-## Maintainers
+## Owner
 
 - Marcus — [`md-at-is24`](https://github.com/md-at-is24)
-- Nadja — [`ndc4scout24`](https://github.com/ndc4scout24)
 
 It uses the shared brand-neutral Studio framework and is not imported by the Creative Hub webpage.
 

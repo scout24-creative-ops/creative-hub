@@ -7,8 +7,8 @@ This registry records Studio assignments in GitHub without publishing their shel
 | Motion Studio | Henrik | [`ScoutBoyDesign`](https://github.com/ScoutBoyDesign) | Motion guidelines | Planned |
 | One System Studio | Alex | [`alexpenk`](https://github.com/alexpenk) | Brand, Assets and One System Studio | Planned |
 | Professionals Studio | Peter | [`PeterSijtsma`](https://github.com/PeterSijtsma) | Professionals and professional products | Planned |
-| Homeowner Studio | Unassigned | — | Homeowner products | Planned |
-| Seeker Studio | Marcus and Nadja | [`md-at-is24`](https://github.com/md-at-is24), [`ndc4scout24`](https://github.com/ndc4scout24) | Seeker products | Planned |
+| Homeowner Studio | Nadja | [`ndc4scout24`](https://github.com/ndc4scout24) | Homeowner products | Planned |
+| Seeker Studio | Marcus | [`md-at-is24`](https://github.com/md-at-is24) | Seeker products | Planned |
 | Sprengnetter Studio | Unassigned | — | Sprengnetter products | Planned |
 
 After accepting a repository invitation, each owner can clone the repository and generate their registered environment:
