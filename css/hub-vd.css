@@ -60,9 +60,9 @@
   .hub-app[data-concept="d"] { --dv-nav-rail-width: 320px; }
 }
 
-/* The navigation is a temporary left drawer. It deliberately overlays the
-   page instead of resizing it: viewport media queries must continue to reflect
-   the width the layouts were designed for. */
+/* Section navigation uses a fixed left rail. Brand and Community keep the rail
+   open while their pages are active; the application shell supplies the
+   corresponding content offset at non-mobile widths. */
 @media (min-width: 721px) and (max-width: 980px) {
   .hub-app[data-concept="d"] { --dv-nav-rail-width: 264px; }
 }

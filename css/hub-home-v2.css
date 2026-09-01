@@ -1365,6 +1365,22 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
   }
 }
 
+/* Brand and Community are section workspaces rather than temporary popovers.
+   Make room for their persistent rail so page content remains fully visible. */
+@media (min-width: 721px) {
+  .hub-app[data-concept="d"].is-nav-open > main,
+  .hub-app[data-concept="d"].is-nav-open > .home2-footer {
+    margin-left: calc(var(--dv-nav-rail-width, 320px) + 24px);
+  }
+}
+
+@media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
+  .hub-app[data-concept="d"] > main,
+  .hub-app[data-concept="d"] > .home2-footer {
+    transition: margin-left 220ms cubic-bezier(.2, .8, .2, 1);
+  }
+}
+
 @keyframes dvTubelightDrawerIn {
   from { opacity: 0; transform: translateX(-16px) scale(.985); }
   to { opacity: 1; transform: translateX(0) scale(1); }

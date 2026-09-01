@@ -2429,7 +2429,7 @@ function HubFrontifyPage({ section, pageKey, title, onNavigate }) {
   const isLocalGuideline = Boolean(page?.portal === "guidelines" && F_LOCAL_GUIDELINE_PAGES.has(page.title));
   const isLocalStrategy = Boolean(page?.portal === "strategy" && F_LOCAL_STRATEGY_PAGES.has(page.title));
   const isSourceDocument = isLocalGuideline || isLocalStrategy;
-  const showContentNavigation = section !== "brand";
+  const showContentNavigation = !["brand", "community"].includes(section);
   const resolvedTitle = title || page?.title || library?.title || section;
   const displayTitle = isLocalGuideline && page.title.startsWith("Tone of Voice (") ? "Tone of Voice" : resolvedTitle;
   const updated = page?.modifiedAt ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(new Date(page.modifiedAt)) : null;
