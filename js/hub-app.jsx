@@ -195,18 +195,24 @@ function AppD() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
   React.useEffect(() => {
+    const sectionTitles = {
+      brand: view.title || "Brand",
+      community: view.title || "Community",
+    };
     const title = view.section === "news"
       ? `${D_NEWS_TITLES[(view.pageKey || "news::gpt-5-6-for-immoscout24").split("::")[1]] || "Creative Hub News"} · Creative Hub`
       : view.section === "create"
         ? "All Agents · Creative Hub"
         : view.section === "knowledge"
           ? "AI & Marketing Updates · Creative Hub"
-        : "AI Marketing Creation Hub · Creative Studio";
+          : sectionTitles[view.section]
+            ? `${sectionTitles[view.section]} · Creative Hub`
+            : "AI Marketing Creation Hub · Creative Studio";
     document.title = window.HubLanguage.translate(title, language);
-    if (!["news", "create", "knowledge"].includes(view.section)) return undefined;
+    if (!["news", "create", "knowledge", "brand", "community"].includes(view.section)) return undefined;
     const focusTimer = window.setTimeout(() => document.querySelector("main h1[tabindex='-1']")?.focus({ preventScroll: true }), 40);
     return () => window.clearTimeout(focusTimer);
-  }, [view.section, view.pageKey, language]);
+  }, [view.section, view.pageKey, view.title, language]);
 
   const changeLanguage = React.useCallback((nextLanguage) => {
     const next = window.HubLanguage.setLanguage(nextLanguage);
