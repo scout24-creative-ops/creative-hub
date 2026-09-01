@@ -54,6 +54,57 @@
       },
       "scope": ["professionals", "professional-products"],
       "status": "planned"
+    },
+    {
+      "id": "homeowner-studio",
+      "name": {
+        "en": "Homeowner Studio",
+        "de": "Homeowner Studio"
+      },
+      "purpose": {
+        "en": "Build approved workflows and guidance for homeowner products.",
+        "de": "Freigegebene Workflows und Richtlinien für Homeowner-Produkte entwickeln."
+      },
+      "owner": {
+        "name": "Unassigned",
+        "team": "Creative Studio"
+      },
+      "scope": ["homeowner", "homeowner-products"],
+      "status": "planned"
+    },
+    {
+      "id": "seeker-studio",
+      "name": {
+        "en": "Seeker Studio",
+        "de": "Seeker Studio"
+      },
+      "purpose": {
+        "en": "Build approved workflows and guidance for seeker products.",
+        "de": "Freigegebene Workflows und Richtlinien für Seeker-Produkte entwickeln."
+      },
+      "owner": {
+        "name": "Unassigned",
+        "team": "Creative Studio"
+      },
+      "scope": ["seeker", "seeker-products"],
+      "status": "planned"
+    },
+    {
+      "id": "sprengnetter-studio",
+      "name": {
+        "en": "Sprengnetter Studio",
+        "de": "Sprengnetter Studio"
+      },
+      "purpose": {
+        "en": "Build approved workflows and guidance for Sprengnetter products.",
+        "de": "Freigegebene Workflows und Richtlinien für Sprengnetter-Produkte entwickeln."
+      },
+      "owner": {
+        "name": "Unassigned",
+        "team": "Creative Studio"
+      },
+      "scope": ["sprengnetter", "sprengnetter-products"],
+      "status": "planned"
     }
   ]
 }

@@ -29,6 +29,9 @@ Registered Studio IDs also apply their assigned owner, purpose and scope from [`
 node .github/studio-template/create-studio.mjs motion-studio
 node .github/studio-template/create-studio.mjs one-system-studio
 node .github/studio-template/create-studio.mjs professionals-studio
+node .github/studio-template/create-studio.mjs homeowner-studio
+node .github/studio-template/create-studio.mjs seeker-studio
+node .github/studio-template/create-studio.mjs sprengnetter-studio
 ```
 
 Use `--destination` to place the workspace elsewhere:

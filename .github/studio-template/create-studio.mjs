@@ -43,8 +43,8 @@ if (registration) {
   manifest.identity.owner = {
     name: registration.owner.name,
     team: registration.owner.team,
-    contact: `https://github.com/${registration.owner.github}`,
   };
+  if (registration.owner.github) manifest.identity.owner.contact = `https://github.com/${registration.owner.github}`;
   manifest.identity.status = registration.status;
   manifest.primaryWorkflow.name = registration.name;
   manifest.primaryWorkflow.description = registration.purpose;
@@ -64,5 +64,5 @@ fs.writeFileSync(path.join(destination, "studio-manifest.json"), `${JSON.stringi
 fs.writeFileSync(path.join(destination, "README.md"), `# ${studioId}\n\nThis is an isolated local Studio workspace generated from the Creative Hub starter kit.\n\n## Validate\n\n\u0060\u0060\u0060sh\nnode ${path.relative(destination, path.join(templateDirectory, "validate-studio.mjs"))} studio-manifest.json\n\u0060\u0060\u0060\n\nUse \u0060--release\u0060 only after all content is approved and every marked placeholder has been removed.\n`);
 
 console.log(`Created Studio workspace: ${destination}`);
-if (registration) console.log(`Applied registered ownership for @${registration.owner.github}.`);
+if (registration) console.log(`Applied registered ownership for ${registration.owner.github ? `@${registration.owner.github}` : registration.owner.name}.`);
 console.log("The default .studio-workspaces directory is ignored by Git.");
