@@ -36,6 +36,24 @@
       },
       "scope": ["brand", "assets", "one-system-studio"],
       "status": "planned"
+    },
+    {
+      "id": "professionals-studio",
+      "name": {
+        "en": "Professionals Studio",
+        "de": "Professionals Studio"
+      },
+      "purpose": {
+        "en": "Build a dedicated creation workspace for approved professional-product workflows.",
+        "de": "Einen dedizierten Arbeitsbereich für freigegebene Professional-Produkt-Workflows entwickeln."
+      },
+      "owner": {
+        "name": "Peter",
+        "github": "PeterSijtsma",
+        "team": "Creative Studio"
+      },
+      "scope": ["professionals", "professional-products"],
+      "status": "planned"
     }
   ]
 }
