@@ -34,3 +34,15 @@ To host this online:
 - All videos are embedded locally; they play without streaming.
 - Design system tokens and fonts are self-contained.
 - Works in all modern browsers (Chrome, Firefox, Safari, Edge).
+
+## Studio collaboration
+
+The reusable Studio starter kit lives under [`.github/studio-template`](.github/studio-template/README.md). It is repository tooling only: the public Creative Hub does not import, route to, or render it.
+
+Each contributor creates an isolated local workspace with:
+
+```sh
+node .github/studio-template/create-studio.mjs my-studio
+```
+
+Generated workspaces live under `.studio-workspaces/`, which is intentionally ignored by Git. Contributors can develop there, then submit only deliberately approved manifest, theme, or platform changes through a feature branch and pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
