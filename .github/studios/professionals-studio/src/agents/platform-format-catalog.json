@@ -1,0 +1,144 @@
+{
+  "version": "4.0.0",
+  "researched": "2026-08-20",
+  "scope": "Major paid, owned and native/performance placement families. Publisher-specific inventory is open-ended; use Open Web/IAB as the interoperable baseline.",
+  "update_policy": {
+    "source_of_truth": "Official platform specification URLs in sources",
+    "refresh_cadence": "weekly",
+    "change_detection": "Firecrawl monitor or the included crawl job compares source pages and flags dimension, media, file-limit, text-policy and safe-zone changes",
+    "safe_zone_rule": "Only pixel values published by the platform are hard. Template/preview guidance is soft and must be rechecked in-platform."
+  },
+  "sources": {
+    "meta": "https://www.facebook.com/business/help/980593475366490",
+    "google": "https://support.google.com/google-ads/answer/13676244",
+    "youtube": "https://support.google.com/google-ads/answer/13547298",
+    "tiktok": "https://ads.tiktok.com/help/article/tiktok-auction-in-feed-ads",
+    "linkedin": "https://business.linkedin.com/advertise/ads/sponsored-content/single-image-ads-specs",
+    "pinterest": "https://help.pinterest.com/en/business/article/pinterest-product-specs",
+    "snapchat": "https://businesshelp.snapchat.com/s/article/safe-zones",
+    "reddit": "https://business.reddit.com/learning-hub/articles/reddit-image-ad-specs",
+    "x": "https://business.x.com/en/help/campaign-setup/creative-ad-specifications",
+    "microsoft": "https://about.ads.microsoft.com/en/policies/creative-specs",
+    "amazon": "https://advertising.amazon.com/resources/ad-specs",
+    "iab": "https://iabtechlab.com/standards/iab-new-ad-portfolio-guidelines/",
+    "spotify": "https://ads.spotify.com/en-US/resources/",
+    "twitch": "https://advertising.amazon.com/resources/ad-specs/custom-media/amazon-video-ads",
+    "taboola": "https://www.taboola.com/help-center/advertiser-ad-formats/",
+    "outbrain": "https://www.outbrain.com/help/advertisers/",
+    "criteo": "https://www.criteo.com/insights/",
+    "moloco": "https://www.moloco.com/resources"
+  },
+  "best_practices": {
+    "meta": "Lead with one focal subject, short live copy, high contrast and a clear first-frame benefit. For Stories/Reels keep faces, logos and copy inside the published UI-safe box and preview the account-specific overlay.",
+    "tiktok": "Design for sound-on vertical video, show the product or human action immediately, use native-feeling pacing and captions, and keep critical elements inside the downloadable template—not an invented universal pixel box.",
+    "youtube": "Hook in the first seconds, make the story understandable without sound, use a single action, and provide landscape plus vertical versions rather than relying on an automatic crop.",
+    "linkedin": "Use one professional idea, legible proof, restrained branding and a specific business outcome. Keep carousel cards consistent and avoid dense body copy.",
+    "pinterest": "Make the image useful and saveable, show the product early, use vertical composition and readable branding, and design the first frame to stand alone in a discovery feed.",
+    "snapchat": "Use full-screen vertical motion, fast visual payoff and native captions. Keep all important content inside Snapchat's safe-zone overlay; overlays vary by format and UI.",
+    "reddit": "Lead with a clear, authentic proposition and community-relevant image. Avoid polished generic stock language, clickbait and text that becomes unreadable in mobile crops.",
+    "x": "Put the point in the image and first sentence, use a strong single visual, preserve legibility on mobile and test both feed and card crops.",
+    "google": "Supply a broad asset mix, use uncluttered images, keep text minimal for responsive inventory, and let the platform combine assets while maintaining a coherent message.",
+    "microsoft": "Provide multiple aspect ratios and clean native-looking images; keep the subject obvious at small sizes and avoid important detail near auto-crop edges.",
+    "amazon": "Show the product or use case immediately, keep branding clear, use high-resolution source media and respect the placement's strict file and duration limits.",
+    "native": "Use a truthful editorial thumbnail and headline pairing, one idea per asset, no baked-in CTA where the platform supplies one, and verify the landing-page promise.",
+    "openweb": "Start from IAB standard sizes, keep the message legible at the smallest placement, compress to the publisher byte limit and reserve animation for a deliberate first-frame fallback.",
+    "owned": "Build mobile-first, inline the image or provide a meaningful images-off fallback, keep the destination and copy consistent with the ad, and test dark mode and Outlook/Gmail rendering."
+  },
+  "ratio_families": {
+    "1:1": {
+      "master": {"w": 1200, "h": 1200}, "difficulty": "direct",
+      "placements": [
+        {"platform":"Meta","placement":"Carousel","w":1080,"h":1080,"max_file_mb":30,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"meta","best_practice":"Keep every card on one ratio and one idea."},
+        {"platform":"Google Display","placement":"Responsive Display square","w":1200,"h":1200,"max_file_kb":5120,"formats":["JPG","PNG","GIF"],"text_in_image":"discouraged","verification":"verified","source":"google","best_practice":"Keep logos in the logo asset; Google may auto-crop the image."},
+        {"platform":"Google Demand Gen","placement":"Square image","w":1200,"h":1200,"max_file_mb":5,"formats":["JPG","PNG","GIF"],"text_in_image":"discouraged","verification":"verified","source":"google","best_practice":"Use a clean, high-resolution image with minimal overlaid copy."},
+        {"platform":"LinkedIn","placement":"Single image square","w":1200,"h":1200,"max_file_mb":10,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"linkedin","best_practice":"One professional message; keep proof legible on mobile."},
+        {"platform":"Pinterest","placement":"Square Pin","w":1000,"h":1000,"max_file_mb":32,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"pinterest","best_practice":"Make the image useful and saveable, not just branded."},
+        {"platform":"Reddit","placement":"Image ad square","w":1200,"h":1200,"max_file_mb":3,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"reddit","best_practice":"Use authentic, community-relevant visual language."},
+        {"platform":"X","placement":"Standalone square","w":1200,"h":1200,"max_file_mb":5,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"x","best_practice":"Make the point legible without relying on the caption."},
+        {"platform":"Open Web / IAB","placement":"Large square","w":300,"h":300,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab","best_practice":"Keep the message legible at the smallest standard placement."}
+      ]
+    },
+    "16:9": {
+      "master": {"w": 1920, "h": 1080}, "difficulty": "direct",
+      "placements": [
+        {"platform":"YouTube","placement":"In-stream landscape video keyframe","w":1920,"h":1080,"formats":["MP4","MOV"],"text_in_image":"allowed_inside_safe_zone","media":"video","planning_only":true,"verification":"verified","source":"youtube","best_practice":"Hook immediately; provide captions and a clear single action."},
+        {"platform":"Google Demand Gen","placement":"Landscape image","w":1200,"h":628,"max_file_mb":5,"formats":["JPG","PNG","GIF"],"text_in_image":"discouraged","verification":"verified","source":"google","best_practice":"Use one focal subject and minimal copy."},
+        {"platform":"Google Display","placement":"Responsive Display landscape","w":1200,"h":628,"max_file_kb":5120,"formats":["JPG","PNG","GIF"],"text_in_image":"discouraged","verification":"verified","source":"google","best_practice":"Leave room for responsive auto-cropping."},
+        {"platform":"LinkedIn","placement":"Video keyframe landscape","w":1920,"h":1080,"formats":["MP4"],"media":"video","planning_only":true,"verification":"verified","source":"linkedin","best_practice":"Show the business outcome early and caption the story."},
+        {"platform":"Reddit","placement":"Video keyframe landscape","w":1920,"h":1080,"formats":["MP4","MOV"],"media":"video","planning_only":true,"verification":"verified","source":"reddit","best_practice":"Make the first frame understandable without sound."},
+        {"platform":"X","placement":"Website card landscape","w":1200,"h":628,"max_file_mb":5,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"x","best_practice":"Test feed and card crops separately."},
+        {"platform":"Landing page","placement":"Desktop hero","w":1920,"h":1080,"formats":["JPG","PNG","WEBP"],"text_in_image":"allowed","verification":"consensus","source":"iab","best_practice":"Keep the focal subject clear of responsive text overlays."}
+      ]
+    },
+    "4:5": {
+      "master": {"w":1440,"h":1800}, "difficulty":"direct",
+      "placements": [
+        {"platform":"Meta","placement":"Facebook Feed","w":1440,"h":1800,"max_file_mb":30,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"meta","best_practice":"Use one focal subject and short live copy."},
+        {"platform":"Meta","placement":"Instagram Feed","w":1440,"h":1800,"max_file_mb":30,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"meta","best_practice":"Preview the profile-grid crop separately."},
+        {"platform":"Pinterest","placement":"Standard Pin","w":1000,"h":1500,"max_file_mb":32,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"pinterest","best_practice":"Vertical discovery composition with product visible early."},
+        {"platform":"Reddit","placement":"Mobile image crop","w":1080,"h":1350,"max_file_mb":3,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"reddit","best_practice":"Keep the proposition readable in the first mobile crop."},
+        {"platform":"Google Display","placement":"Responsive Display portrait","w":1200,"h":1500,"max_file_kb":5120,"formats":["JPG","PNG","GIF"],"text_in_image":"discouraged","verification":"verified","source":"google","best_practice":"Keep important detail away from auto-crop edges."}
+      ]
+    },
+    "9:16": {
+      "master": {"w":1080,"h":1920}, "difficulty":"outpaint",
+      "placements": [
+        {"platform":"Meta","placement":"Stories","w":1080,"h":1920,"max_file_mb":30,"formats":["JPG","PNG","MP4"],"text_in_image":"allowed_inside_safe_zone","safe_zone":{"top_px":269,"bottom_px":672,"left_px":65,"right_px":65,"confidence":"hard","note":"Published Meta Stories/Reels working safe zone."},"verification":"verified","source":"meta","best_practice":"Keep faces, logo and copy inside the UI-safe box."},
+        {"platform":"Meta","placement":"Reels","w":1080,"h":1920,"max_file_mb":30,"formats":["JPG","PNG","MP4"],"text_in_image":"allowed_inside_safe_zone","safe_zone":{"top_px":269,"bottom_px":672,"left_px":65,"right_px":65,"confidence":"hard","note":"Published Meta Stories/Reels working safe zone."},"verification":"verified","source":"meta","best_practice":"Design the first frame as a complete message."},
+        {"platform":"TikTok","placement":"In-Feed Auction video keyframe","w":1080,"h":1920,"max_file_mb":500,"formats":["MP4","MOV"],"text_in_image":"allowed_inside_safe_zone","media":"video","planning_only":true,"safe_zone":{"confidence":"soft","note":"TikTok publishes template overlays and says the zone varies by caption length, aspect ratio and add-ons; no universal pixel box."},"verification":"verified","source":"tiktok","best_practice":"Use TikTok's current template overlay and preview, never a universal centered safe zone."},
+        {"platform":"YouTube","placement":"Shorts video keyframe","w":1080,"h":1920,"formats":["MP4","MOV"],"text_in_image":"allowed_inside_safe_zone","media":"video","planning_only":true,"safe_zone":{"confidence":"soft","note":"No universal pixel safe zone; keep critical content away from platform UI and validate in preview."},"verification":"verified","source":"youtube","best_practice":"Hook in the first seconds and keep the action understandable muted."},
+        {"platform":"Pinterest","placement":"Full-screen video Pin keyframe","w":1080,"h":1920,"formats":["MP4","MOV"],"text_in_image":"allowed_inside_safe_zone","media":"video","planning_only":true,"safe_zone":{"top_px":195,"bottom_px":440,"left_px":270,"right_px":270,"confidence":"hard","note":"Pinterest full-screen video working safe zone."},"verification":"verified","source":"pinterest","best_practice":"Show the product or idea immediately; make the frame saveable."},
+        {"platform":"Snapchat","placement":"Single Image/Video full-screen","w":1080,"h":1920,"formats":["JPG","PNG","MP4","MOV"],"text_in_image":"allowed_inside_safe_zone","safe_zone":{"top_px":150,"bottom_px":330,"left_px":0,"right_px":0,"confidence":"hard","note":"Snapchat published full-screen safe-zone guidance; validate the account format overlay."},"verification":"verified","source":"snapchat","best_practice":"Full-screen vertical motion with a fast visual payoff."},
+        {"platform":"Landing page","placement":"Mobile full-screen hero","w":1080,"h":1920,"formats":["JPG","PNG","WEBP"],"text_in_image":"allowed","verification":"consensus","source":"iab","best_practice":"Keep the focal subject clear of responsive text and browser chrome."}
+      ]
+    },
+    "3:2": {
+      "master": {"w":1200,"h":800}, "difficulty":"rebuild",
+      "placements": [
+        {"platform":"Outbrain","placement":"Standard Native / In the Feed","w":1200,"h":800,"formats":["JPG","PNG"],"text_in_image":"no_baked_text","verification":"secondary","source":"outbrain","best_practice":"Editorial thumbnail, no CTA baked into the image."},
+        {"platform":"Taboola","placement":"Native thumbnail","w":1200,"h":800,"formats":["JPG","PNG"],"text_in_image":"no_baked_text","verification":"secondary","source":"taboola","best_practice":"Truthful thumbnail that matches the headline and landing page."}
+      ]
+    },
+    "2:3": {
+      "master": {"w":1000,"h":1500}, "difficulty":"direct",
+      "placements": [
+        {"platform":"Pinterest","placement":"Standard Pin alternative","w":1000,"h":1500,"max_file_mb":32,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"pinterest","best_practice":"Vertical, useful, saveable composition."},
+        {"platform":"Amazon Ads","placement":"Mobile commerce image","w":1200,"h":1920,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"amazon","best_practice":"Make the product/use case immediately recognizable."}
+      ]
+    },
+    "3:1": {
+      "master": {"w":1200,"h":400}, "difficulty":"rebuild",
+      "placements": [
+        {"platform":"Email","placement":"Retina header","w":1200,"h":400,"formats":["JPG","PNG","WEBP"],"text_in_image":"allowed","verification":"consensus","source":"iab","best_practice":"Inline or provide a meaningful images-off fallback; test dark mode."},
+        {"platform":"Spotify","placement":"Companion banner","w":640,"h":360,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"spotify","best_practice":"Pair one simple visual with one clear audio action."}
+      ]
+    },
+    "misc_banners": {
+      "master": null, "difficulty":"rebuild",
+      "placements": [
+        {"platform":"Google Display","placement":"Medium rectangle","w":300,"h":250,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"google","best_practice":"One short message; test readability at 300px."},
+        {"platform":"Google Display","placement":"Large rectangle","w":336,"h":280,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"google"},
+        {"platform":"Google Display","placement":"Leaderboard","w":728,"h":90,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"google"},
+        {"platform":"Google Display","placement":"Half page","w":300,"h":600,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"google"},
+        {"platform":"Google Display","placement":"Mobile banner","w":320,"h":50,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"google"},
+        {"platform":"Google Display","placement":"Billboard","w":970,"h":250,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"google"},
+        {"platform":"Microsoft Audience","placement":"Native square","w":300,"h":300,"formats":["JPG","PNG"],"text_in_image":"discouraged","verification":"verified","source":"microsoft","best_practice":"Provide multiple crops; keep the subject obvious at small sizes."},
+        {"platform":"Microsoft Audience","placement":"Native landscape","w":1200,"h":628,"formats":["JPG","PNG"],"text_in_image":"discouraged","verification":"verified","source":"microsoft"},
+        {"platform":"Amazon Ads","placement":"Medium rectangle","w":300,"h":250,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"verified","source":"amazon"},
+        {"platform":"Open Web / IAB","placement":"Medium rectangle","w":300,"h":250,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab"},
+        {"platform":"Open Web / IAB","placement":"Large rectangle","w":336,"h":280,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab"},
+        {"platform":"Open Web / IAB","placement":"Skyscraper","w":160,"h":600,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab"},
+        {"platform":"Open Web / IAB","placement":"Wide skyscraper","w":300,"h":600,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab"},
+        {"platform":"Open Web / IAB","placement":"Leaderboard","w":728,"h":90,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab"},
+        {"platform":"Open Web / IAB","placement":"Billboard","w":970,"h":250,"max_file_kb":150,"formats":["JPG","PNG","GIF"],"text_in_image":"allowed","verification":"verified","source":"iab"},
+        {"platform":"Criteo","placement":"Display 300x250","w":300,"h":250,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"criteo"},
+        {"platform":"Criteo","placement":"Display 300x600","w":300,"h":600,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"criteo"},
+        {"platform":"Criteo","placement":"Display 728x90","w":728,"h":90,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"criteo"},
+        {"platform":"Criteo","placement":"Display 320x50","w":320,"h":50,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"criteo"},
+        {"platform":"Spotify","placement":"Display banner","w":640,"h":360,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"spotify"},
+        {"platform":"Twitch","placement":"Stream display keyframe","w":1920,"h":1080,"formats":["MP4"],"media":"video","planning_only":true,"text_in_image":"allowed","verification":"secondary","source":"twitch","best_practice":"Keep the first frame legible and brand-safe at stream scale."},
+        {"platform":"Moloco","placement":"Mobile interstitial","w":320,"h":480,"formats":["JPG","PNG"],"text_in_image":"allowed","verification":"secondary","source":"moloco"}
+      ]
+    }
+  }
+}

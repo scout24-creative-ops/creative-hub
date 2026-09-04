@@ -1,28 +1,19 @@
 # Professionals Studio
 
-Professionals Studio is a planned product workspace owned by [PeterSijtsma](https://github.com/PeterSijtsma). It uses the shared brand-neutral Studio framework while keeping all Professionals-specific content isolated from the Creative Hub webpage.
+Professionals Studio is the ImmoScout24 campaign workspace for agents and other real estate professionals.
 
-## Product boundary
+## Open locally
 
-- Build approved workflows for professional-product creation.
-- Keep identity, content, tools, templates and launch destinations in the product manifest.
-- Do not copy Plus+ names, claims, assets, colors, workflows, credentials or links.
-- Keep launch actions unavailable until their protected destinations are approved.
+Serve the `src` folder with a local web server and open `index.html`.
 
-## Create the local environment
+The main routes are:
 
-From the Creative Hub repository root:
+* `src/index.html` for the dashboard
+* `src/brand.html` for the bilingual brand guidelines
+* `src/concept-studio.html` for the concept, format and asset workflow
 
-```sh
-node .github/studio-template/create-studio.mjs professionals-studio
-```
+## Brand sources
 
-The generated workspace is created at `.studio-workspaces/professionals-studio/`. It is intentionally ignored by Git while the product is being developed.
+Approved reusable values live in `brand/tokens.json`. Practical usage rules live in `brand/notes.md`. The evidence inventory lives in `docs/brandsources.md`.
 
-Validate during development:
-
-```sh
-node .github/studio-template/validate-studio.mjs .studio-workspaces/professionals-studio/studio-manifest.json
-```
-
-Release validation must not be used until the content, bilingual guidelines, theme and workflow destinations are approved.
+The full 196 MB Professionals imagery archive is retained outside Git. Web ready reference images needed by the product are included under `src/assets/imagery-guidelines`.
