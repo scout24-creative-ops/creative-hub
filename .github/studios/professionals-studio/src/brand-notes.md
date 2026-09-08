@@ -1,6 +1,6 @@
 # Professionals brand usage notes
 
-Professionals keeps the master brand system and the established Studio workflow. The deliberate differences are the Agents tone of voice, `color.professionals.blue` as the journey accent, and the absence of a standalone product symbol. Exact values live in [tokens.json](./tokens.json); use token names rather than introducing raw values.
+Professionals keeps the master brand system and the established Studio workflow. The deliberate differences are the Agents tone of voice, `color.professionals.blue` as the journey accent, and the absence of a standalone product symbol. Exact values live in [tokens.json](./brand-tokens.json); use token names rather than introducing raw values.
 
 ## Use case map
 

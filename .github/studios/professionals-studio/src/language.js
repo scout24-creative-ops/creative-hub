@@ -1,13 +1,23 @@
 (function () {
   const storageKey = "professionals_studio_language";
+  let sessionLanguage = null;
+  const boundButtons = new WeakSet();
 
   function currentLanguage() {
-    const saved = window.localStorage.getItem(storageKey);
-    return saved === "de" ? "de" : "en";
+    if (sessionLanguage !== null) return sessionLanguage;
+    sessionLanguage = "en";
+    try {
+      const saved = window.localStorage.getItem(storageKey);
+      if (saved === "en" || saved === "de") sessionLanguage = saved;
+    } catch (error) {
+      // Language switching still works when this browser blocks storage.
+    }
+    return sessionLanguage;
   }
 
   function applyLanguage(language) {
     const next = language === "de" ? "de" : "en";
+    sessionLanguage = next;
     document.documentElement.lang = next;
     document.querySelectorAll("[data-en][data-de]").forEach((element) => {
       element.textContent = element.dataset[next];
@@ -23,8 +33,13 @@
       button.setAttribute("aria-pressed", active ? "true" : "false");
       button.classList.toggle("is-active", active);
     });
-    window.localStorage.setItem(storageKey, next);
+    try { window.localStorage.setItem(storageKey, next); } catch (error) {
+      // Keep this choice for the current page even when it cannot be saved.
+    }
     window.dispatchEvent(new CustomEvent("professionalslanguagechange", { detail: { language: next } }));
+    // Translate dynamic UI in place. Rebuilding a panel here would lose its
+    // fields, focus, selected outputs or an in-flight export.
+    window.ProfessionalsUI?.refresh();
   }
 
   function initLanguageSwitch() {
@@ -39,7 +54,9 @@
       document.body.appendChild(control);
     }
     document.querySelectorAll("[data-language]").forEach((button) => {
+      if (boundButtons.has(button)) return;
       button.addEventListener("click", () => applyLanguage(button.dataset.language));
+      boundButtons.add(button);
     });
     applyLanguage(currentLanguage());
   }
@@ -47,7 +64,8 @@
   window.ProfessionalsLanguage = {
     get: currentLanguage,
     set: applyLanguage,
-    init: initLanguageSwitch
+    init: initLanguageSwitch,
+    refresh: () => window.ProfessionalsUI?.refresh()
   };
 
   if (document.readyState === "loading") {

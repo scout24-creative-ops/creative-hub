@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Professionals Concept Studio</title>
+<title data-en="Professionals Concept Studio" data-de="Professionals Konzeptstudio">Professionals Concept Studio</title>
 <style>
   @font-face { font-family:"Make It Better"; font-weight:400; src:url("assets/fonts/MakeItBetter-Regular.woff2") format("woff2"); }
   @font-face { font-family:"Make It Better"; font-weight:700; src:url("assets/fonts/MakeItBetter-Bold.woff2") format("woff2"); }
@@ -26,8 +26,6 @@
   }
   .headrow { display:flex; align-items:center; gap:16px; padding:13px 0; }
   .headrow img.logo { height:24px; display:block; }
-  .headrow .title { font-weight:700; font-size:16px; line-height:1.2; }
-  .headrow .subtitle { font-size:12.5px; color:var(--muted); font-weight:700; }
   .headrow .spacer { flex:1; }
   .language-switch { display:inline-flex; padding:3px; background:var(--sand); border:1px solid var(--hairline); border-radius:11px; }
   .language-switch button { border:0; background:transparent; color:var(--muted2); border-radius:8px; padding:6px 9px; font-size:12px; font-weight:700; }
@@ -98,7 +96,7 @@
   .generation-feedback strong { font-size:14px; font-weight:700; }
   .generation-feedback span { max-width:230px; font-size:11.5px; font-weight:700; line-height:1.35; color:var(--muted2); }
   .generation-orbit { position:relative; width:34px; height:34px; border:3px solid color-mix(in srgb, var(--blue) 30%, transparent); border-top-color:var(--blue); border-radius:50%; animation:gen-orbit .8s linear infinite; }
-  .generation-orbit::after { content:""; position:absolute; width:8px; height:8px; right:-5px; top:1px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 4px rgba(61,245,220,.20); }
+  .generation-orbit::after { content:""; position:absolute; width:8px; height:8px; right:-5px; top:1px; border-radius:50%; background:var(--charcoal); box-shadow:0 0 0 4px rgba(51,51,51,.12); }
   .generation-meter { width:min(190px,68%); height:4px; overflow:hidden; border-radius:999px; background:rgba(51,51,51,.12); }
   .generation-meter::before { content:""; display:block; width:44%; height:100%; border-radius:inherit; background:var(--charcoal); animation:gen-meter 1.35s ease-in-out infinite; }
   .pill-btn.is-generating { display:inline-flex; align-items:center; gap:7px; transform:translateY(1px); }
@@ -112,11 +110,7 @@
      the headline at scale — which is what the engine draws for this route —
      over the sand field the ad will be set on, and says so in words. */
   .cc-nophoto { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center;
-    gap:6px; padding:18px 20px; background:var(--sand);
-    /* The brand colours come from the variables, never from a literal. */
-    background-image:linear-gradient(135deg,
-      color-mix(in srgb, var(--blue) 34%, transparent),
-      color-mix(in srgb, var(--teal) 26%, transparent)); }
+    gap:6px; padding:18px 20px; background:var(--sand); }
   .cc-np-tag { align-self:flex-start; background:var(--charcoal); color:var(--white); font-size:10px;
     font-weight:700; letter-spacing:.04em; text-transform:none; border-radius:999px; padding:3px 10px; }
   .cc-np-line { font-size:26px; font-weight:700; line-height:1.12; color:var(--charcoal);
@@ -262,23 +256,29 @@
                font-family:var(--font); text-align:left; color:var(--charcoal); }
   .routetile:hover, .routetile.on { border-color:var(--charcoal); }
   .routetile.on { box-shadow:0 0 0 2px var(--charcoal); }
-  .rt-thumb { width:58px; height:58px; border-radius:9px; background:var(--sand) center/cover no-repeat;
+  /* Finished artwork must remain fully visible, even when its ratio differs from the thumbnail. */
+  .rt-thumb { width:58px; height:58px; border-radius:9px; background:var(--sand) center/contain no-repeat;
               border:1px solid rgba(51,51,51,.08); }
   .rt-copy b { display:block; font-size:12.5px; font-weight:700; line-height:1.25; }
   .rt-copy span { display:block; margin-top:3px; font-size:10.5px; color:var(--muted); line-height:1.35; }
   .picker-step { display:flex; align-items:center; gap:9px; margin-top:6px; font-size:13.5px; font-weight:700; }
   .picker-step i, .asset-step-title i { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px;
     border-radius:50%; background:var(--charcoal); color:var(--white); font-style:normal; font-size:11px; flex:none; }
-  .referencegrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:10px; margin:14px 0 22px; }
+  .referencegrid { margin:18px 0 22px; }
+  .referencefamily + .referencefamily { margin-top:24px; }
+  .referencefamily-title { font-size:16px; font-weight:700; margin-bottom:10px; }
+  .referencefamily-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
   .referencetile { border:1px solid var(--hairline); background:var(--white); border-radius:14px;
-    padding:8px 8px 10px; font-family:var(--font); text-align:left; color:var(--charcoal); transition:all .14s; }
+    padding:9px 9px 12px; font-family:var(--font); text-align:left; color:var(--charcoal); transition:all .14s; }
   .referencetile:hover { border-color:var(--charcoal); }
   .referencetile.on { border-color:var(--charcoal); box-shadow:0 0 0 2px var(--charcoal); }
-  .ref-thumb { width:100%; aspect-ratio:4/5; display:block; object-fit:cover; object-position:center;
-    border-radius:9px; background:var(--sand); border:1px solid rgba(51,51,51,.08); }
-  .ref-name { display:block; font-size:11.5px; font-weight:700; line-height:1.25; margin-top:7px; }
-  .ref-source { display:block; font-size:9.5px; line-height:1.3; color:var(--muted); margin-top:3px; }
-  .reference-note { max-width:760px; margin:-4px 0 2px; font-size:12px; line-height:1.5; color:var(--muted2); }
+  .ref-thumb { width:100%; aspect-ratio:var(--ref-ratio,4/5); display:block;
+    border-radius:9px; background:var(--sand) center/contain no-repeat; border:1px solid rgba(51,51,51,.08); }
+  .ref-name { display:block; font-size:12.5px; font-weight:700; line-height:1.25; margin-top:9px; }
+  .ref-kind { display:block; margin-top:9px; font-size:10px; font-weight:700; line-height:1.2; color:var(--muted); }
+  .ref-kind + .ref-name { margin-top:3px; }
+  .ref-source { display:block; font-size:10.5px; line-height:1.35; color:var(--muted); margin-top:4px; }
+  .reference-note { max-width:680px; margin:2px 0 0; font-size:13px; line-height:1.55; color:var(--muted2); }
   .stylegrid, .usedgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:10px; }
   .usedgrid { margin-top:10px; }
   .useddetails { margin-top:12px; }
@@ -307,7 +307,7 @@
                padding:8px 8px 9px; font-family:var(--font); text-align:left; transition:all .14s; }
   .styletile:hover { border-color:var(--charcoal); }
   .styletile.on { border-color:var(--charcoal); box-shadow:0 0 0 2px var(--charcoal); }
-  .st-thumb { width:100%; aspect-ratio:4/5; border-radius:9px; background:var(--sand) center/cover no-repeat;
+  .st-thumb { width:100%; aspect-ratio:4/5; border-radius:9px; background:var(--sand) center/contain no-repeat;
               border:1px solid rgba(51,51,51,.08); }
   .st-name { font-size:11.5px; font-weight:700; margin-top:7px; line-height:1.25; }
 
@@ -351,13 +351,22 @@
               display:flex; align-items:center; justify-content:center; min-height:300px; }
   .pv-frame img { max-width:100%; max-height:460px; display:block; border-radius:4px;
                   box-shadow:0 6px 24px rgba(51,51,51,.16); }
+  .preview-status { max-width:480px; padding:28px 20px; color:var(--charcoal); line-height:1.5; }
+  .preview-status strong, .preview-status span { display:block; }
+  .preview-status strong { font-size:20px; font-weight:700; margin-bottom:12px; }
+  .preview-status p { margin:0 0 12px; font-size:14px; }
+  .preview-status span { font-size:13px; color:var(--muted2); }
+  .preview-held-thumb { display:flex; align-items:center; justify-content:center; text-align:center;
+                        padding:8px; color:var(--charcoal); font-size:12px; background-image:none!important; }
+  .fm-thumb.preview-held-thumb { font-size:18px; padding:0; }
+  .emphasis-hint { display:block; color:var(--muted2); font-size:12px; line-height:1.45; margin-top:6px; font-weight:400; }
   .pv-side { width:236px; flex:none; }
   .formatlist { max-height:420px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; padding-right:4px; }
   .fmt { display:flex; gap:9px; align-items:center; border:1px solid transparent; background:transparent;
          border-radius:10px; padding:6px 8px; font-family:var(--font); text-align:left; width:100%; }
   .fmt:hover { background:var(--sand); }
   .fmt.on { border-color:var(--charcoal); background:var(--sand); }
-  .fm-thumb { width:38px; height:38px; flex:none; border-radius:6px; background:var(--sand) center/cover no-repeat;
+  .fm-thumb { width:38px; height:38px; flex:none; border-radius:6px; background:var(--sand) center/contain no-repeat;
               border:1px solid rgba(51,51,51,.1); }
   .fm-txt { flex:1; min-width:0; display:block; line-height:1.3; }
   .fm-txt b { display:block; font-size:12px; font-weight:700; }
@@ -371,7 +380,7 @@
   .pv-notes { margin-top:14px; display:flex; flex-direction:column; gap:6px; }
   .note { font-size:12px; line-height:1.45; padding:8px 12px; border-radius:9px; background:var(--sand); color:var(--muted2); }
   .note.n-zone { background:rgba(61,245,220,.16); }
-  .note.n-policy { background:rgba(213,170,255,.20); }
+  .note.n-policy { background:rgba(36,227,255,.14); }
   .note.n-warn { background:#fff7e6; color:#8a6d3b; }
   .note.n-bad { background:#fdecea; color:#a5271b; font-weight:700; }
   /* SUBSTITUTION IS NOT A WARNING. `n-warn` is amber and `n-bad` is red
@@ -419,14 +428,14 @@
   .focalwrap.off { opacity:.4; cursor:default; }
   .focalwrap img { display:block; width:100%; }
   .focaldot { position:absolute; width:16px; height:16px; border-radius:50%; border:2.5px solid #fff;
-              background:#FF005A; box-shadow:0 0 0 1px rgba(0,0,0,.35); transform:translate(-50%,-50%); pointer-events:none; }
+              background:var(--blue); box-shadow:0 0 0 1px rgba(0,0,0,.35); transform:translate(-50%,-50%); pointer-events:none; }
   .focalwrap.off .focaldot { display:none; }
 
   /* The chosen design, once, at a size you can judge. */
   .chosen { display:flex; gap:18px; align-items:center; margin-top:20px;
             border:1px solid var(--hairline); border-radius:16px; padding:14px 16px; background:var(--sand); }
   .ch-thumb { width:92px; height:115px; flex:none; border-radius:10px;
-              background:var(--white) center/cover no-repeat; border:1px solid rgba(51,51,51,.10); }
+              background:var(--white) center/contain no-repeat; border:1px solid rgba(51,51,51,.10); }
   .ch-body { flex:1 1 220px; min-width:0; }
   .ch-name { font-size:18px; font-weight:700; line-height:1.2; }
   .ch-note { font-size:12.5px; color:var(--muted2); line-height:1.5; margin-top:4px; max-width:520px; }
@@ -497,6 +506,10 @@
      the same frame the results card shows afterwards. */
   .campcard { padding:0; }
   .campbody { padding:18px 22px 20px; }
+  .camp-outputs { border:0; padding:0; margin:18px 0; display:flex; flex-wrap:wrap; gap:12px 24px; }
+  .camp-outputs legend { font-size:14px; font-weight:700; margin-bottom:10px; }
+  .camp-outputs label { display:flex; align-items:center; gap:8px; font-size:14px; min-height:44px; }
+  .camp-editor[hidden], .storytile[hidden] { display:none; }
   .camp-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:16px; }
   .camp-fields label, .camp-which { display:flex; flex-direction:column; gap:5px; font-size:11.5px;
     font-weight:700; letter-spacing:.05em; text-transform:none; color:var(--muted); }
@@ -527,6 +540,14 @@
      column one word wide, and the pinned actions go full width so the
      download is still the easiest thing on the screen to hit. */
   @media (max-width:640px) {
+    header.app { padding:0 14px; }
+    .headrow { flex-wrap:wrap; gap:10px; }
+    .headrow .spacer { display:none; }
+    .headrow > a { margin-right:auto; }
+    .headrow > .pill-btn { flex:1 1 42%; }
+    .stepbtn { min-width:0; flex-direction:column; align-items:flex-start; gap:6px; padding:12px 6px; }
+    .stepbtn .sub { display:none; }
+    .stepbtn + .stepbtn::before { display:none; }
     .chosen { flex-wrap:wrap; }
     .ch-thumb { width:74px; height:92px; }
     .ch-act { order:3; flex:1 1 100%; }
@@ -584,12 +605,14 @@
   .sc-meta span { display:block; font-size:11.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .sc-meta em { font-style:normal; font-size:10.5px; color:var(--muted); }
   .modal.wide { max-width:820px; }
+  .designpicker .modal.wide { max-width:1040px; }
   .histlist { display:flex; flex-direction:column; gap:10px; max-height:56vh; overflow-y:auto; padding-right:4px; }
   .histempty { font-size:13.5px; color:var(--muted); padding:22px 0; }
   .histrow { display:flex; gap:14px; align-items:center; border:1px solid var(--hairline);
              border-radius:14px; padding:11px 13px; }
   .hr-thumbs { display:flex; gap:4px; flex:none; }
-  .hr-thumbs img { width:44px; height:44px; object-fit:cover; border-radius:7px; border:1px solid var(--hairline); }
+  .hr-thumbs img { width:44px; height:44px; object-fit:contain; object-position:center;
+                   background:var(--sand); border-radius:7px; border:1px solid var(--hairline); }
   .hr-none { font-size:10.5px; color:var(--muted); width:44px; }
   .hr-body { flex:1; min-width:0; }
   .hr-top b { font-size:13px; font-weight:700; }
@@ -605,10 +628,14 @@
   .vt-name { font-size:12.5px; font-weight:700; margin:7px 0 7px; }
   .vt-name span { font-weight:400; color:var(--muted); font-size:11px; }
   @media (max-width:820px) {
+    .referencefamily-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .pv-body { flex-direction:column; }
     .pv-side { width:100%; }
     .formatlist { max-height:none; flex-direction:row; overflow-x:auto; }
     .fmt { width:auto; flex:none; }
+  }
+  @media (max-width:520px) {
+    .referencefamily-grid { grid-template-columns:1fr; }
   }
 
   /* ---------- Modal ---------- */
@@ -659,17 +686,11 @@
   <div class="headrow">
     <a href="index.html" title="Back to the dashboard" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit">
       <img class="logo" src="assets/logo-professionals.svg" alt="Back to the dashboard">
-      <div>
-        <div class="title">Concept Studio</div>
-        <div class="subtitle" data-en="Concepts → Formats → Assets" data-de="Konzepte → Formate → Inhalte">Concepts → Formats → Assets</div>
-      </div>
     </a>
     <div class="spacer"></div>
     <div class="language-switch" aria-label="Language"><button type="button" data-language="en" aria-pressed="true">English</button><button type="button" data-language="de" aria-pressed="false">Deutsch</button></div>
-    <button class="pill-btn" id="btnImageLibrary" data-en="Image library" data-de="Bildbibliothek">Image library</button>
     <button class="pill-btn" id="btnHistory" data-en="History" data-de="Verlauf">History</button>
     <button class="pill-btn" id="btnNew" data-en="New session" data-de="Neue Sitzung">New session</button>
-    <button class="pill-btn primary" id="btnSettings" data-en="Settings" data-de="Einstellungen">Settings</button>
   </div>
   <div class="stepper" id="stepper"></div>
 </header>
@@ -719,7 +740,7 @@
   <section class="panel" id="panel3">
     <div class="stepintro">
       <h1 data-en="Assets" data-de="Inhalte">Assets</h1>
-      <p data-en="Choose a look, check the result and build the set. Every placement receives only the variants allowed by its own rules." data-de="Wählen Sie einen Look, prüfen Sie das Ergebnis und erstellen Sie das Set. Jede Platzierung erhält nur die Varianten die nach ihren Regeln erlaubt sind.">Choose a look, check the result and build the set. Every placement receives only the variants allowed by its own rules.</p>
+      <p data-en="Choose one editable layout, review how it adapts and build the set. Every placement receives only the variants allowed by its own rules." data-de="Wählen Sie ein bearbeitbares Layout, prüfen Sie die Anpassung und erstellen Sie das Set. Jede Platzierung erhält nur die Varianten die nach ihren Regeln erlaubt sind.">Choose one editable layout, review how it adapts and build the set. Every placement receives only the variants allowed by its own rules.</p>
     </div>
     <div id="step3body"></div>
   </section>
@@ -749,6 +770,11 @@
   </div>
 </div>
 
+<script src="locales/common.de.js"></script>
+<script src="locales/studio-concepts.de.js"></script>
+<script src="locales/studio-assets.de.js"></script>
+<script src="locales/studio-quality.de.js"></script>
+<script src="ui-localization.js"></script>
 <script src="language.js"></script>
 <script type="module">
 import { lookupSafeZone, SAFE_ZONE_VERSION, SAFE_ZONE_VERIFIED, allEntries } from "./safe-zones.js";
@@ -757,7 +783,7 @@ import {
   allowedVariants, withheldVariants, policyNote, ADVISORY, preloadFonts, loadImg, normaliseLayout,
   resolveSafeBox, ENGINE_VERSION, seedOf, FOCAL_DEFAULT,
   DESIGNS, designById, rotationSet, ROTATION_POOL,
-} from "./ad-engine.js";
+} from "./ad-engine.js?v=20260907-quality";
 import { buildMasters, hardCasesFrom, ADAPTER_VERSION, ASPECT_TOLERANCE } from "./size-adapter.js";
 import { PLATFORM_CHOICES, readPlacements } from "./placement-parser.js";
 import { slug, assetFileName } from "./asset-naming.js";
@@ -768,7 +794,7 @@ import {
 } from "./imagery-agent.js";
 import {
   storyFrom, buildLandingPage, buildEmail, fieldOf,
-  seedCampaign, linkRefused, SLOTS as STORY_SLOTS,
+  seedCampaign, linkRefused, SLOTS as STORY_SLOTS, STORY_FONT_FILES,
 } from "./story-builder.js";
 import {
   makeBuildRecord, putBuildRecord, setBuildVerdict, recordsAvailable,
@@ -792,7 +818,7 @@ import {
 /* =========================================================================
    Professionals Concept Studio, 3-step flow
    Step 1 Concept · Step 2 Imagery · Step 3 Formats
-   UI in English; customer-facing copy stays German.
+   UI in English or German; customer-facing copy stays German.
    The only file this page loads from agents/ is platform-export-presets.json,
    which step 2 groups placements with. imagery-agent.md and
    size-adapter-agent.md are reference documents for people, not inputs to
@@ -840,7 +866,7 @@ const CATEGORY_IMG = {
 const STEPS = [
   { n:1, en:"Concepts", de:"Konzepte", enSub:"Brief, ideas and imagery", deSub:"Briefing, Ideen und Bildwelt" },
   { n:2, en:"Formats", de:"Formate", enSub:"Platform exports", deSub:"Exporte für Plattformen" },
-  { n:3, en:"Assets", de:"Inhalte", enSub:"Logo and copy", deSub:"Logo und Text" },
+  { n:3, en:"Assets", de:"Inhalte", enSub:"Layout, logo and copy", deSub:"Layout, Logo und Text" },
 ];
 
 /* Settings used to offer an Anthropic key, a Claude model and two ChatGPT
@@ -851,8 +877,17 @@ for (const dead of ["professionals_studio_api_key", "professionals_studio_model"
   try { localStorage.removeItem(dead); } catch (e) { /* a locked-down browser is not a reason to stop */ }
 }
 
+function storedValue(key) {
+  try { return localStorage.getItem(key) || ""; } catch { return ""; }
+}
+function storedRows(key) {
+  try {
+    const value = JSON.parse(storedValue(key) || "[]");
+    return Array.isArray(value) ? value.filter(row => row && typeof row === "object") : [];
+  } catch { return []; }
+}
 const state = {
-  openaiKey: localStorage.getItem("professionals_studio_openai_key") || "",
+  openaiKey: storedValue("professionals_studio_openai_key"),
   messages: [],
   step: 1,
   brief: null,
@@ -884,6 +919,7 @@ const state = {
   assetsBuilt: false,
   assets: [],
   assetsKey: null,
+  assetsFacts: null,
   buildToken: 0,
   builtDesign: null,
   designReference: null,
@@ -959,7 +995,7 @@ function createExportPlanFromSelection() {
   const action = document.getElementById("btnCreatePlanSticky");
   action.textContent = document.documentElement.lang === "de" ? "Exportplan aktualisieren" : "Update export plan";
   action.disabled = true;
-  sendMessage(`Placements for export: ${picked.join(", ")}. Create the export plan for the selected image.`);
+  sendMessage(`Placements for export: ${picked.join(", ")}. Create the export plan for the selected image.`, true);
 }
 
 function renderStepper() {
@@ -1015,11 +1051,11 @@ function renderWorkflowBack() {
   intro.appendChild(back);
 }
 
-function addBubble(role, text) {
+function addBubble(role, text, uiMessage = false) {
   hideEmpty();
   const who = role === "user" ? "You" : "Concept Studio";
   const av = role === "user" ? "Y" : "P";
-  const b = el(`<div class="msg ${role}"><div class="avatar">${av}</div><div style="flex:1;min-width:0"><div class="who">${who}</div><div class="body"></div></div></div>`);
+  const b = el(`<div class="msg ${role}"><div class="avatar"${role === "user" ? ' data-en="Y" data-de="S"' : ""}>${role === "user" && document.documentElement.lang === "de" ? "S" : av}</div><div style="flex:1;min-width:0"><div class="who">${who}</div><div class="body"${role === "user" && !uiMessage ? " data-no-translate" : ""}></div></div></div>`);
   b.querySelector(".body").textContent = text || "";
   body().appendChild(b); scrollDown();
   return b.querySelector(".body");
@@ -1041,7 +1077,7 @@ function haptic(pattern) {
 function startImageFeedback(c, btn) {
   const card = btn.closest(".conceptcard") || bodies[1].querySelector(`[data-concept="${c.id}"]`);
   const top = card && card.querySelector(".cc-top");
-  const label = btn.textContent;
+  const label = window.ProfessionalsUI?.sourceText(btn) ?? btn.textContent;
   let overlay = null;
   let stage = null;
   if (top) {
@@ -1175,15 +1211,15 @@ function renderBriefCard(b) {
   /* One quiet line. The full brief stays one click away, but it is not the
      point of this page: choosing a route is. */
   bodies[1].appendChild(el(`<div style="margin:16px 0 2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <span class="chip dark">${esc(b.product)}</span>
-    <span class="chip outline">${esc(b.audience)}</span>
-    <span class="chip outline">${esc(b.objective)}</span>
+    <span class="chip dark" data-no-translate>${esc(b.product)}</span>
+    <span class="chip outline" data-no-translate>${esc(b.audience)}</span>
+    <span class="chip outline" data-no-translate>${esc(b.objective)}</span>
     <details class="more" style="margin:0;flex-basis:100%"><summary style="font-size:12.5px">Full brief</summary>
       <div class="card" style="margin-top:8px;padding:16px 18px">
-        <div class="kv"><b>INSIGHT</b>${esc(b.insight)}</div>
-        <div class="kv"><b>KEY MESSAGE</b>${esc(b.key_message || "")}</div>
-        <div class="kv"><b>PROOF POINTS</b>${esc((b.proof_points || []).join(" · "))}</div>
-        <div class="kv"><b>TONE</b>${esc(b.tone)}</div>
+        <div class="kv"><b>INSIGHT</b><span data-no-translate>${esc(b.insight)}</span></div>
+        <div class="kv"><b>KEY MESSAGE</b><span data-no-translate>${esc(b.key_message || "")}</span></div>
+        <div class="kv"><b>PROOF POINTS</b><span data-no-translate>${esc((b.proof_points || []).join(" · "))}</span></div>
+        <div class="kv"><b>TONE</b><span data-no-translate>${esc(b.tone)}</span></div>
         ${b.assumptions && b.assumptions.length ? `<div class="kv"><b>I ASSUMED</b>${esc(b.assumptions.filter(Boolean).join(" · "))}</div>` : ""}
         ${b.open_questions && b.open_questions.length ? `<div class="kv"><b>STILL OPEN</b><span style="color:var(--muted2)">${esc(b.open_questions.join(" · "))}</span></div>` : ""}
       </div>
@@ -1251,15 +1287,15 @@ function conceptCard(c) {
     <div class="cc-top" style="position:relative;height:200px;background:var(--sand)">
       ${photo
         ? `<img src="${esc(photo)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
-        : `<div class="cc-nophoto"><span class="cc-np-tag">No photograph, by design</span><span class="cc-np-line">${esc(c.headline_de || "")}</span><span class="cc-np-note">This route is set typographically.</span></div>`}
+        : `<div class="cc-nophoto"><span class="cc-np-tag">No photograph, by design</span><span class="cc-np-line" data-no-translate>${esc(c.headline_de || "")}</span><span class="cc-np-note">This route is set typographically.</span></div>`}
       <span style="position:absolute;left:14px;bottom:12px;background:rgba(255,255,255,.94);color:var(--charcoal);font-size:11px;font-weight:700;border-radius:999px;padding:4px 11px">${c.id} · ${esc(categoryLabel(c))}</span>
       ${usesProvidedImage ? `<span style="position:absolute;left:14px;top:12px;background:var(--charcoal);color:#fff;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 10px">Provided reference · approval pending</span>` : c.__upload ? `<span style="position:absolute;left:14px;top:12px;background:var(--charcoal);color:#fff;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 10px">${c.__generated ? (c.__imagery && c.__imagery.reviewed ? "Generated · reviewed" : "Generated · unreviewed") : "Your picture"}</span>` : ""}
       <span class="tick" style="position:absolute;top:12px;right:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;background:${on ? "var(--teal)" : "rgba(255,255,255,.92)"};color:var(--charcoal);border:1.5px solid ${on ? "var(--teal)" : "rgba(51,51,51,.18)"}">${on ? "✓" : ""}</span>
     </div>
     <div style="padding:16px 18px 0;flex:1">
-      <div style="font-size:16.5px;font-weight:700;line-height:1.3">${esc(c.headline_de)}</div>
-      <div style="font-size:13.5px;color:var(--muted2);margin-top:5px;line-height:1.5">${esc(c.subline_de || c.creative_hook)}</div>
-      <div style="margin-top:12px"><span style="background:var(--charcoal);color:#fff;font-weight:700;font-size:12px;border-radius:999px;padding:5px 14px;display:inline-block">${esc(c.cta_de)}</span></div>
+      <div data-no-translate style="font-size:16.5px;font-weight:700;line-height:1.3">${esc(c.headline_de)}</div>
+      <div data-no-translate style="font-size:13.5px;color:var(--muted2);margin-top:5px;line-height:1.5">${esc(c.subline_de || c.creative_hook)}</div>
+      <div data-no-translate style="margin-top:12px"><span style="background:var(--charcoal);color:#fff;font-weight:700;font-size:12px;border-radius:999px;padding:5px 14px;display:inline-block">${esc(c.cta_de)}</span></div>
       <details class="more" style="margin-top:14px"><summary>Details</summary>
         <div class="kv"><b>HOOK</b>„${esc(c.creative_hook)}"</div>
         <div class="kv"><b>IDEA</b>${esc(c.big_idea)}</div>
@@ -1318,7 +1354,7 @@ function toggleConcept(id) {
 
 const CONCEPT_FEEDBACK_KEY = "professionals_studio_concept_feedback";
 function rejectedConceptNotes() {
-  try { return JSON.parse(localStorage.getItem(CONCEPT_FEEDBACK_KEY) || "[]"); } catch (e) { return []; }
+  return storedRows(CONCEPT_FEEDBACK_KEY);
 }
 function rememberRejectedConcept(c, reason, note) {
   const entries = rejectedConceptNotes();
@@ -1444,6 +1480,9 @@ let SERVER_INFO = null;
 const LOCAL_API_BASE = location.protocol === "file:" ? "http://127.0.0.1:8918" : "";
 const apiUrl = path => LOCAL_API_BASE + path;
 
+/* A stalled provider must not leave the interface busy indefinitely. */
+function requestSignal(ms = 120000) { return AbortSignal.timeout(ms); }
+
 /* THE WHOLE CONNECTION, ANSWERED IN ONE CALL.
    `SERVER_KEY`, `SERVER_IMAGES`, `browserKey`, `serverKey` and `j.key` were
    five names for two facts — what /api/status said, and whether a key is in
@@ -1464,7 +1503,7 @@ function conn() {
 async function detectServerKey() {
   let j = null;
   try {
-    const r = await fetch(apiUrl("/api/status"), { cache: "no-store" });
+    const r = await fetch(apiUrl("/api/status"), { cache: "no-store", signal: requestSignal(8000) });
     if (r.ok) j = await r.json();
   } catch (e) { j = null; }
   SERVER_INFO = j;
@@ -1547,7 +1586,7 @@ async function conceptsFromModel(brief, n) {
     `Each concept must lead with a different proof point from: ${(brief.proof_points || []).join(" | ")}.`,
     `The Studio will pair concepts with supplied Professionals reference imagery first. Do not request invented visual assets in the copy. Final image approval remains human.`,
     `Approved general composition references support full-bleed portraits, editorial splits, image-over-copy, image-under-copy, colour-only statements, angled image/field divisions, oversized cropped type and text-friendly negative space. Transfer the layout principle only, never the flattened reference artwork.`,
-    `Professionals assets use only Brand Teal, Professionals Blue, Charcoal, White and Sand. Never use purple or yellow. Never carry a Plus name, Plus symbol, informal Du/Dir/Deine wording or consumer-journey copy from a general reference.`,
+    `Professionals assets use only Brand Teal, Professionals Blue, Charcoal, White and Sand. Teal is the main brand colour and Blue is an accent only, never the full colour field. Never use purple or yellow. Never carry a Plus name, Plus symbol, informal Du/Dir/Deine wording or consumer-journey copy from a general reference.`,
     `German B2B customer copy always uses formal Sie, Ihnen and Ihre. Name the audience only as Immobilien-Profis or Makler-Profis; do not use Makler:innen for this audience.`,
     `Tone: professional, collaborative, approachable, engaged and supportive. Keep the added value immediately clear. Confident, never arrogant.`,
     `Approved claim: "Mehr Möglichkeiten. Mehr Erfolg. Mehr für Sie." You may adapt the benefit terms when the brief supports them, but keep every beat starting with Mehr and keep the message directed to Sie.`,
@@ -1560,6 +1599,7 @@ async function conceptsFromModel(brief, n) {
   ].join("\n");
   const r = await fetch(apiUrl("/api/text"), {
     method: "POST", headers: { "Content-Type": "application/json" },
+    signal: requestSignal(),
     body: JSON.stringify({ messages: [{ role:"system", content:sys }, { role:"user", content:user }], temperature: 0.9 }),
   });
   const j = await r.json();
@@ -1602,7 +1642,7 @@ async function testOpenAIKey(key, out) {
   }
   say("Checking\u2026", false);
   try {
-    const r = await fetch("https://api.openai.com/v1/models", { headers: { Authorization: "Bearer " + k } });
+    const r = await fetch("https://api.openai.com/v1/models", { headers: { Authorization: "Bearer " + k }, signal: requestSignal(15000) });
     const j = await r.json().catch(() => ({}));
     if (r.status === 401) { say("Rejected (401). OpenAI said: <b>" + esc((j.error && j.error.message) || "no detail") + "</b>", true); return; }
     if (!r.ok) { say("HTTP " + r.status + ": " + esc((j.error && j.error.message) || ""), true); return; }
@@ -1708,6 +1748,8 @@ async function generatePhoto(c, btn, plan) {
   if (!conn().can.generatePhoto) { addNotice(esc(conn().keylessLine), true); return; }
 
   const feedback = startImageFeedback(c, btn);
+  const requestedPhoto = conceptImage(c);
+  const requestId = c.__photoRequest = (c.__photoRequest || 0) + 1;
   let created = false;
   const body = P.request.body;
   try {
@@ -1717,10 +1759,12 @@ async function generatePhoto(c, btn, plan) {
     const r = viaServer
       ? await fetch(apiUrl("/api/image"), {
           method: "POST", headers: { "Content-Type": "application/json" },
+          signal: requestSignal(180000),
           body: JSON.stringify({ model: body.model, prompt: body.prompt, size: body.size }),
         })
       : await fetch("https://api.openai.com/v1/images/generations", {
           method: "POST",
+          signal: requestSignal(180000),
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + state.openaiKey },
           body: JSON.stringify(body),
         });
@@ -1743,6 +1787,10 @@ async function generatePhoto(c, btn, plan) {
       if (!src) throw new Error("The API returned no image.");
     }
 
+    if (!state.concepts.includes(c) || c.__photoRequest !== requestId || conceptImage(c) !== requestedPhoto) {
+      addNotice("The photograph changed while this request was running. Your current selection was kept.");
+      return;
+    }
     c.__upload = src; c.__uploadName = "generated"; c.__generated = true; c.__provided = false;
     created = true;
     photographChanged(c);
@@ -2225,7 +2273,7 @@ async function adaptationFor(concept, families) {
   const { masters, verdicts, subject, analysisOk } = buildMasters(img, families || []);
   const entry = {
     conceptId: concept.id, photo, planKey, version: ADAPTER_VERSION,
-    masters, verdicts,
+    masters, verdicts, extendedSources: new Map(),
     /* The same verdicts, indexed. A surface that wants one family's finding
        should not have to scan an array to know it is reading the same object
        the array holds. */
@@ -2546,9 +2594,12 @@ async function paintExtendPanel(host, fam, bg) {
 }
 
 async function runExtend({ fam, img, plan, prompt, concept, model = imageModelName() }) {
+  const originalPhoto = concept && conceptImage(concept);
+  const originalPlanKey = planKeyOf(currentFamilies());
   const { image, mask } = buildExtendInputs(img, plan);
   const r = await fetch(apiUrl("/api/image/extend"), {
     method: "POST", headers: { "Content-Type": "application/json" },
+    signal: requestSignal(180000),
     body: JSON.stringify({ model, prompt, size: plan.target.id, image, mask }),
   });
   const j = await r.json();
@@ -2589,8 +2640,11 @@ async function runExtend({ fam, img, plan, prompt, concept, model = imageModelNa
      neither the photograph nor the plan has changed, so this is a better
      answer to the same question, not a different question. */
   const A = planAdaptation();
-  if (!A) throw new Error("The extension came back, but the photograph or the plan changed while it was running, so there is nothing left for it to refine. Nothing was changed.");
+  if (!A || A.conceptId !== concept?.id || conceptImage(concept) !== originalPhoto
+      || planKeyOf(currentFamilies()) !== originalPlanKey)
+    throw new Error("The photograph or export plan changed during the extension. The current image was kept.");
   A.masters.set(fam.ratio, master);
+  A.extendedSources.set(fam.ratio, merged);
   A.byRatio.set(fam.ratio, verdict);
   const at = A.verdicts.findIndex(v => v.ratio === fam.ratio);
   if (at >= 0) A.verdicts[at] = verdict; else A.verdicts.push(verdict);
@@ -2986,8 +3040,8 @@ function renderExportPlan(p) {
 
   if (hardCases.length) {
     const hc = el(`<div class="card" style="border-left:4px solid #24E3FF">
-      <h3>Hard adaptations</h3>
-      <div style="font-size:14px;color:var(--muted2)">The image size adapter has found crops, soft enlargements or fixed-size composition jobs. Eligible format extensions run automatically; fixed-size banners stay separate layout jobs.</div>
+      <h3>How the photograph will adapt</h3>
+      <div style="font-size:14px;color:var(--muted2)">The figures below describe a full frame crop, not the final design. In Assets, the Studio prepares a master for every ratio family, keeps the selected layout and resolves safe colours automatically. Review the finished preview before export.</div>
     </div>`);
     for (const h of hardCases) {
       hc.appendChild(el(`<div class="kv"><b>${esc(h.placement).toUpperCase()}</b>${esc(hardProblem(h))}<div style="margin-top:5px;font-weight:700">→ ${esc(h.recommendation)}</div></div>`));
@@ -3138,10 +3192,21 @@ function zipStore(files) {
   end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
   return new Blob([...chunks, ...central, new Uint8Array(end.buffer)], { type:"application/zip" });
 }
-function downloadBlob(blob, name) {
+function downloadBlob(blob, name, host = null) {
   const u = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = u; a.download = name; a.click();
-  setTimeout(() => URL.revokeObjectURL(u), 4000);
+  const a = document.createElement("a"); a.href = u; a.download = name;
+  let notice = null;
+  if (host) {
+    host.querySelector(".download-notice")?.remove();
+    notice = document.createElement("p"); notice.className = "notice download-notice";
+    notice.setAttribute("role", "status");
+    notice.append("Your ZIP is prepared. If the download does not start, ");
+    a.textContent = "save the ZIP here"; notice.append(a); host.append(notice);
+  } else {
+    a.hidden = true; document.body.append(a);
+  }
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(u); a.remove(); notice?.remove(); }, 600000);
 }
 /* `slug` and the filename rule live in asset-naming.js, imported above:
    no screen prints a filename, so the rule can only be pinned by a test. */
@@ -3164,26 +3229,82 @@ const CTA_COLOURS = [
   { id: "sand",     bg: COLORS.sand,     fg: COLORS.charcoal, label: "Sand" },
 ];
 
-/* User-approved general ImmoScout24 examples. These are visible evidence in
-   Change design, not flattened artwork inserted into a new campaign. Each
-   card maps the approved composition principle to a renderer and a compliant
-   Professionals palette. Copy, purple, yellow, Plus marks and all-caps type
-   in the source image never transfer. */
-const APPROVED_DESIGN_REFERENCES = [
-  { id:"group-161942", file:"Group 161942.png", label:"Full-bleed stacked copy", src:"assets/design-references/full-bleed-stacked.png", design:"fullbleed-top", band:"teal" },
-  { id:"a4-3", file:"A4 - 3.jpg", label:"Professional portrait overlay", src:"assets/design-references/professional-portrait-overlay.jpg", design:"fullbleed-bottom", band:"teal" },
-  { id:"frame-1000004797", file:"Frame 1000004797.jpg", label:"Image over copy", src:"assets/design-references/image-over-copy.jpg", design:"anchor-bottom", band:"white" },
-  { id:"a4-2", file:"A4 - 2.jpg", label:"Colour-only statement", src:"assets/design-references/colour-statement.jpg", design:"statement-middle", band:"charcoal" },
-  { id:"frame-26095484", file:"Frame 26095484.png", label:"Full-bleed emphasis", src:"assets/design-references/full-bleed-emphasis.png", design:"fullbleed-middle", band:"blue" },
-  { id:"group-161893-1", file:"Group 161893-1.png", label:"Vertical portrait", src:"assets/design-references/vertical-type-portrait.png", design:"fullbleed-middle", band:"blue" },
-  { id:"frame-26095487", file:"Frame 26095487.png", label:"Angled colour field", src:"assets/design-references/angled-colour-field.png", design:"statement-top", band:"teal" },
-  { id:"frame-26095486", file:"Frame 26095486.png", label:"Asymmetric split", src:"assets/design-references/asymmetric-split.png", design:"editorial-left", band:"blue" },
-  { id:"frame-26095485-png", file:"Frame 26095485.png", label:"Oversized crop", src:"assets/design-references/oversized-crop.png", design:"panel-top", band:"blue" },
-  { id:"group-161893", file:"Group 161893.png", label:"Environmental portrait", src:"assets/design-references/environmental-vertical.png", design:"fullbleed-middle", band:"blue" },
-  { id:"homeowner", file:"Homeowner.png", label:"Wide editorial split", src:"assets/design-references/wide-editorial-split.png", design:"editorial-left", band:"sand" },
-  { id:"frame-15144-1", file:"Frame 15144 1.png", label:"Text-friendly portrait", src:"assets/design-references/text-friendly-portrait.png", design:"fullbleed-top", band:"teal" },
-  { id:"group-161879", file:"Group 161879.png", label:"Angled poster", src:"assets/design-references/angled-poster.png", design:"poster-type-first", band:"sand" },
-  { id:"frame-26095485-jpg", file:"Frame 26095485.jpg", label:"Image under copy", src:"assets/design-references/image-under-copy.jpg", design:"poster-type-first", band:"sand" },
+/* The supplied references are rebuilt as executable Professionals templates.
+   Every item below points to different renderer geometry, so changing design
+   changes the composition rather than merely recolouring one layout. */
+const PROFESSIONALS_TEMPLATES = [
+  {
+    id: "negative-space-portrait", group: "Full bleed image", label: "Negative space portrait",
+    design: "fullbleed-negative-space", band: "sand", ctaColour: "blue",
+    note: "A person leads on one side while the message uses the quiet side of the photograph.",
+    sources: "Rebuilt from A4 3 and Frame 15144 1",
+  },
+  {
+    id: "impact-photo", group: "Full bleed image", label: "Impact photo",
+    design: "fullbleed-impact", band: "sand", ctaColour: "charcoal",
+    note: "The photograph fills the canvas. You can highlight an exact phrase you choose from the headline.",
+    sources: "Rebuilt from Group 161942 and Frame 26095484",
+  },
+  {
+    id: "hard-split", group: "Split screen", label: "Hard split",
+    design: "editorial-vertical", band: "teal", ctaColour: "charcoal",
+    note: "A straight edge gives image and message equally clear roles and adapts to the format.",
+    sources: "Rebuilt from Homeowner and Frame 15144 1",
+  },
+  {
+    id: "angled-split-left", group: "Split screen", label: "Angled split left",
+    design: "editorial-angle-left", band: "teal", ctaColour: "charcoal",
+    note: "A diagonal split gives the message and photograph distinct, balanced areas.",
+    sources: "Rebuilt from Frame 26095487",
+  },
+  {
+    id: "angled-split-right", group: "Split screen", label: "Angled split right",
+    design: "editorial-angle-right", band: "sand", ctaColour: "blue",
+    note: "The mirrored diagonal offers a second direction while preserving the same hierarchy.",
+    sources: "Rebuilt from Frame 26095487 and A4 3",
+  },
+  {
+    id: "image-over-message", group: "Split screen", label: "Image over message",
+    design: "poster-angle-photo-first", band: "sand", ctaColour: "teal",
+    note: "The photograph opens the story and an angled seam reveals the message below.",
+    sources: "Rebuilt from Frame 1000004797",
+  },
+  {
+    id: "message-over-image", group: "Split screen", label: "Message over image",
+    design: "poster-angle-type-first", band: "teal", ctaColour: "charcoal",
+    note: "The headline leads and the photograph enters through an angled lower edge.",
+    sources: "Rebuilt from Group 161879 and Frame 26095485",
+  },
+  {
+    id: "type-statement", group: "Typography", label: "Type statement",
+    design: "statement-impact", band: "charcoal", ctaColour: "blue",
+    note: "A typographic composition without a photograph. Optionally highlight an exact phrase you choose from the headline.",
+    sources: "Rebuilt from A4 2",
+  },
+  {
+    id: "editorial-horizontal", group: "Split screen", label: "Horizontal split",
+    design: "editorial-horizontal", band: "teal", ctaColour: "charcoal",
+    note: "A straight horizontal division separates the photograph and brand message.",
+    sources: "Adapted from Frame 1000004797",
+  },
+  {
+    id: "fullbleed-lower-caption", group: "Full bleed image", label: "Photo with lower caption",
+    design: "fullbleed-lower-caption", band: "sand", ctaColour: "charcoal",
+    note: "A restrained lower caption leaves the image and its professional context visible.",
+    sources: "Adapted from A4 3 and Frame 15144 1",
+  },
+  {
+    id: "statement-centred", group: "Typography", label: "Centred statement",
+    design: "statement-centred", band: "sand", ctaColour: "charcoal",
+    note: "A centred headline, signature and action give a short business benefit room to breathe.",
+    sources: "Typographic variation of A4 2",
+  },
+  {
+    id: "statement-underline", group: "Typography", label: "Underlined statement",
+    design: "statement-underline", band: "charcoal", ctaColour: "white",
+    note: "An approved underline gives one phrase emphasis in a calm typographic composition.",
+    sources: "Adapted from A4 2 and Frame 15144 1",
+  },
 ];
 
 /* Which concepts this build covers. The tick you made in step 1 is the
@@ -3210,21 +3331,31 @@ function looksAllCaps(value) {
 
 function professionalsCaseViolations(concepts, campaign) {
   const found = [];
-  for (const concept of concepts || []) {
+  const selected = Array.isArray(concepts) ? concepts.filter(concept => concept && typeof concept === "object") : [];
+  for (const concept of selected) {
     for (const [key, label] of [["headline_de", "headline"], ["subline_de", "subline"], ["cta_de", "button"]]) {
       if (looksAllCaps(concept[key])) found.push(`Concept ${concept.id} ${label}`);
     }
   }
-  const walk = (value, path) => {
-    if (typeof value === "string") {
-      if (!/url|link/i.test(path) && looksAllCaps(value)) found.push(path);
-      return;
+  const kinds = campaignPageKinds(campaign);
+  if (kinds.length && selected.length) {
+    /* Only copy that the selected documents actually print belongs in this
+       check. Hidden drafts, disabled proof, internal notes and destinations
+       must not prevent an otherwise valid image export. */
+    for (const concept of selected) {
+      const override = campaign.over && campaign.over[concept.id];
+      for (const [key, label] of [["headline", "headline"], ["subline", "subline"], ["cta", "button"]]) {
+        if (override && looksAllCaps(override[key])) found.push(`Campaign Concept ${concept.id} ${label}`);
+      }
     }
-    if (Array.isArray(value)) return value.forEach((item, i) => walk(item, `${path} ${i + 1}`));
-    if (value && typeof value === "object")
-      Object.entries(value).forEach(([key, item]) => walk(item, `${path} ${key}`));
-  };
-  walk(campaign, "Campaign");
+    const proofFields = kinds.includes("landingpage") ? [["short", "heading"], ["line", "line"]] : [["line", "line"]];
+    (Array.isArray(campaign.proof) ? campaign.proof : []).forEach((proof, index) => {
+      if (!proof || proof.on === false) return;
+      for (const [key, label] of proofFields) {
+        if (looksAllCaps(proof[key])) found.push(`Campaign proof point ${index + 1} ${label}`);
+      }
+    });
+  }
   return [...new Set(found)];
 }
 /* What the chips are actually toggling, with no fallback in it. The fallback
@@ -3278,19 +3409,30 @@ function designForStructure(style, chosenId) {
 
 function copyFor(concept, cfgState) {
   /* Reopened builds from the earlier prototype may still carry the internal
-     id `purple`, although its value was already Professionals Blue. Translate
-     it at the boundary so every new record and export uses the correct name. */
-  const bandId = cfgState.band === "purple" ? "blue" : cfgState.band;
-  const ctaId = cfgState.ctaColour === "purple" ? "blue" : cfgState.ctaColour;
+     ids `purple` or `blue` as a full colour field. Blue is now an accent only,
+     so both old surface choices migrate to Sand at the rendering boundary. */
+  const bandId = cfgState.band === "purple" || cfgState.band === "blue" ? "sand" : cfgState.band;
+  const ctaId = safeCtaId(bandId, cfgState.ctaColour);
   const band = BAND_CHOICES.find(b => b.id === bandId) || BAND_CHOICES[0];
   const cta = CTA_COLOURS.find(x => x.id === ctaId) || CTA_COLOURS[0];
   return {
     band, logoKey: cfgState.logoKey,
     kicker: (state.brief && state.brief.product) || "Professionals",
     headline: concept.headline_de || "", subline: concept.subline_de || "", cta: concept.cta_de || "",
+    emphasis: typeof cfgState.emphasisByConcept?.[concept.id] === "string" ? cfgState.emphasisByConcept[concept.id] : "",
     ctaBg: cta.bg, ctaFg: cta.fg,
     showSafe: cfgState.showSafe,
   };
+}
+
+function safeCtaId(bandId, ctaId) {
+  const normal = ctaId === "purple" ? "blue" : ctaId;
+  const sameField = normal === bandId;
+  const brandClash = bandId === "teal" && normal === "blue";
+  const paleOnPale = (bandId === "sand" || bandId === "white")
+    && (normal === "sand" || normal === "white");
+  if (sameField || brandClash || paleOnPale) return bandId === "charcoal" ? "blue" : "charcoal";
+  return normal;
 }
 
 /* Byte budgets. A 1200x1200 PNG of a photograph is comfortably over a
@@ -3318,7 +3460,7 @@ async function assetDataUri(path) {
   const p = (async () => {
     try {
       if (/^data:/.test(path)) return path;
-      const r = await fetch(path);
+      const r = await fetch(path, { signal: requestSignal(15000) });
       if (!r.ok) return null;
       const blob = await r.blob();
       return await new Promise(res => {
@@ -3330,6 +3472,8 @@ async function assetDataUri(path) {
     } catch (e) { return null; }
   })();
   dataUriCache.set(path, p);
+  while (dataUriCache.size > 32) dataUriCache.delete(dataUriCache.keys().next().value);
+  p.then(value => { if (!value && dataUriCache.get(path) === p) dataUriCache.delete(path); });
   return p;
 }
 
@@ -3354,6 +3498,11 @@ function campaignState() {
   return state.campaign;
 }
 
+/* Additional documents are opt in, including when reopening an older build. */
+function campaignPageKinds(campaign) {
+  return ["landingpage", "email"].filter(kind => campaign?.outputs?.[kind] === true);
+}
+
 /* One concept, the whole campaign. The ads carry the message; these two
    carry the same message onward, so the page a click lands on is
    recognisably the thing that was clicked.
@@ -3364,21 +3513,37 @@ function campaignState() {
    what the campaign says. The preview card hands over `{ cfg, campaign }`
    and gets back exactly the two documents the build will write. */
 async function buildCampaignPages(concept, shot) {
-  const f = fieldOf(shot.cfg.band);
+  const kinds = campaignPageKinds(shot.campaign);
+  if (!kinds.length) return [];
+  const band = ["purple", "blue"].includes(shot.cfg.band) ? "sand" : shot.cfg.band;
+  const f = fieldOf(band);
   const [heroDataUri, logoDataUri, plusDataUri] = await Promise.all([
     assetDataUri(conceptImage(concept)),
-    assetDataUri(`assets/${shot.cfg.logoKey}${f.logo}.svg`),
+    assetDataUri(f.logo === "-inverse"
+      ? "assets/logos/immoscout24-vertical-inverse.svg"
+      : f.logo === "-white"
+        ? "assets/logos/immoscout24-vertical-white.svg"
+        : "assets/logos/immoscout24-vertical.svg"),
     assetDataUri("assets/blank.svg"),
   ]);
+  if (!logoDataUri) throw new Error("The logo could not be embedded. Reload before exporting document drafts.");
+  if (conceptImage(concept) && !heroDataUri) throw new Error("The selected photograph could not be embedded. Check the source before exporting document drafts.");
   const story = storyFrom({
-    brief: state.brief, concept, band: shot.cfg.band === "purple" ? "blue" : shot.cfg.band, logoKey: shot.cfg.logoKey,
+    brief: state.brief, concept, band, logoKey: shot.cfg.logoKey,
     proof: proofForProduct(), campaign: shot.campaign,
     heroDataUri, logoDataUri, plusDataUri, photoPath: conceptImage(concept),
   });
-  return [
-    { kind: "landingpage", label: "Landing page", html: buildLandingPage(story), concept, story },
-    { kind: "email", label: "Email", html: buildEmail(story), concept, story },
-  ];
+  const fonts = await Promise.all(STORY_FONT_FILES.map(async font => {
+    const data = await assetDataUri(font.asset);
+    if (!data) throw new Error("The Make It Better font could not be embedded. Reload before exporting the campaign pages.");
+    return { ...font, data };
+  }));
+  const embedFonts = html => fonts.reduce((result, font) => result.replaceAll(font.path, font.data), html);
+  return kinds.map(kind => ({
+    kind, label: kind === "landingpage" ? "Landing page draft" : "Email draft",
+    html: embedFonts(kind === "landingpage" ? buildLandingPage(story) : buildEmail(story)),
+    concept, story, status: "draft",
+  }));
 }
 
 /* `prettyBytes` came out of here. It was the third byte formatter on this
@@ -3455,22 +3620,25 @@ async function exportBlob(canvas, cap, wantsPng, allowed) {
       if (!cap || j.size <= cap) return { blob: j, ext: "jpg", note: null };
     }
     const j = await blobOf(canvas, "image/jpeg", 0.5);
-    return { blob: j, ext: "jpg", note: `This size is ${byteFacts([j]).text} against a ${capText(cap)} limit even at low quality. It needs a simpler photograph.` };
+    if (!cap || j.size <= cap) return { blob: j, ext: "jpg", note: null };
+    return { blob: null, ext: "jpg", blocked: true, note: `This image exceeds the ${capText(cap)} upload limit. Choose a layout with a smaller photo area or a simpler image. This file was not exported.` };
   }
-  /* PNG is the only still this placement named, so it ships as PNG whatever it
-     weighs, and says so rather than quietly breaking the stated format. */
+  /* A format requirement never overrides the placement's byte limit. */
   const p = await blobOf(canvas, "image/png");
-  return { blob: p, ext: "png", note: cap && p.size > cap
-    ? `This placement accepts no JPEG, so it ships as a ${byteFacts([p]).text} PNG against a ${capText(cap)} limit. It needs a simpler picture.`
-    : null };
+  if (cap && p.size > cap) return { blob: null, ext: "png", blocked: true,
+    note: `This PNG exceeds the ${capText(cap)} upload limit. Choose a layout with a smaller photo area. This file was not exported.` };
+  return { blob: p, ext: "png", note: null };
 }
 
 async function renderAssetStudio() {
   const B = bodies[3];
   /* Any in-flight build belongs to a panel that is about to stop existing. */
   state.buildToken = (state.buildToken || 0) + 1;
+  const panelToken = state.buildToken;
   B.innerHTML = "";
-  await preloadFonts();
+  try { await preloadFonts(); }
+  catch (error) { if (panelToken === state.buildToken) addNotice("The brand font could not load. Reload this page before building assets.", true, B); return; }
+  if (panelToken !== state.buildToken) return;
 
   if (!state.excluded) state.excluded = new Set();
   const concepts = conceptsForBuild();
@@ -3482,37 +3650,32 @@ async function renderAssetStudio() {
     return;
   }
 
-  const cfg = state.assetCfg = state.assetCfg || {
+  const cfg = state.assetCfg = {
     band: "sand", logoKey: logoKeyForBrief(), ctaColour: "charcoal",
     showSafe: false, variant: "full", formatIdx: 0, manualFocal: false, forBrief: null,
-    pattern: false,
-    /* ROTATION IS OFF BY DEFAULT, and that is a decision rather than
-       inertia. The screen above this one spends its whole effort on
-       choosing ONE design, tells you which designs have not run yet, and
-       retires the ones that have. Defaulting to rotation would take that
-       choice and demote it to one slot in eight without asking. The switch
-       is one click and says what it buys; the person who wants a rotated
-       set is one click away from it, and nobody gets a set they did not
-       ask for. */
-    rotate: false,
+    pattern: false, rotate: false,
+    ...(state.assetCfg || {}),
   };
-  if (cfg.rotate === undefined) cfg.rotate = false;   /* a config from before the switch existed */
-  /* Open on something that has not run yet, so the default is a new design
-     rather than the one the last campaign used. `designFacts` reads the
-     history it is handed and is called on every paint below; this one call
-     only picks the opening design. */
-  if (!state.design || !DESIGNS.some(d => d.id === state.design)) {
-    const opening = designFacts(state.design, loadHistory());
-    /* Launch variety is structural, not positional. Previously the first
-       three campaigns walked anchor-bottom, anchor-top, anchor-left before
-       showing a second idea. Prefer a direction that has never run; only
-       after every direction has appeared do we return to its variations. */
-    const usedStyles = new Set(opening.all.filter(d => d.used && d.known)
-      .map(d => designById(d.id).style));
-    const directionFresh = opening.fresh.find(d => d.known && !usedStyles.has(designById(d.id).style));
-    state.design = (directionFresh || opening.fresh[0] || opening.all[0]).id;
+  cfg.emphasisByConcept = Object.fromEntries(Object.entries(cfg.emphasisByConcept || {})
+    .filter(([, phrase]) => typeof phrase === "string"));
+  /* The main flow deliberately offers one layout decision. Old saved sessions
+     may still contain a full Blue surface, a hidden texture, a multi layout
+     rotation or one of the many inherited variations. Bring those sessions
+     into the smaller executable Professionals library without losing copy. */
+  cfg.rotate = false;
+  cfg.pattern = false;
+  if (!BAND_CHOICES.some(b => b.id === cfg.band)) cfg.band = "sand";
+  let activeTemplate = PROFESSIONALS_TEMPLATES.find(t => t.id === state.designReference)
+    || PROFESSIONALS_TEMPLATES.find(t => t.design === state.design);
+  if (!activeTemplate) {
+    activeTemplate = PROFESSIONALS_TEMPLATES[0];
+    cfg.band = activeTemplate.band;
+    cfg.ctaColour = activeTemplate.ctaColour;
   }
+  state.designReference = activeTemplate.id;
+  state.design = activeTemplate.design;
   state.layout = designById(state.design).style;
+  cfg.ctaColour = safeCtaId(cfg.band, cfg.ctaColour);
 
   const places = planPlacements();
   /* A new brief means a new product, and the logo has to follow it. The
@@ -3524,7 +3687,7 @@ async function renderAssetStudio() {
   const heroPhoto = conceptImage(concepts[0]);
 
   B.appendChild(el(`<div class="asset-flow" aria-label="Asset creation steps">
-    <span><b>1</b>Choose direction</span><span><b>2</b>Review formats</span>
+    <span><b>1</b>Choose layout</span><span><b>2</b>Review formats</span>
     <span><b>3</b>Edit content</span><span><b>4</b>Build and download</span>
   </div>`));
 
@@ -3535,7 +3698,7 @@ async function renderAssetStudio() {
      and it is most of what made this page shout. The choice is now a single
      chosen design with a Change button; the library opens when you want it. */
   const head = el(`<div class="card studiohead">
-    <h2 class="asset-step-title"><i>1</i>Choose the creative direction</h2>
+    <h2 class="asset-step-title"><i>1</i>Choose the layout</h2>
     <div class="sh-row">
       <div>
         <div class="sh-label">Concepts in this build</div>
@@ -3547,7 +3710,7 @@ async function renderAssetStudio() {
     <div class="chosen">
       <div class="ch-thumb"></div>
       <div class="ch-body">
-        <div class="sh-label">Design</div>
+        <div class="sh-label">Editable template</div>
         <div class="ch-name"></div>
         <div class="ch-note"></div>
         <div class="ch-fresh"></div>
@@ -3561,14 +3724,6 @@ async function renderAssetStudio() {
         <div class="swatches"></div>
       </div>
     </div>
-    <details class="advanced-look"><summary>Advanced options · texture and multi-layout rotation</summary>
-      <div class="lookopts">
-        <label class="chk" hidden><input type="checkbox" class="f-pattern">
-          <span><b>Background texture</b></span></label>
-        <label class="chk"><input type="checkbox" class="f-rotate"${cfg.rotate ? " checked" : ""}>
-          <span><b>Rotate layouts across placements</b><em>Uses several structures while keeping the campaign message, image and palette consistent. ${esc(rotationPlan().sentence)}</em></span></label>
-      </div>
-    </details>
   </div>`);
   B.appendChild(head);
 
@@ -3588,17 +3743,9 @@ async function renderAssetStudio() {
   const buildStat = bar.querySelector(".buildstat");
 
   const picker = el(`<div class="modal-bg designpicker"><div class="modal wide">
-    <h2>Choose a creative direction</h2>
-    <div class="picker-step"><i>1</i>Start from an approved example</div>
-    <p class="reference-note">All 14 supplied examples are here. Selecting one applies its composition with Professionals imagery, sentence-case copy and the approved Professionals palette. The source artwork itself is never pasted into the export.</p>
+    <h2>Choose a layout</h2>
+    <p class="reference-note">These editable Professionals layouts are rebuilt from the supplied references. Every choice changes the composition. Each preview uses your current image and copy.</p>
     <div class="referencegrid"></div>
-    <p class="sub freshcount"></p>
-    <div class="picker-step"><i>2</i>Or pick a layout family</div>
-    <div class="routegrid"></div>
-    <div class="picker-step"><i>3</i>Pick a variation</div>
-    <div class="stylegrid"></div>
-    <details class="useddetails"><summary class="usedsummary"></summary><div class="usedgrid"></div></details>
-    <p class="sub verdictlead"></p>
     <div class="row"><button class="pill-btn primary pickclose">Done</button></div>
   </div></div>`);
   /* The drawer lives on the body so it can sit over everything, which means
@@ -3608,19 +3755,9 @@ async function renderAssetStudio() {
   document.querySelectorAll(".designpicker").forEach(n => n.remove());
   document.body.appendChild(picker);
   head.querySelector(".change-design").addEventListener("click", () => {
-    /* Counted and filed from one read of history, a moment before the drawer
-       is visible: the summary above the retired grid and the tiles inside it
-       are then the same answer to the same question, and nothing moved while
-       anyone was looking at it. */
     paintChosen();
-    /* `paintChosen` first, `openModal` second: `fileTiles` refuses to move a
-       tile while the drawer is open, so the filing has to happen in the last
-       moment it is still shut. */
     openModal(picker);
     paintStyles();
-    /* Asked fresh on every open, because a verdict pressed since the last one
-       is exactly the thing this is here to show. */
-    paintDesignVerdicts();
   });
   const closePicker = () => picker.classList.remove("open");
   picker.querySelector(".pickclose").addEventListener("click", closePicker);
@@ -3629,7 +3766,7 @@ async function renderAssetStudio() {
   const chips = head.querySelector(".sh-concepts");
   for (const c of state.concepts.filter(x => state.selected.has(x.id))) {
     const on = !state.excluded.has(c.id);
-    const chip = el(`<button class="cchip${on ? " on" : ""}" title="${esc(c.headline_de || "")}">
+    const chip = el(`<button class="cchip${on ? " on" : ""}" data-no-translate title="${esc(c.headline_de || "")}">
       <b>${c.id}</b> ${esc((c.headline_de || "").slice(0, 34))}${(c.headline_de || "").length > 34 ? "…" : ""}</button>`);
     chip.addEventListener("click", () => {
       if (state.excluded.has(c.id)) state.excluded.delete(c.id); else state.excluded.add(c.id);
@@ -3649,6 +3786,7 @@ async function renderAssetStudio() {
       conceptsForBuild().map(c => [c.id, c.headline_de, c.subline_de, c.cta_de, conceptImage(c)]),
       places.map(p => [p.platform, p.placement, p.w, p.h]),
       state.design, cfg.band, cfg.pattern, cfg.logoKey, cfg.ctaColour,
+      cfg.emphasisByConcept,
       state.designReference,
       cfg.manualFocal ? state.focal : null,
       /* Rotation changes the geometry of every file in the set, so a set
@@ -3670,6 +3808,7 @@ async function renderAssetStudio() {
     const btn = bar.querySelector(".do-build");
     const zip = bar.querySelector(".dl-zip");
     const current = setIsCurrent();
+    if (!current) B.querySelector(".download-notice")?.remove();
     const p = plan();
     if (current) {
       /* THE SAME SET THE RESULTS CARD ABOVE MEASURES. This reduced
@@ -3677,19 +3816,22 @@ async function renderAssetStudio() {
          so a set of 870 KB read "0.9 MB" here and "870 KB" on the card
          directly above it, and a set holding one file that failed to
          encode threw rather than counting it as zero. */
-      buildStat.innerHTML = `<b>${esc(countPhrase(state.assets.length, null, "file"))} ready</b> · ${esc(byteFacts(state.assets).text)}`
-        + `<br><span class="alsoline">${esc(p.phrases.pagesDefinite)} are in the set and in the ZIP with the ads.</span>`;
+      const facts = state.assetsFacts;
+      buildStat.innerHTML = state.assets.length
+        ? `<b>${esc(countPhrase(state.assets.length, null, "file"))} built${facts?.blocked ? " · Some outputs held" : ""}</b> · ${esc(byteFacts(state.assets).text)}`
+          + `<br><span class="alsoline">${facts?.pageFiles ? "Includes document drafts. " : ""}Review before publishing.</span>`
+        : "<b>No files could be built</b><br><span class=\"alsoline\">Check the reasons above, adjust your selections and rebuild.</span>";
       btn.textContent = "Rebuild";
     } else if (state.assets.length) {
       buildStat.innerHTML = `<b>${esc(p.phrases.files)}</b> to build · ${designPhrase()}`
         + `<br><span class="stale">The ${esc(countPhrase(state.assets.length, null, "file"))} you already have were built from different settings.</span>`;
       btn.textContent = "Build the set";
     } else {
-      buildStat.innerHTML = `<b>${esc(p.phrases.files)}</b> ready · ${designPhrase()}`
-        + `<br><span class="alsoline">${esc(p.phrases.ads)}, plus ${esc(p.phrases.pagesIndefinite)}.${esc(p.phrases.held)}</span>`;
+      buildStat.innerHTML = `<b>${esc(p.phrases.files)}</b> planned · ${designPhrase()}`
+        + `<br><span class="alsoline">${esc(p.phrases.ads)}${p.pages ? `, plus ${esc(p.phrases.pagesIndefinite)}` : ". No document drafts selected"}.${esc(p.phrases.held)}</span>`;
       btn.textContent = "Build the set";
     }
-    zip.disabled = !current;
+    zip.disabled = !current || !state.assets.length;
     zip.classList.toggle("primary", current);
     btn.classList.toggle("primary", !current);
   }
@@ -3720,8 +3862,9 @@ async function renderAssetStudio() {
      rotation is on would be naming one placement out of however many the
      rotation really produces. */
   function designPhrase() {
-    if (!cfg.rotate) return esc(labelOf("design", state.design).label);
-    return esc(rotationPlan().phrase);
+    const template = PROFESSIONALS_TEMPLATES.find(t => t.id === state.designReference)
+      || PROFESSIONALS_TEMPLATES.find(t => t.design === state.design);
+    return esc(template ? template.label : labelOf("design", state.design).label);
   }
 
   /* THE ONE COUNT, AND IT IS NOT COMPUTED HERE ANY MORE.
@@ -3742,198 +3885,74 @@ async function renderAssetStudio() {
     return plannedBuild({
       concepts: conceptsForBuild().map(c => ({ id: c.id, hasPhoto: !!conceptImage(c) })),
       placements: places.map(p => ({ ...p, stills: !stillBlock(p) })),
+      pageKinds: campaignPageKinds(campaignState()),
     });
   }
 
   const countUp = () => {
     const p = plan();
     head.querySelector(".sh-count").innerHTML =
-      `<b>${p.files}</b> files<br><span>${esc(p.phrases.concepts)} · ${esc(p.phrases.placements)} · ${esc(countPhrase(p.concepts, null, "landing page"))} and ${p.concepts === 1 ? "email" : "emails"}</span>`;
+      `<b>${p.files}</b> planned files<br><span>${esc(p.phrases.concepts)} · ${esc(p.phrases.placements)}${p.pages ? ` · ${esc(countPhrase(p.pages, null, "document draft"))}` : ""}</span>`;
     paintBar();
   };
   countUp();
 
-  /* The design is shown, not described: a live render of your own concept
-     beats a name every time. Designs that have already run are retired to the
-     bottom, so what you see first is what has not been online yet.
-
-     The TILES are built once, from one read — retiring a design out from
-     under the grid you are reading would move the thing you were about to
-     click — and NO NUMBER and NO PLACEMENT comes off that read. This comment
-     twice claimed something it had not earned. First `Already used (N)` was
-     written once, here, from `spent.length`, while the sentence directly
-     above it repainted live: build something and the drawer said one design
-     had run while the line above it said two. Then the count came out of
-     `paintChosen` and WHICH GRID A TILE SAT IN still came out of the
-     snapshot, which is the same fact one level down — so the drawer read
-     `Already used (9)` over a grid of four, and five designs whose own tiles
-     said `ran just now` sat in the un-retired grid, under a sentence
-     promising that a design that has run retires below.
-
-     Which tiles EXIST is not a live question: every design in the library
-     gets one, whichever grid it belongs in, so this read decides nothing
-     that can go stale. Where each tile is FILED is live, and is read in
-     `paintChosen` beside the count it has to agree with. */
-  const designs0 = designFacts(state.design, loadHistory());
-  const styleGrid = picker.querySelector(".stylegrid");
-  const usedGrid = picker.querySelector(".usedgrid");
-  const routeGrid = picker.querySelector(".routegrid");
+  /* One card now equals one executable template. The card never contains a
+     flattened campaign example: it is painted later by the same renderer as
+     the large preview and the final export. */
   const referenceGrid = picker.querySelector(".referencegrid");
-  let pickerStyle = designById(state.design).style;
-
-  /* The tile carries no verdict about the design it draws: whether it has
-     run, when it last ran and which grid it belongs in are all written by
-     `paintChosen` from one live read, so a tile cannot say `ran just now`
-     from one history while the count above it is off another. */
-  const makeTile = d => {
-    const t = el(`<button class="styletile${d.id === state.design ? " on" : ""}"
-        data-id="${d.id}" data-thumb="1" title="${esc(d.note)}">
-      <div class="st-thumb"></div>
-      <div class="st-name">${esc(d.label)}</div>
-      <div class="st-sub"></div>
-      <div class="st-used"></div>
-      <div class="st-verdict"></div>
+  for (const group of ["Typography", "Split screen", "Full bleed image"]) {
+    const family = el(`<section class="referencefamily"><h3 class="referencefamily-title">${esc(group)}</h3><div class="referencefamily-grid"></div></section>`);
+    const familyGrid = family.querySelector(".referencefamily-grid");
+    referenceGrid.appendChild(family);
+    for (const template of PROFESSIONALS_TEMPLATES.filter(item => item.group === group)) {
+    const t = el(`<button class="referencetile${template.id === state.designReference ? " on" : ""}"
+        data-template="${esc(template.id)}" data-design="${esc(template.design)}"
+        title="${esc(template.note)}">
+      <span class="ref-thumb" role="img" aria-label="Live preview of ${esc(template.label)}"></span>
+      <span class="ref-kind">${esc(template.group)}</span>
+      <span class="ref-name">${esc(template.label)}</span>
+      <span class="ref-source">${esc(template.note)}</span>
     </button>`);
     t.addEventListener("click", () => {
-      state.designReference = null;
-      state.design = d.id;
-      state.layout = designById(d.id).style;
-      picker.querySelectorAll(".styletile").forEach(x => x.classList.toggle("on", x.dataset.id === d.id));
-      /* The files on disk were composed in the old design. Saying "ready to
-         download" now would hand over a Poster-named archive of Anchor ads. */
-      paintChosen(); paintChosenThumb(); paintFormats(); paintPreview(); countUp();
-      picker.classList.remove("open");
-    });
-    return t;
-  };
-  /* One tile per design this library can actually draw. A design a foreign
-     record says ran is counted below but gets no tile: this library cannot
-     draw it, and a tile that composed a different design under a bracketed
-     name would be worse than an absence. */
-  const tiles = new Map(designs0.all.filter(d => d.known).map(d => [d.id, makeTile(d)]));
-
-  for (const ref of APPROVED_DESIGN_REFERENCES) {
-    const t = el(`<button class="referencetile${ref.id === state.designReference ? " on" : ""}" data-ref="${esc(ref.id)}" title="Apply the layout principle from ${esc(ref.file)}">
-      <img class="ref-thumb" src="${esc(ref.src)}" alt="${esc(ref.label)} reference">
-      <span class="ref-name">${esc(ref.label)}</span>
-      <span class="ref-source">${esc(ref.file)} · layout only</span>
-    </button>`);
-    t.addEventListener("click", () => {
-      state.designReference = ref.id;
-      state.design = ref.design;
-      state.layout = designById(ref.design).style;
-      cfg.band = ref.band;
-      pickerStyle = state.layout;
-      picker.querySelectorAll(".referencetile").forEach(x => x.classList.toggle("on", x.dataset.ref === ref.id));
-      picker.querySelectorAll(".styletile").forEach(x => x.classList.toggle("on", x.dataset.id === ref.design));
-      routeGrid.querySelectorAll(".routetile").forEach(x => x.classList.toggle("on", x.dataset.style === pickerStyle));
-      head.querySelectorAll(".sw").forEach(x => x.classList.toggle("on", x.dataset.id === ref.band));
-      paintChosen(); paintChosenThumb(); paintStyles(); paintFormats(); paintPreview(); countUp();
+      state.designReference = template.id;
+      state.design = template.design;
+      state.layout = designById(template.design).style;
+      cfg.band = template.band;
+      cfg.ctaColour = safeCtaId(template.band, template.ctaColour);
+      picker.querySelectorAll(".referencetile").forEach(x => x.classList.toggle("on", x.dataset.template === template.id));
+      head.querySelectorAll(".sw").forEach(x => x.classList.toggle("on", x.dataset.id === template.band));
+      syncCtaChoices();
+      paintChosen(); paintChosenThumb(); paintStyles(); paintFormats(); paintPreview(); paintCampaign(); countUp();
       closePicker();
     });
-    referenceGrid.appendChild(t);
-  }
-
-  /* Direction first, variation second. Mirroring a split or moving its seam
-     is useful, but it is a variation of one idea—not another creative idea.
-     The route grid therefore shows every renderer once; only the selected
-     route's variations appear beneath it. */
-  for (const layout of LAYOUTS) {
-    const base = DESIGNS.find(d => d.style === layout.id);
-    if (!base) continue;
-    const t = el(`<button class="routetile${layout.id === pickerStyle ? " on" : ""}" data-style="${esc(layout.id)}" data-design="${esc(base.id)}">
-      <span class="rt-thumb"></span><span class="rt-copy"><b>${esc(layout.label)}</b><span>${esc(layout.blurb)}</span></span>
-    </button>`);
-    t.addEventListener("click", () => {
-      pickerStyle = layout.id;
-      routeGrid.querySelectorAll(".routetile").forEach(x => x.classList.toggle("on", x.dataset.style === pickerStyle));
-      paintChosen();
-      paintStyles();
-    });
-    routeGrid.appendChild(t);
-  }
-
-  /* THE CARD, THE COUNT, THE MARKERS AND THE GRIDS, FROM ONE CALL.
-     Immediately after a build the card read "Used before · ran just now · 25
-     of 26 designs are still unused" and the picker read "26 of 26 have not
-     run yet" — one re-read history on every paint, the other held the Map
-     captured when step 3 was drawn. Everything the drawer says about what
-     has run now comes out of the single `designFacts` call below.
-
-     No-reflow is kept by `fileTiles`, not by freezing the answer: it refuses
-     to move a tile while the drawer is open. It is reached here, so a build
-     re-files the grids while the drawer is shut, and from the opener a
-     moment before the drawer appears — between them, every path by which a
-     design's used-ness can change while nobody is looking at it. */
-  function fileTiles(f) {
-    /* A picker that reflows under you is not a picker. Everything this moves
-       is invisible when it moves, and the next open shows the truth. */
-    if (picker.classList.contains("open")) return;
-    for (const d of f.all) {
-      const t = tiles.get(d.id);
-      if (!t) continue;
-      t.hidden = designById(d.id).style !== pickerStyle;
-      t.classList.toggle("spent", d.used);
-      (d.used ? usedGrid : styleGrid).appendChild(t);
+      familyGrid.appendChild(t);
     }
   }
 
   function paintChosen() {
-    const f = designFacts(state.design, loadHistory());
-    const ref = APPROVED_DESIGN_REFERENCES.find(x => x.id === state.designReference);
-    fileTiles(f);
-    picker.querySelectorAll(".referencetile").forEach(x => x.classList.toggle("on", !!ref && x.dataset.ref === ref.id));
-    head.querySelector(".ch-name").textContent = ref ? ref.label : f.label;
-    head.querySelector(".ch-note").textContent = ref
-      ? `${f.label}. Adapted from ${ref.file} with Professionals colours and sentence-case copy.`
-      : f.note;
-    head.querySelector(".ch-fresh").innerHTML = f.used
-      ? `<span class="warnpip">Used before</span> ran ${esc(relTime(f.ranAt))} · ${esc(f.sentence)}`
-      : `<span class="freshpip">Not used yet</span> ${esc(f.sentence)}`;
-    const count = picker.querySelector(".freshcount");
-    const directionDesigns = f.all.filter(d => d.known && designById(d.id).style === pickerStyle);
-    const unusedHere = directionDesigns.filter(d => !d.used).length;
-    if (count) count.innerHTML = `<b>${esc(LAYOUTS.find(x => x.id === pickerStyle)?.label || pickerStyle)}</b> · `
-      + `${directionDesigns.length} ${directionDesigns.length === 1 ? "variation" : "variations"}, ${unusedHere} not used yet. `
-      + `Choose the idea first; position and seam options stay together beneath it.`;
-    const drawer = picker.querySelector(".useddetails");
-    const summary = picker.querySelector(".usedsummary");
-    const usedHere = directionDesigns.length - unusedHere;
-    if (drawer) drawer.style.display = usedHere ? "" : "none";
-    if (summary) summary.textContent = `Used variations (${usedHere})`;
-    for (const t of picker.querySelectorAll(".styletile")) {
-      const d = f.all.find(x => x.id === t.dataset.id);
-      const slot = t.querySelector(".st-used");
-      if (!d || !slot) continue;
-      slot.textContent = d.used ? `ran ${relTime(d.ranAt)}${d.runCount > 1 ? ` · ${d.runCount}×` : ""}` : "";
-    }
+    const template = PROFESSIONALS_TEMPLATES.find(x => x.id === state.designReference)
+      || PROFESSIONALS_TEMPLATES.find(x => x.design === state.design)
+      || PROFESSIONALS_TEMPLATES[0];
+    picker.querySelectorAll(".referencetile").forEach(x => x.classList.toggle("on", x.dataset.template === template.id));
+    head.querySelector(".ch-name").textContent = template.label;
+    head.querySelector(".ch-note").textContent = template.note;
+    head.querySelector(".ch-fresh").innerHTML = `<span class="freshpip">Editable</span> Keeps this layout across formats. Ratio masters and approved colour combinations are resolved automatically.`;
   }
   paintChosen();
-  head.querySelector(".f-pattern").addEventListener("change", e => {
-    cfg.pattern = e.target.checked; paintChosenThumb(); paintStyles(); paintFormats(); paintPreview();
-  });
-  /* The format list and the big preview both compose through the same
-     resolver as the build, so ticking this shows you the actual rotation
-     before you spend half a minute on it, rather than promising variety and
-     revealing it afterwards. The chosen-design thumbnail and the library
-     tiles are deliberately left alone: those two are the design picker, and
-     a picker that rotates under you is not a picker. */
-  head.querySelector(".f-rotate").addEventListener("change", e => {
-    state.designReference = null;
-    cfg.rotate = e.target.checked; paintChosen(); paintBar(); paintFormats(); paintPreview();
-  });
 
   const swatches = head.querySelector(".swatches");
   for (const b of BAND_CHOICES) {
     const sw = el(`<button class="sw${b.id === cfg.band ? " on" : ""}" data-id="${b.id}" title="${esc(b.label)}"
       style="background:${b.bg}${b.id === "white" || b.id === "sand" ? ";border-color:#ddd" : ""}"></button>`);
     sw.addEventListener("click", () => {
-      state.designReference = null;
       cfg.band = b.id;
+      cfg.ctaColour = safeCtaId(cfg.band, cfg.ctaColour);
       swatches.querySelectorAll(".sw").forEach(x => x.classList.toggle("on", x.dataset.id === b.id));
       /* The colour field is the one thing the ads, the landing page and the
          email are guaranteed to share, so the campaign preview moves with
          the swatch rather than a build later. */
+      syncCtaChoices();
       paintChosen(); paintChosenThumb(); paintStyles(); paintFormats(); paintPreview(); paintCampaign();
     });
     swatches.appendChild(sw);
@@ -3972,34 +3991,26 @@ async function renderAssetStudio() {
   }
 
   /* ------------------------------------ 3. The landing page and the email */
-  /* WHERE THE CAMPAIGN IS ENTERED, AND IT USED TO BE NOWHERE.
-     These two documents were written silently on every build and met for the
-     first time as files in the ZIP: nothing to set, nothing to see, nothing
-     to change. The build is unchanged — it still writes them from the chosen
-     concept — but the four slots a person actually reaches for are now theirs
-     to set, and both documents are on screen before a single file is drawn.
-
-     WHAT IS NOT HERE IS DELIBERATE. The four steps, the reassurance line
-     under the button, the "Im Professionals enthalten" eyebrow and the legal footer
-     are the product, not the campaign, and they stay fixed in the template.
-     This is not a page editor and there is no fifth field waiting to be
-     added: a slot the template cannot use would be a box that swallowed
-     what somebody typed. */
+  /* Documents are opt in. The same selection drives previews, counts and
+     the frozen build; all generated documents remain review drafts. */
   const camp = campaignState();
   const campCard = el(`<details class="card campcard">
     <summary><b>Optional: landing page and email</b><span>Open only when this campaign also needs destination assets.</span></summary>
     <div class="campbody"><div class="story-head">
       <b>Landing page and email content</b>
-      <span>Both are written from the concept and go in the set with the ads. Leave a box empty and
-        the ad's own word is used, shown below it. What is not a box here is fixed in the
-        template — the four steps, the small print and the footer belong to the product rather than
-        to this campaign.</span>
+      <span>Choose only the documents you need. They are included as drafts for review, not as approved publishing files. Leave a copy field empty to use the concept wording.</span>
     </div>
+    <fieldset class="camp-outputs"><legend>Include in this download</legend>
+      <label><input type="checkbox" class="cm-output" value="landingpage">Landing page draft</label>
+      <label><input type="checkbox" class="cm-output" value="email">Email draft</label>
+    </fieldset>
+    <p class="cm-output-summary" role="status"></p>
+    <div class="camp-editor" hidden>
     <label class="camp-which" hidden>Which concept<select class="cm-which"></select></label>
     <div class="camp-fields">
-      <label>Headline<input class="cm-hl"><span class="camp-sub cm-hl-sub"></span></label>
-      <label>Subline<input class="cm-sl"><span class="camp-sub cm-sl-sub"></span></label>
-      <label>Button text<input class="cm-cta"><span class="camp-sub cm-cta-sub"></span></label>
+      <label>Headline<input class="cm-hl" data-no-translate><span class="camp-sub cm-hl-sub"></span></label>
+      <label>Subline<input class="cm-sl" data-no-translate><span class="camp-sub cm-sl-sub"></span></label>
+      <label>Button text<input class="cm-cta" data-no-translate><span class="camp-sub cm-cta-sub"></span></label>
       <label>Button link<input class="cm-url" placeholder="https://…"><span class="camp-sub cm-url-sub"></span></label>
     </div>
     <div class="camp-proof">
@@ -4008,7 +4019,7 @@ async function renderAssetStudio() {
     </div>
     <div class="camp-gaps"></div>
     <div class="storygrid cm-grid"></div>
-    </div></details>`);
+    </div></div></details>`);
   B.appendChild(campCard);
 
   /* The card has its own concept selector rather than borrowing Fine tune's:
@@ -4026,8 +4037,8 @@ async function renderAssetStudio() {
   /* The two tiles, made once and refilled, so typing does not tear down and
      rebuild two iframes on every keystroke. */
   const campGrid = campCard.querySelector(".cm-grid");
-  const campTiles = ["Landing page", "Email"].map(label => {
-    const t = el(`<div class="storytile">
+  const campTiles = ["Landing page draft", "Email draft"].map((label, i) => {
+    const t = el(`<div class="storytile" data-kind="${i ? "email" : "landingpage"}" hidden>
       <div class="sy-meta"><b>${esc(label)}</b><span class="cm-t-sub"></span></div>
       <div class="sy-frame"><iframe title="${esc(label)}" sandbox=""></iframe></div>
     </div>`);
@@ -4040,10 +4051,31 @@ async function renderAssetStudio() {
      box that reads "same as the ads" and a document that says something else
      is not a state this screen can reach. */
   let campToken = 0;
-  async function paintCampaign() {
+  function documentPreviewFailed(error) {
+    if (!campCard.isConnected) return;
+    for (const tile of campTiles) tile.querySelector("iframe").removeAttribute("srcdoc");
+    campCard.querySelector(".cm-output-summary").textContent = `The document preview could not be prepared: ${error?.message || error}`;
+  }
+  function paintCampaign() { return paintCampaignInner().catch(documentPreviewFailed); }
+  async function paintCampaignInner() {
     const run = ++campToken;
-    const pages = await buildCampaignPages(campEditing, { cfg, campaign: camp });
-    if (run !== campToken) return;
+    const kinds = campaignPageKinds(camp);
+    campCard.querySelector(".camp-editor").hidden = !kinds.length;
+    campCard.querySelector(".cm-output-summary").textContent = kinds.length
+      ? "Selected documents need content, link and brand review. Email also needs legal links and a sending system check."
+      : "Only image assets will be included. Select a document to edit and preview it.";
+    for (const tile of campTiles) {
+      tile.hidden = !kinds.includes(tile.dataset.kind);
+      if (tile.hidden) tile.querySelector("iframe").removeAttribute("srcdoc");
+    }
+    if (!kinds.length) return;
+    let pages;
+    try { pages = await buildCampaignPages(campEditing, { cfg, campaign: JSON.parse(JSON.stringify(camp)) }); }
+    catch (error) {
+      if (run === campToken && campCard.isConnected) documentPreviewFailed(error);
+      return;
+    }
+    if (run !== campToken || !campCard.isConnected) return;
     const story = pages[0].story;
 
     campCard.querySelector(".cm-hl-sub").textContent =
@@ -4056,15 +4088,15 @@ async function renderAssetStudio() {
        silently would hand over four buttons pointing at nothing while the
        box on screen still showed the address. */
     campCard.querySelector(".cm-url-sub").textContent = linkRefused(camp.url)
-      ? "Not a link a browser will follow, so every button still points at #. Use http://, https:// or a path starting with /."
+      ? "This link is not supported. Enter an https:// address or a path starting with /."
       : story.href === "#"
-        ? "Every button on both documents points at # until this is filled."
-        : `Every button on both documents points here.`;
+        ? "Add the destination before publishing. The draft button has no destination yet."
+        : "Buttons in the selected documents use this destination.";
 
     const on = camp.proof.filter(p => p.on).length;
     campCard.querySelector(".cm-proof-head").textContent =
       `${countPhrase(on, camp.proof.length, "proof point")} from ${(state.brief && state.brief.product) || "Professionals"}`
-      + (on ? "" : " — neither document carries a proof section");
+      + (on ? "" : ". No proof section is included.");
 
     const gapNames = [...new Set(story.gaps)];
     campCard.querySelector(".camp-gaps").innerHTML = gapNames.length
@@ -4073,11 +4105,21 @@ async function renderAssetStudio() {
         + ` and prints its own name in the document rather than closing up, so the gap is visible in the file too.`
       : "";
 
-    for (let i = 0; i < campTiles.length; i++) {
-      campTiles[i].querySelector(".cm-t-sub").textContent = story.headline;
-      campTiles[i].querySelector("iframe").srcdoc = pages[i].html;
+    for (const page of pages) {
+      const tile = campTiles.find(t => t.dataset.kind === page.kind);
+      tile.querySelector(".cm-t-sub").textContent = "Draft. Human approval required.";
+      tile.querySelector("iframe").srcdoc = page.html;
     }
   }
+
+  campCard.querySelectorAll(".cm-output").forEach(input => {
+    input.checked = campaignPageKinds(camp).includes(input.value);
+    input.addEventListener("change", () => {
+      camp.outputs = { ...(camp.outputs || {}), [input.value]: input.checked };
+      countUp();
+      paintCampaign().catch(documentPreviewFailed);
+    });
+  });
 
   const campPaintFields = () => {
     const o = overOf();
@@ -4132,12 +4174,13 @@ async function renderAssetStudio() {
 
   /* --------------------------------------------------------- 4. Fine tune */
   const tune = el(`<details class="card tunecard">
-    <summary><b>3. Edit content and brand controls</b> <span>copy, button colour, focal point, safe zone overlay</span></summary>
+    <summary><b>3. Edit content and brand controls</b> <span>copy, emphasis phrase, button colour, focal point, safe zone overlay</span></summary>
     <div class="tunebody">
       <div class="tunegrid">
         <label>Headline<input class="f-hl"></label>
         <label>Subline<input class="f-sl"></label>
         <label>Button text<input class="f-cta"></label>
+        <label>Emphasis phrase<input class="f-emphasis" data-no-translate aria-describedby="emphasisHint emphasisState"><span class="emphasis-hint" id="emphasisHint">Optional. Copy an exact phrase from the headline. Only layouts with a highlighter use it. Leave blank for no highlighted phrase.</span><span class="emphasis-hint" id="emphasisState" role="status"></span></label>
       </div>
       <div class="tunerow">
         <label>Which concept<select class="f-which"></select></label>
@@ -4151,12 +4194,23 @@ async function renderAssetStudio() {
             <img class="focalimg" src="${esc(heroPhoto || "")}">
             <div class="focaldot"></div>
           </div>
-          <div class="hintline" style="max-width:210px">Left alone, every crop is chosen automatically for that exact ratio: the engine finds the subject and keeps it whole.</div>
+          <div class="hintline" style="max-width:210px">The Studio estimates a focal point inside the chosen layout. Review the subject and safe zones yourself. A format that cannot fit is held, not redesigned.</div>
         </div>
       </div>
     </div>
   </details>`);
   B.insertBefore(tune, campCard);
+
+  function syncCtaChoices() {
+    const select = B.querySelector(".f-ctacol");
+    if (!select) return;
+    cfg.ctaColour = safeCtaId(cfg.band, cfg.ctaColour);
+    for (const option of select.options) {
+      option.disabled = safeCtaId(cfg.band, option.value) !== option.value;
+    }
+    select.value = cfg.ctaColour;
+  }
+  syncCtaChoices();
 
   const whichSel = tune.querySelector(".f-which");
   whichSel.innerHTML = concepts.map(c => `<option value="${c.id}">Concept ${c.id}</option>`).join("");
@@ -4165,6 +4219,7 @@ async function renderAssetStudio() {
     tune.querySelector(".f-hl").value = editing.headline_de || "";
     tune.querySelector(".f-sl").value = editing.subline_de || "";
     tune.querySelector(".f-cta").value = editing.cta_de || "";
+    tune.querySelector(".f-emphasis").value = cfg.emphasisByConcept[editing.id] || "";
   };
   paintCopy();
   /* The focal picker shows the concept you are editing, and disappears for a
@@ -4183,6 +4238,7 @@ async function renderAssetStudio() {
   const FIELD = { "f-hl": "headline_de", "f-sl": "subline_de", "f-cta": "cta_de" };
   Object.keys(FIELD).forEach(k => tune.querySelector("." + k).addEventListener("input", ev => {
     editing[FIELD[k]] = ev.target.value;
+    paintBar();
     clearTimeout(window.__cpT);
     /* The campaign card inherits these three words wherever it has no
        override of its own, and prints them under each box as "From the ad",
@@ -4193,7 +4249,20 @@ async function renderAssetStudio() {
       paintChosenThumb(); paintStyles(); paintFormats(); paintPreview(); paintCampaign();
     }, 320);
   }));
-  tune.querySelector(".f-ctacol").addEventListener("change", e => { cfg.ctaColour = e.target.value; paintChosenThumb(); paintStyles(); paintFormats(); paintPreview(); });
+  tune.querySelector(".f-emphasis").addEventListener("input", ev => {
+    // Preserve the exact user phrase, including case and spacing.
+    cfg.emphasisByConcept[editing.id] = ev.target.value;
+    paintBar();
+    clearTimeout(window.__cpT);
+    window.__cpT = setTimeout(() => {
+      paintChosenThumb(); paintStyles(); paintFormats(); paintPreview();
+    }, 320);
+  });
+  tune.querySelector(".f-ctacol").addEventListener("change", e => {
+    cfg.ctaColour = safeCtaId(cfg.band, e.target.value);
+    syncCtaChoices();
+    paintChosenThumb(); paintStyles(); paintFormats(); paintPreview();
+  });
   tune.querySelector(".f-safe").addEventListener("change", e => { cfg.showSafe = e.target.checked; paintFormats(); paintPreview(); });
   tune.querySelector(".f-manual").addEventListener("change", e => {
     cfg.manualFocal = e.target.checked;
@@ -4236,75 +4305,131 @@ async function renderAssetStudio() {
     return designForStructure(rot[i] || designById(state.design).style, state.design);
   }
 
-  function specFor(concept, pl, variant, design) {
+  function specFor(concept, pl, variant, design, bandId, ctaColour) {
     /* The preview draws from the same master the build will, so what is
        on screen is the file. `adaptationOf` answers null for a concept
        whose photograph or plan has moved since it was measured, and that
        concept draws from its source exactly as it did before. */
     const ad = adaptationOf(concept);
-    const masters = ad ? ad.masters : null;
+    const renderCfg = bandId || ctaColour
+      ? { ...cfg, band: bandId || cfg.band, ctaColour: ctaColour || cfg.ctaColour }
+      : cfg;
     return {
-      ...copyFor(concept, cfg),
+      ...copyFor(concept, renderCfg),
       w: pl.w, h: pl.h, variant, photo: conceptImage(concept), placement: pl,
-      photoSource: masterFor(masters, pl.ratio, pl.w, pl.h),
+      photoSource: masterFor(ad?.masters, pl.ratio, pl.w, pl.h)
+        || ad?.extendedSources?.get(pl.ratio) || null,
       design: design || state.design, focal: cfg.manualFocal ? state.focal : null,
       pattern: cfg.pattern, rotationSeed: concept.id,
     };
   }
 
+  function blockedAdvice(reason) {
+    if (/emphasis|highlight.*phrase|exact phrase/i.test(reason))
+      return "Enter an exact phrase from the headline or leave Emphasis phrase blank.";
+    if (/variant|text.*forbid|baked|no.text|live.html/i.test(reason))
+      return "Choose an allowed variant explicitly. Image only is a separate photo output, not the selected design.";
+    if (/text.*readable|contrast/i.test(reason))
+      return "Choose a different photograph or a neutral colour field. The selected layout stays unchanged.";
+    if (/photograph|photo|resolution|enlarg|source|crop/i.test(reason))
+      return "Use a larger or better framed photograph, or choose a different format or layout yourself.";
+    if (/headline|subline|copy|text|fit|safe.zone|safe.area/i.test(reason))
+      return "Shorten the copy or choose a different format or layout yourself. No text has been removed.";
+    return "Adjust the content or explicitly choose another format or layout. Nothing is substituted.";
+  }
+
+  function previewStatus(frame, heading, reason, advice) {
+    frame.innerHTML = `<div class="preview-status" role="status" aria-live="polite"><strong>${esc(heading)}</strong>${reason ? `<p>${esc(reason)}</p>` : ""}${advice ? `<span>${esc(advice)}</span>` : ""}</div>`;
+  }
+
+  function paintPreviewThumb(node, result, size) {
+    if (!node) return;
+    node.style.backgroundImage = "none";
+    node.classList.toggle("preview-held-thumb", !!result.blocked);
+    node.textContent = result.blocked ? (node.classList.contains("fm-thumb") ? "!" : "Held") : "";
+    if (result.blocked) node.title = result.blockedReason || "This output is held.";
+    else {
+      node.removeAttribute("title");
+      node.style.backgroundImage = `url(${thumbOf(result.canvas, size)})`;
+    }
+  }
+
+  async function previewResult(concept, pl, variant, design, bandId, ctaColour) {
+    const requestedLayout = designById(design || state.design).style;
+    const unavailable = stillBlock(pl) || (!allowedVariants(pl.text_in_image).includes(variant)
+      ? `This placement does not allow the selected variant. ${withheldVariants(pl.text_in_image)?.reason || "Choose an allowed variant explicitly."}` : "");
+    if (unavailable) return { blocked: true, blockedReason: unavailable, canvas: null, layout: null, requestedLayout, notes: [] };
+    try {
+      return await composeAsset(specFor(concept, pl, variant, design, bandId, ctaColour));
+    } catch (error) {
+      return { blocked: true, blockedReason: `The preview could not be prepared: ${error?.message || error}`, canvas: null, layout: null, requestedLayout, notes: [] };
+    }
+  }
+
   /* The one preview that is always on screen: the design you have chosen,
      rendered from your own concept at the format you are looking at. */
   let chosenToken = 0;
-  async function paintChosenThumb() {
+  function paintChosenThumb() { return paintChosenThumbInner().catch(previewFailed); }
+  async function paintChosenThumbInner() {
     const token = ++chosenToken;
     const pl = places[Math.min(cfg.formatIdx, places.length - 1)] || { w: 1080, h: 1350, platform: "Meta", placement: "Facebook Feed" };
-    const probe = { ...pl, w: 640, h: 800 };
-    const r = await composeAsset(specFor(editing, probe, "full"));
-    if (token !== chosenToken) return;
     const t = head.querySelector(".ch-thumb");
-    if (t) t.style.backgroundImage = `url(${r.canvas.toDataURL("image/png")})`;
+    if (t) { t.style.backgroundImage = "none"; t.textContent = ""; }
+    const r = await previewResult(editing, pl, "full");
+    if (token !== chosenToken || !head.isConnected) return;
+    paintPreviewThumb(t, r, 420);
+    tune.querySelector("#emphasisState").textContent = r.metrics?.emphasisSupported === false && (cfg.emphasisByConcept[editing.id] || "").trim()
+      ? "This layout has no headline highlighter. The phrase is saved but has no visual emphasis here." : "";
   }
 
   let styleToken = 0;
-  async function paintStyles() {
+  function paintStyles() { return paintStylesInner().catch(previewFailed); }
+  async function paintStylesInner() {
     const token = ++styleToken;
+    if (!picker.classList.contains("open")) return;
     const pl = places[Math.min(cfg.formatIdx, places.length - 1)] || { w: 1080, h: 1350, platform: "Meta", placement: "Facebook Feed" };
-    const probe = { ...pl, w: 560, h: 700, platform: pl.platform, placement: pl.placement };
-    for (const t of picker.querySelectorAll(".routetile")) {
-      const r = await composeAsset(specFor(editing, probe, "full", t.dataset.design));
-      if (token !== styleToken) return;
-      t.querySelector(".rt-thumb").style.backgroundImage = `url(${r.canvas.toDataURL("image/png")})`;
+    picker.querySelectorAll(".ref-thumb").forEach(thumb => { thumb.style.backgroundImage = "none"; thumb.textContent = ""; });
+    for (const t of picker.querySelectorAll(".referencetile")) {
+      const template = PROFESSIONALS_TEMPLATES.find(x => x.id === t.dataset.template);
+      if (!template) continue;
+      const r = await previewResult(editing, pl, "full", template.design, template.band, template.ctaColour);
+      if (token !== styleToken || !picker.isConnected || !picker.classList.contains("open")) return;
+      /* The design library is a list of usable choices, not a diagnostics
+         screen. A template that cannot render the current content and format
+         is removed from the choice set instead of appearing as a Held card. */
+      t.hidden = !!r.blocked;
+      if (r.blocked) continue;
+      const thumb = t.querySelector(".ref-thumb");
+      thumb.style.setProperty("--ref-ratio", `${pl.w}/${pl.h}`);
+      paintPreviewThumb(thumb, r, 420);
     }
-    for (const t of picker.querySelectorAll(".styletile[data-thumb]:not([hidden])")) {
-      const r = await composeAsset(specFor(editing, probe, "full", t.dataset.id));
-      if (token !== styleToken) return;
-      t.querySelector(".st-thumb").style.backgroundImage = `url(${r.canvas.toDataURL("image/png")})`;
-      /* THE TILE SHOWS WHAT IT DREW, NOT WHAT IT IS NAMED AFTER. On a concept
-         with no photograph every one of these twenty-six thumbnails is the
-         same typographic frame under twenty-six different names, and the
-         picker was the loudest place in the product saying "your choice does
-         nothing". `requestedLayout` here is this tile's own design, so the
-         mark answers for the tile it sits on rather than for the set. */
-      paintSubstitution(t.querySelector(".st-sub"), r);
-    }
+    picker.querySelectorAll(".referencefamily").forEach(family => {
+      family.hidden = !family.querySelector(".referencetile:not([hidden])");
+    });
   }
 
   /* ONE WRITER FOR THE MARK, and it is handed the engine's own result rather
      than being told what to say. `composeAsset` already reports the structure
      it drew next to the one it was asked for; every surface below prints the
      derivation off that pair and none of them recomputes it. */
-  function paintSubstitution(slot, r, form = "short") {
+  function paintSubstitution(slot, r, form = "short", variant = cfg.variant) {
     if (!slot) return null;
-    const sub = substitutionFacts({ drawn: r.layout, requested: r.requestedLayout });
-    slot.innerHTML = sub.substituted ? `<i class="drawnas">${esc(sub[form])}</i>` : "";
+    if (r.blocked) {
+      slot.textContent = "Held. Design unchanged.";
+      slot.title = r.blockedReason || "This output is held.";
+      return null;
+    }
+    const sub = substitutionFacts({ drawn: r.layout, requested: r.requestedLayout, variant });
+    slot.innerHTML = sub.substituted || sub.intentionalPhoto ? `<i class="drawnas">${esc(sub[form])}</i>` : "";
     /* The full sentence lives on the element that carries the mark, so the
        reason is one hover away from every frame that shows one. */
-    if (sub.substituted) slot.title = sub.sentence; else slot.removeAttribute("title");
+    if (sub.substituted || sub.intentionalPhoto) slot.title = sub.sentence; else slot.removeAttribute("title");
     return sub;
   }
 
   let fmtToken = 0;
-  async function paintFormats() {
+  function paintFormats() { return paintFormatsInner().catch(previewFailed); }
+  async function paintFormatsInner() {
     const token = ++fmtToken;
     const list = pv.querySelector(".formatlist");
     if (!list.children.length) {
@@ -4316,22 +4441,22 @@ async function renderAssetStudio() {
         row.addEventListener("click", () => {
           cfg.formatIdx = i;
           list.querySelectorAll(".fmt").forEach(x => x.classList.toggle("on", +x.dataset.i === i));
-          paintPreview();
+          paintChosenThumb(); paintPreview();
         });
         list.appendChild(row);
       });
     }
+    list.querySelectorAll(".fm-thumb").forEach(thumb => { thumb.style.backgroundImage = "none"; thumb.textContent = ""; });
     for (let i = 0; i < places.length; i++) {
       const pl = places[i];
-      const allowed = allowedVariants(pl.text_in_image);
-      const vId = allowed.includes(cfg.variant) ? cfg.variant : allowed[allowed.length - 1];
-      const r = await composeAsset(specFor(editing, pl, vId, designForPlacement(editing, i)));
-      if (token !== fmtToken) return;
+      const vId = cfg.variant;
+      const r = await previewResult(editing, pl, vId, designForPlacement(editing, i));
+      if (token !== fmtToken || !pv.isConnected) return;
       const row = list.children[i];
-      row.querySelector(".fm-thumb").style.backgroundImage = `url(${r.canvas.toDataURL("image/png")})`;
+      paintPreviewThumb(row.querySelector(".fm-thumb"), r, 160);
       /* A placement that takes no still is flagged exactly like one whose type
          will not fit its reserved area, because the build treats them alike. */
-      const bad = r.blocked || !!stillBlock(pl), warn = r.notes.some(n => n.level === "warn");
+      const bad = r.blocked || !!stillBlock(pl), warn = (r.notes || []).some(n => n.level === "warn");
       row.querySelector(".fm-flag").className = "fm-flag" + (bad ? " bad" : warn ? " warn" : " ok");
       row.querySelector(".fm-flag").textContent = bad ? "!" : warn ? "·" : "";
       /* THIS IS THE GRID THE COMPLAINT WAS ABOUT. Every row here is a frame
@@ -4339,48 +4464,51 @@ async function renderAssetStudio() {
          visibly disagreed with the design named at the top of the page and
          said nothing. The mark goes on the row itself, not on a paragraph
          elsewhere: the fact belongs where the disagreement is visible. */
-      paintSubstitution(row.querySelector(".fm-sub"), r);
+      paintSubstitution(row.querySelector(".fm-sub"), r, "short", vId);
     }
   }
 
   let prevToken = 0;
-  async function paintPreview() {
+  function paintPreview() { return paintPreviewInner().catch(previewFailed); }
+  async function paintPreviewInner() {
     const token = ++prevToken;
     const idx = Math.min(cfg.formatIdx, places.length - 1);
     const pl = places[idx];
     if (!pl) return;
-    const allowed = allowedVariants(pl.text_in_image);
-    const vId = allowed.includes(cfg.variant) ? cfg.variant : allowed[allowed.length - 1];
+    const vId = cfg.variant;
     const dId = designForPlacement(editing, idx);
-    const r = await composeAsset(specFor(editing, pl, vId, dId));
-    if (token !== prevToken) return;
     const frame = pv.querySelector(".pv-frame");
-    frame.innerHTML = `<img src="${r.canvas.toDataURL("image/png")}" alt="">`;
+    previewStatus(frame, "Updating selected design", "", "");
+    pv.querySelector(".pv-notes").innerHTML = "";
+    const r = await previewResult(editing, pl, vId, dId);
+    if (token !== prevToken || !pv.isConnected) return;
+    if (r.blocked) previewStatus(frame, "This output is held", r.blockedReason || "The selected design cannot fit this format.", blockedAdvice(r.blockedReason || ""));
+    else frame.innerHTML = `<img src="${r.canvas.toDataURL("image/png")}" alt="">`;
     /* THE BIG ONE SAYS IT TOO, and it says it in the name line rather than
        only in a note, because the name line is what is read while the eye is
        still on the picture. The reason stays where it already lives: the
        engine's own info note, a few lines below in `pv-notes`. */
-    const sub = substitutionFacts({ drawn: r.layout, requested: r.requestedLayout });
+    const sub = substitutionFacts({ drawn: r.blocked ? null : r.layout, requested: r.requestedLayout, variant: vId, blocked: r.blocked });
     pv.querySelector(".pv-name").innerHTML =
       `<b>${esc(pl.platform)} ${esc(pl.placement)}</b> <span>${pl.w}×${pl.h} · ${esc(pl.ratio || "")}</span>` +
       /* With the rotation on, the design under this frame is not the one
          named at the top of the page, and the preview has to say which one
          it is rather than let the header speak for it. */
       (cfg.rotate ? ` <span class="mini">rotated · ${esc(designById(dId).label)}</span>` : "") +
-      (vId !== cfg.variant ? ` <span class="mini">showing ${esc((VARIANTS.find(v => v.id === vId) || {}).label)}, this placement allows no more</span>` : "") +
-      (sub.substituted ? ` <i class="drawnas" title="${esc(sub.sentence)}">${esc(sub.short)}</i>` : "");
+      (r.blocked ? ` <span class="mini">Held. Design unchanged.</span>` : "") +
+      (sub.substituted || sub.intentionalPhoto ? ` <i class="drawnas" title="${esc(sub.sentence)}">${esc(sub.short)}</i>` : "");
 
     const notes = [];
     /* First, because it answers the question a disagreeing frame provokes
        before any of the measurements below are worth reading. */
-    if (sub.substituted) notes.push({ level: "sub", text: sub.sentence });
+    if (sub.substituted || sub.intentionalPhoto) notes.push({ level: "sub", text: sub.sentence });
     const z = r.safe;
-    notes.push({ level: "zone", text: z.kind === "hard"
+    if (z) notes.push({ level: "zone", text: z.kind === "hard"
       ? `Reserved by the platform: ${z.top} top, ${z.right} right, ${z.bottom} bottom, ${z.left} left. Nothing is placed there. ${z.verification === "verified" ? "Published by the platform." : z.verification === "consensus" ? "The platform publishes no figure; the strictest widely cited values are used." : "Not confirmed on the platform's own page."}`
-      : `Studio margin, ${z.top} top, ${z.right} right, ${z.bottom} bottom, ${z.left} left. Nothing here is a platform rule, so nothing gets blocked.` });
+      : `Studio margin, ${z.top} top, ${z.right} right, ${z.bottom} bottom, ${z.left} left. Essential content stays inside this margin before export. This is a Studio requirement, not a platform rule.` });
     const pn = policyNote(pl.text_in_image);
     if (pn) notes.push({ level: "policy", text: pn });
-    for (const n of r.notes) notes.push(n);
+    for (const n of r.notes || []) notes.push(n);
     if (r.blocked) notes.push({ level: "bad", text: r.blockedReason });
     const noStill = stillBlock(pl);
     if (noStill) notes.push({ level: "bad", text: noStill });
@@ -4390,9 +4518,15 @@ async function renderAssetStudio() {
 
   /* A photograph that will not decode should say so, not leave three blank
      frames and a file count that can never be delivered. */
-  const previewFailed = (e) => addNotice("That picture could not be drawn: "
-    + esc(e && e.message ? e.message : String(e))
-    + " Try a different photograph on this concept, or drop a JPEG or PNG onto its card in step 1.", true, B);
+  let lastPreviewError = "";
+  function previewFailed(e) {
+    if (!head.isConnected) return;
+    const message = e && e.message ? e.message : String(e);
+    previewStatus(pv.querySelector(".pv-frame"), "This output is held", message, blockedAdvice(message));
+    if (message === lastPreviewError) return;
+    lastPreviewError = message;
+    addNotice("The preview could not be prepared: " + esc(message), true, B);
+  }
   Promise.all([paintChosenThumb(), paintFormats(), paintPreview(), paintCampaign()]).catch(previewFailed);
 
   /* ---------------------------------------------------------- 5. Build it */
@@ -4413,7 +4547,7 @@ async function renderAssetStudio() {
     const shot = {
       design: state.design,
       referenceId: state.designReference,
-      cfg: { ...cfg, showSafe: false },
+      cfg: { ...cfg, emphasisByConcept: { ...cfg.emphasisByConcept }, showSafe: false },
       focal: cfg.manualFocal ? { ...(state.focal || {}) } : null,
       /* THE CAMPAIGN, FROZEN LIKE THE PALETTE. A proof point unticked while
          a 244 file run is in flight would otherwise leave the landing page
@@ -4428,7 +4562,8 @@ async function renderAssetStudio() {
     const run = ++state.buildToken;
     const stale = () => run !== state.buildToken;
 
-    const lock = on => [head, pv, tune].forEach(n => {
+    const lock = on => [head, pv, tune, campCard].forEach(n => {
+      n.inert = on;
       n.style.pointerEvents = on ? "none" : "";
       n.style.opacity = on ? ".72" : "";
     });
@@ -4443,6 +4578,7 @@ async function renderAssetStudio() {
     state.assets = [];
     state.assetsBuilt = false;
     state.assetsKey = null;
+    state.assetsFacts = null;
 
     const built = [];
     const noteTally = new Map();
@@ -4452,7 +4588,7 @@ async function renderAssetStudio() {
     /* `heldTally` was here, a second tally of the very files `perAssetMetrics`
        already carries a blocked row for. `buildFacts(...).heldReasons` groups
        those rows by reason, so one build counts its withheld files once. */
-    const list = conceptsForBuild();
+    const list = conceptsForBuild().map(concept => ({ ...concept }));
     /* THE DENOMINATOR, DECIDED BEFORE THE FIRST FILE IS DRAWN. There used to
        be a running `total` here, incremented inside the same loop that filled
        `built`, and the progress line divided by it — so the denominator chased
@@ -4489,7 +4625,8 @@ async function renderAssetStudio() {
       /* The path stays on `photo`: the engine reads it to know the
          approved library already carries Professionals shapes. The master travels
          beside it, never in place of it. */
-      photoSource: masterFor(mastersFor.get(concept.id), pl.ratio, pl.w, pl.h), placement: pl,
+      photoSource: masterFor(mastersFor.get(concept.id), pl.ratio, pl.w, pl.h)
+        || adaptationOf(concept)?.extendedSources?.get(pl.ratio) || null, placement: pl,
       /* Everything that makes this set one campaign is above this line and
          does not move: the words, the picture, the colour field. Only the
          design below it changes when the structure rotates. */
@@ -4517,29 +4654,8 @@ async function renderAssetStudio() {
             const A = await adaptationFor(concept, currentFamilies());
             if (stale()) return;
             mastersFor.set(concept.id, A ? A.masters : new Map());
-            for (const v of (A ? A.verdicts : [])) {
-              if (v.mixed || v.served) continue;
-              /* THE PLAN'S FIGURE, SAID TO BE THE PLAN'S. This tally used to
-                 restate the adapter's per-family enlargement in step 3's own
-                 voice — "the largest size in that family enlarges it 1.6×" —
-                 so a person reading the build report saw a step 2 number
-                 described as something the build had measured. It is the
-                 same sentence `enlargementFacts` writes on the card in step
-                 2, quoted as a prediction about the family rather than
-                 rephrased as a finding about the files. */
-              const e = enlargementFacts(v);
-              if (e.band === "insufficient" || e.band === "soft")
-                /* AND THE SOURCE THAT WOULD FIX IT COMES OFF THE FACT, not
-                   out of `requirements[0]`. Indexing into a prose array by
-                   position is a guess about what the adapter happened to
-                   push first — an unreadable canvas pushes its own line
-                   ahead of this one — and the pixels were on the verdict
-                   the whole time. */
-                tally(`The ${v.ratio} master is ${v.master.w}×${v.master.h}. ${e.sentence}`
-                  + (e.needSource ? ` A source of at least ${e.needSource.w}×${e.needSource.h} would hold it at native detail.` : ""));
-              else if (v.cuts.length)
-                tally(`${v.ratio}: ${cutLine(v)} ${v.requirements[0] || ""}`.trim());
-            }
+            /* Final results report the original pixels and actual photo region
+               measured by the renderer, not predictions from a reduced preview. */
           } catch (e) {
             /* A master is an improvement, not a precondition. If the
                picture cannot be adapted the build still runs off the
@@ -4550,7 +4666,7 @@ async function renderAssetStudio() {
         }
         /* A concept with no photograph is not skipped in silence: the engine
            sets it typographically. Only the image-only variant is meaningless. */
-        if (!hasPhoto) tally(`Concept ${concept.id} has no photograph, so it is set typographically and has no image-only variant.`);
+        if (!hasPhoto) tally(`Concept ${concept.id} has no photograph. Layouts that need one are held. The image-only variant is not available.`);
         /* One rotation per concept, indexed by the placement's position in
            the plan, so the whole set is decided before a single file is
            drawn and the four variants of one placement never disagree with
@@ -4615,7 +4731,7 @@ async function renderAssetStudio() {
             const row = {
               concept: concept.id, platform: pl.platform, placement: pl.placement,
               w: pl.w, h: pl.h, variant: vId, design: dId,
-              style: r.layout, requestedStyle: r.requestedLayout, substituted: !!r.substituted,
+              style: r.blocked ? null : r.layout, requestedStyle: r.requestedLayout, substituted: !r.blocked && !!r.substituted,
               blocked: !!r.blocked, blockedReason: r.blockedReason || null,
               bytes: 0, metrics: r.metrics || {},
             };
@@ -4640,6 +4756,11 @@ async function renderAssetStudio() {
             const e = await exportBlob(r.canvas, capBytesFor(pl), designById(dId).style === "statement", stills);
             if (stale()) return;
             if (e.note) tally(e.note);
+            if (e.blocked || !e.blob) {
+              row.blocked = true;
+              row.blockedReason = e.note || "This file could not be encoded within its placement limit.";
+              continue;
+            }
             row.bytes = e.blob ? e.blob.size : 0;
             built.push({
               concept, pl, vId, name, style: r.layout, requestedStyle: r.requestedLayout, design: dId, ext: e.ext,
@@ -4654,7 +4775,7 @@ async function renderAssetStudio() {
       /* The rest of the story. One landing page and one email per concept,
          written from the same headline, subline, button, photograph and
          colour field the ads just used. */
-      stat.textContent = "Writing the landing page and the email…";
+      if (campaignPageKinds(shot.campaign).length) stat.textContent = "Writing the selected document drafts…";
       const pages = [];
       for (const concept of list) {
         for (const pg of await buildCampaignPages(concept, shot)) {
@@ -4697,7 +4818,7 @@ async function renderAssetStudio() {
         design: shot.design,
         designReference: shot.referenceId,
         style: designById(shot.design).style,
-        params: designById(shot.design).params,
+        params: { ...designById(shot.design).params, emphasisByConcept: { ...shot.cfg.emphasisByConcept } },
         rotation: {
           rotate: !!shot.cfg.rotate,
           /* COUNTED OFF THE FILES THAT SHIPPED, like every other structure
@@ -4731,6 +4852,7 @@ async function renderAssetStudio() {
       renderSet(out, built, list, { facts, noteTally, pages, record, recordError });
       state.assetsBuilt = true;
       state.assetsKey = buildKey();
+      state.assetsFacts = facts;
       state.builtDesign = shot.design;
       /* The archive is named after what is in it. A rotated set named after
          one design would be a folder full of eight structures claiming to
@@ -4742,6 +4864,10 @@ async function renderAssetStudio() {
       paintChosen();
       out.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
+      if (stale()) return;
+      state.assets = [];
+      state.assetsBuilt = false;
+      state.assetsKey = null;
       addNotice("The build stopped: " + esc(err && err.message ? err.message : String(err))
         + " Nothing was exported. If a concept uses an uploaded picture, the browser may have failed to decode it.", true, out);
     } finally {
@@ -4756,12 +4882,22 @@ async function renderAssetStudio() {
   });
 
   bar.querySelector(".dl-zip").addEventListener("click", async ev => {
-    if (!state.assets.length) return;
+    if (!state.assetsBuilt || state.assetsKey !== buildKey() || !state.assets.length) return;
+    const zipKey = buildKey();
+    const sourceFiles = state.assets.slice();
+    const filename = `professionals-assets-${slug((state.brief && state.brief.product) || "campaign")}-${state.builtRotate ? "rotated" : slug(state.builtDesign || state.design)}.zip`;
     ev.target.textContent = "Packing…"; ev.target.disabled = true;
-    const files = [];
-    for (const a of state.assets) files.push({ name: a.name, data: new Uint8Array(await a.blob.arrayBuffer()) });
-    downloadBlob(zipStore(files), `professionals-assets-${slug((state.brief && state.brief.product) || "campaign")}-${state.builtRotate ? "rotated" : slug(state.builtDesign || state.design)}.zip`);
-    ev.target.textContent = "Download ZIP"; ev.target.disabled = false;
+    try {
+      const files = [];
+      for (const a of sourceFiles) files.push({ name: a.name, data: new Uint8Array(await a.blob.arrayBuffer()) });
+      if (zipKey !== buildKey() || !setIsCurrent()) return;
+      downloadBlob(zipStore(files), filename, out);
+    } catch {
+      addNotice("The download could not be prepared. Your completed files are still available. Try again.", true, out);
+    } finally {
+      ev.target.textContent = "Download ZIP";
+      paintBar();
+    }
   });
 }
 
@@ -4803,7 +4939,8 @@ const HISTORY_KEY = "professionals_studio_history";
 const HISTORY_MAX = 24;
 
 function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch (e) { return []; }
+  return storedRows(HISTORY_KEY).filter(row => Array.isArray(row.concepts)
+    && row.concepts.every(concept => concept && typeof concept === "object"));
 }
 function writeHistory(list) {
   /* Trim from the back until it fits rather than failing the whole save. */
@@ -4850,9 +4987,9 @@ function historyFacts(h) {
       files: countPhrase(files, null, "file"),
       ads: countPhrase(ads, null, "ad"),
       placements: countPhrase(delivered, planned, "placement"),
-      pages: !pageFiles ? ""
+      pages: f?.phrases?.pages ?? (!pageFiles ? ""
         : pageFiles % 2 ? countPhrase(pageFiles, null, "page file")
-        : `${countPhrase(pageFiles / 2, null, "landing page")} and ${pageFiles / 2 === 1 ? "email" : "emails"}`,
+        : `${countPhrase(pageFiles / 2, null, "landing page")} and ${pageFiles / 2 === 1 ? "email" : "emails"}`),
     },
   };
 }
@@ -4884,6 +5021,7 @@ function saveToHistory(built, concepts, summary, shot) {
        lists what actually ran; this says whether that was the intention. */
     rotate: !!scfg.rotate,
     band: scfg.band,
+    emphasisByConcept: { ...(scfg.emphasisByConcept || {}) },
     /* THE ONE FACTS OBJECT, WRITTEN HERE AND AGAIN ONTO THE BUILD RECORD.
        This row used to count the build for itself — `files: built.length +
        pageCount` here against `files: built.length` on the record for the
@@ -5034,7 +5172,7 @@ function openHistory() {
   const list = loadHistory();
   const bg = el(`<div class="modal-bg histmodal"><div class="modal wide">
     <h2>History</h2>
-    <p class="sub">Every set built in this browser. Reopening one restores the brief, the concepts and the export plan, and rebuilds the same files: nothing here is random.</p>
+    <p class="sub">Reopen a saved brief, its concepts and export plan. Review your selections before rebuilding. For older sets, select any document drafts again.</p>
     <div class="histlist"></div>
     <div class="row"><button class="pill-btn clearall">Clear history</button><button class="pill-btn primary close">Close</button></div>
   </div></div>`);
@@ -5058,7 +5196,7 @@ function openHistory() {
       <div class="hr-thumbs">${(h.thumbs || []).map(t => `<img src="${esc(t)}" alt="">`).join("") || `<span class="hr-none">no preview</span>`}</div>
       <div class="hr-body">
         <div class="hr-top"><b>${esc(h.product)}</b> <span>${esc(relTime(h.at))}</span></div>
-        <div class="hr-head">${esc((h.concepts[0] && h.concepts[0].headline_de) || "")}</div>
+        <div class="hr-head" data-no-translate>${esc((h.concepts[0] && h.concepts[0].headline_de) || "")}</div>
         <div class="hr-meta">${esc(hf.phrases.files)} · ${esc(hf.phrases.ads)} across ${esc(hf.phrases.placements)}${hf.phrases.pages ? ` · ${esc(hf.phrases.pages)}` : ""} · ${esc(countPhrase(h.concepts.length, null, "concept"))}
           · ${esc(labelOf("design", h.design).label)}${h.pattern ? " · Professionals texture" : ""}${esc(rot)}</div>
       </div>
@@ -5074,7 +5212,7 @@ function openHistory() {
   bg.querySelector(".close").addEventListener("click", () => bg.remove());
   wireModal(bg, () => bg.remove());
   bg.querySelector(".clearall").addEventListener("click", () => {
-    if (!confirm("Remove every entry from history? The files you already downloaded are not affected.")) return;
+    if (!confirm(window.ProfessionalsUI.translate("Remove every entry from history? The files you already downloaded are not affected."))) return;
     writeHistory([]); bg.remove(); openHistory();
   });
   document.body.appendChild(bg);
@@ -5103,6 +5241,7 @@ function reopenBuild(h) {
   state.layout = designById(state.design).style;
   state.assets = []; state.assetsBuilt = false; state.assetsKey = null;
   state.assetCfg = { ...(state.assetCfg || {}), band: h.band || "sand",
+                     emphasisByConcept: { ...(h.emphasisByConcept || {}) },
                      pattern: !!h.pattern, rotate: !!h.rotate, formatIdx: 0, forBrief: null };
   /* THE CAMPAIGN COMES BACK WITH THE BUILD, and it is stamped with the
      product it was written against so `campaignState` does not immediately
@@ -5149,14 +5288,15 @@ function renderSet(out, built, concepts, summary) {
 
   const head = el(`<div class="card resultcard">
     <div class="res-top">
-      <span class="res-tick">✓</span>
-      <span class="res-txt"><b>${esc(facts.phrases.files)} ready</b>
+      <span class="res-tick">${facts.files ? "✓" : "!"}</span>
+      <span class="res-txt"><b>${facts.files ? `${esc(facts.phrases.files)} built${facts.blocked ? " · Some outputs held" : ""}` : "No files could be built"}</b>
         <span>${esc(facts.phrases.ads)} across ${esc(facts.phrases.placements)}${facts.phrases.pages ? ` · ${esc(facts.phrases.pages)}` : ""} · ${esc(countPhrase(concepts.length, null, "concept"))} · ${esc(facts.bytes.text)}${facts.blocked ? ` · <em class="resheld">${esc(String(facts.blocked))} not exported</em>` : ""}</span>
       </span>
-      <button class="pill-btn browse">Browse the placements</button>
+      <button class="pill-btn browse"${built.length ? "" : " disabled"}>Browse the placements</button>
     </div>
     <div class="res-strip"></div>
-    <div class="res-prov">Every file was measured against the hard coded safe zones (safe-zones.js v${SAFE_ZONE_VERSION}, engine v${ENGINE_VERSION}) and keeps its type and logo out of any area a platform actually reserves.${
+    ${facts.structures.photoOnlySentence ? `<div class="res-prov">${esc(facts.structures.photoOnlySentence)}</div>` : ""}
+    <div class="res-prov">${built.length ? `Image exports passed the configured safe zone checks (safe-zones.js v${SAFE_ZONE_VERSION}, engine v${ENGINE_VERSION}). Review the crop, copy, claims and brand before publishing.` : "No image assets were exported. Check the reasons below before rebuilding."}${pages.length ? " Document files are drafts and need a separate review." : ""}${
       facts.rotated ? ` The structure was rotated across the placements. Every one of them carries the same headline, subline, button, photograph and colour field.` : ""}${
       mixed ? ` ${esc(facts.structures.sentence)}` : ""}${
       /* THE AGGREGATE, AND IT AGREES WITH THE FRAMES BECAUSE IT IS COUNTED
@@ -5197,7 +5337,7 @@ function renderSet(out, built, concepts, summary) {
   if (facts.heldReasons.length) {
     const card = el(`<div class="card heldcard">
       <h3>${esc(facts.phrases.blocked)}</h3>
-      <div class="held-lead">Each one would have broken a rule of the placement it was made for. That is a fact about the placement, not a failure of the build.</div>
+      <div class="held-lead">These outputs were not included. Read each reason below, then adjust the source, copy or placement and rebuild if needed.</div>
     </div>`);
     for (const r of facts.heldReasons)
       /* `andList`, not `orList`: every placement on this line hit the rule
@@ -5249,10 +5389,8 @@ function renderSet(out, built, concepts, summary) {
       : "";
     const card = el(`<div class="card storycard">
       <div class="story-head">
-        <b>Landing page${many ? "s" : ""} and email${many ? "s" : ""}</b>
-        <span>${esc(many
-          ? `One of each per concept, written from the same concepts as the ads: ${shared}.`
-          : `Written from the same concept as the ads: ${shared}.`)}${esc(rewritten)} ${esc(pages.length === 2 ? "Both are" : `All ${pages.length} are`)} in the ZIP.</span>
+        <b>${esc(facts.phrases.pages)} · Drafts</b>
+        <span>${esc(`Written from the selected concepts: ${shared}.`)}${esc(rewritten)} Only the selected documents are in the ZIP. Human approval is required before publishing or sending.</span>
       </div>
       <div class="storygrid"></div>
     </div>`);
@@ -5265,7 +5403,7 @@ function renderSet(out, built, concepts, summary) {
       const tile = el(`<div class="storytile">
         <div class="sy-meta">
           <b>${esc(pg.label)}</b>
-          <span>${esc(pg.concept.headline_de || "")}</span>
+          <span data-no-translate>${esc(pg.concept.headline_de || "")}</span>
         </div>
         <div class="sy-frame"><iframe title="${esc(pg.label)}" sandbox=""></iframe></div>
         <div class="sy-act">
@@ -5340,7 +5478,7 @@ function renderSet(out, built, concepts, summary) {
          frame in step 3 read and neither can name a structure the other
          does not. */
       const sub = substitutionFacts(lead);
-      const card = el(`<button class="setcard"${sub.substituted ? ` title="${esc(sub.sentence)}"` : ""}>
+      const card = el(`<button class="setcard"${sub.substituted || sub.intentionalPhoto ? ` title="${esc(sub.sentence)}"` : ""}>
         <span class="sc-img"><img src="${lead.thumb}" alt=""></span>
         <span class="sc-meta"><b>${esc(lead.pl.platform)}</b><span>${esc(lead.pl.placement)}</span>
           <em>${lead.pl.w}×${lead.pl.h} · ${esc(countPhrase(group.length, null, "variant"))}${
@@ -5357,7 +5495,7 @@ function renderSet(out, built, concepts, summary) {
                says both names rather than one — the word "Typographic" alone
                was never the missing information, "not Poster" was. Where
                nothing was substituted the old rule stands untouched. */
-            sub.substituted ? " · " + esc(sub.line)
+            sub.substituted || sub.intentionalPhoto ? " · " + esc(sub.line)
               : mixed && lead.style ? " · " + esc(labelOf("structure", lead.style).label) : ""}</em></span>
       </button>`);
       card.addEventListener("click", () => openVariants(group));
@@ -5365,6 +5503,8 @@ function renderSet(out, built, concepts, summary) {
     }
     gallery.appendChild(grid);
   }
+
+  if (!facts.files) return;
 
   /* ---------- The verdict ----------
      THE ONE THING THE STUDIO CANNOT MEASURE. It knows the contrast, the type
@@ -5467,7 +5607,7 @@ function openVariants(group) {
     const tile = el(`<div class="vartile">
       <div class="vt-img"><img src="${b.thumb}" alt=""></div>
       <div class="vt-name">${esc(v.label || b.vId)} <span>${esc(byteFacts([b]).text)} ${esc(b.ext || "png")}</span></div>
-      <div class="vt-sub">${sub.substituted ? `<i class="drawnas" title="${esc(sub.sentence)}">${esc(sub.short)}</i>` : ""}</div>
+      <div class="vt-sub">${sub.substituted || sub.intentionalPhoto ? `<i class="drawnas" title="${esc(sub.sentence)}">${esc(sub.short)}</i>` : ""}</div>
       <button class="pill-btn dl">Download</button>
     </div>`);
     tile.querySelector(".dl").addEventListener("click", () => downloadBlob(b.blob, `${b.name}.${b.ext}`));
@@ -5709,9 +5849,9 @@ function handleToolUse(block) {
 /* ---------- One input, one router ----------
    Steps 1 and 3 use the text composer. Step 2 replaces it with the export-plan
    action because platform choice is already handled by the placement picker. */
-async function sendMessage(text) {
+async function sendMessage(text, uiMessage = false) {
   if (state.running || !text.trim()) return;
-  addBubble("user", text);
+  addBubble("user", text, uiMessage);
   state.running = true; sendBtn.disabled = true;
   const think = addThinking();
   try {
@@ -5824,7 +5964,7 @@ async function runAssets(text) {
 
 /* ---------- Worked example (no API) ---------- */
 async function runDemo() {
-  await sendMessage("Create a Professionals campaign for a local estate agency in Berlin. Audience: property owners considering a sale. Goal: qualified mandate leads. Channels: Meta, LinkedIn and Google Display.");
+  await sendMessage("Create a Professionals campaign for a local estate agency in Berlin. Audience: property owners considering a sale. Goal: qualified mandate leads. Channels: Meta, LinkedIn and Google Display.", true);
 }
 
 /* ---------- Wiring ---------- */
@@ -5836,25 +5976,19 @@ inputEl.addEventListener("input", autoGrow);
 
 document.querySelectorAll(".starter").forEach(b => b.addEventListener("click", () => {
   if (b.dataset.demo) return runDemo();
-  sendMessage(b.dataset.starter);
+  sendMessage(b.dataset.starter, true);
 }));
 document.getElementById("btnNew").addEventListener("click", () => location.reload());
 
 const modalBg = document.getElementById("modalBg");
-document.getElementById("btnSettings").addEventListener("click", () => {
-  document.getElementById("setOpenaiKey").value = state.openaiKey;
-  openModal(modalBg);
-  /* Asked fresh every time it is opened, because the answer changes when the
-     server is restarted with a key and the page is not. */
-  renderApiStatus();
-});
 document.getElementById("btnTestKey").addEventListener("click", () =>
   testOpenAIKey(document.getElementById("setOpenaiKey").value, document.getElementById("keyTestOut")));
 document.getElementById("setCancel").addEventListener("click", () => modalBg.classList.remove("open"));
 document.getElementById("setSave").addEventListener("click", () => {
   const hadOpenai = !!state.openaiKey;
   state.openaiKey = cleanKey(document.getElementById("setOpenaiKey").value);
-  localStorage.setItem("professionals_studio_openai_key", state.openaiKey);
+  try { localStorage.setItem("professionals_studio_openai_key", state.openaiKey); }
+  catch { addNotice("Your key is available for this session. This browser could not save it.", false); }
   /* Pasting a key makes the first screen's claim false, so the first screen
      is repainted at the moment it stops being true rather than at the next
      reload. */
@@ -5909,13 +6043,12 @@ detectServerKey().then(paintEmptyRuns).catch(paintEmptyRuns);
 })();
 
 document.getElementById("btnHistory").addEventListener("click", openHistory);
-document.getElementById("btnImageLibrary").addEventListener("click", openImageLibrary);
 document.getElementById("btnCreatePlanSticky").addEventListener("click", createExportPlanFromSelection);
 
 window.__studio = { state, runDemo, goStep, renderAssetStudio, composeAsset, zipStore,
   openHistory, loadHistory, saveToHistory,
   resolveSafeBox, LAYOUTS, parseBrief, generateConcepts, buildExportPlan, conceptImage,
-  conceptsForBuild, planPlacements,
+  conceptsForBuild, planPlacements, PROFESSIONALS_TEMPLATES,
   /* The rotation and the record, reachable from the console for the same
      reason everything else here is: so a build can be checked from outside
      the screen that produced it. */

@@ -2,7 +2,7 @@
    PLATFORM SAFE ZONES, HARD CODED.
 
    HARD RULE: this file is the single source of truth for every safe zone
-   in the Plus system. Nothing may be laid out over these margins, ever.
+   in the Professionals system. Nothing essential may cross these margins.
 
    Three properties this file is required to hold:
 
@@ -41,7 +41,8 @@ export const SOURCES = Object.freeze({
   moloco:  "https://www.moloco.com/",
 });
 
-/* Two kinds of margin, and only one of them may block a file.
+/* Two kinds of margin with different source authority. Professionals keeps
+   essential content inside both kinds before export.
 
    HARD   The platform draws its own interface over this strip. Anything
           placed there is invisible to a real person, so it is a fact about
@@ -51,14 +52,14 @@ export const SOURCES = Object.freeze({
    SOFT   A studio margin, or a centre-bias guide for a platform that
           re-crops the file itself. This is taste and craft. It shapes the
           layout, it is reported when a composition runs wide of it, and it
-          never deletes work.
+          remains a Studio requirement rather than a platform rule.
 
    Getting this wrong in the other direction is expensive: the old build
    blocked perfectly legal square feed ads because they touched a 5.5%
    house margin that no platform has ever published. */
 export const ZONE_KIND = Object.freeze({
   hard: "Reserved by the platform's own interface. Nothing may be placed here.",
-  soft: "A studio margin or a crop-survival guide. Shapes the layout, never blocks a file.",
+  soft: "A Studio margin or crop guide. Essential content stays inside it; this is not a platform rule.",
 });
 
 /* How much to trust each number. Never present a non-verified figure as fact. */

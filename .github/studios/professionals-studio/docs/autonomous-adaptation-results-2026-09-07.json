@@ -1,0 +1,55 @@
+{
+  "date": "2026-09-07",
+  "engineVersion": "2.5.0",
+  "unitTests": {
+    "total": 100,
+    "passed": 100,
+    "failed": 0
+  },
+  "sourceAudit": {
+    "syntaxChecks": 21,
+    "localReferences": 110,
+    "syntaxFailures": 0,
+    "brokenLinks": 0,
+    "brandMirrorsMatch": true
+  },
+  "responsivePageChecks": {
+    "total": 18,
+    "findings": 0
+  },
+  "rawRendererStress": {
+    "renders": 1296,
+    "exported": 776,
+    "controlledHolds": 520,
+    "adapted": 272,
+    "assertionFailures": 0,
+    "note": "Synthetic raw-renderer fixtures intentionally bypass the normal ratio-family adapter. Controlled holds verify that the low-level renderer still refuses unsafe direct input."
+  },
+  "designFidelity": {
+    "renders": 921,
+    "exported": 495,
+    "controlledHolds": 426,
+    "adapted": 152,
+    "assertionFailures": 0
+  },
+  "liveStudioWorkflow": {
+    "photoBasedBuild": {
+      "design": "Negative space portrait",
+      "placements": 5,
+      "plannedFiles": 20,
+      "builtFiles": 20,
+      "heldFiles": 0,
+      "includedRatios": ["1:1", "4:5", "9:16"]
+    },
+    "automaticColourBuild": {
+      "design": "Type statement",
+      "requestedField": "teal",
+      "resolvedField": "sand",
+      "placements": 5,
+      "plannedFiles": 20,
+      "builtFiles": 20,
+      "heldFiles": 0
+    },
+    "germanAdjustmentMessageVerified": true
+  }
+}

@@ -14,14 +14,13 @@
    order. Nothing here invents a message. It carries one.
 
    Both outputs are standalone files. The landing page is a single HTML
-   document with the fonts linked and the images inlined as data URIs, so
-   it opens anywhere. The email is 600px of tables with inline styles and
-   a system font fallback, because that is the only thing every client
-   agrees on.
+   document whose linked font paths are embedded by the Studio alongside
+   its image data. The email is 600px of tables with inline styles. It is
+   explicitly a draft until links and rendering in the sending system are reviewed.
 
    Brand rules this file is built to keep:
-   - Five colours. Charcoal on sand, white, teal or purple; white on
-     charcoal. Never white on teal or purple, which measures 1.4:1.
+   - Five colours. Charcoal on sand, white, teal or blue; white on
+     charcoal. Never white on teal or blue. Never teal on blue or blue on teal.
    - Nothing coloured behind a word. Colour is the field the type sits on,
      or it is a button, and there is nothing in between.
    - Buttons are pills, radius half the height, never a rounded rectangle.
@@ -34,11 +33,10 @@
    of the slots in them are the ones a person genuinely wants their hands
    on before a build — the headline, the subline, the button, and the proof
    points — so those four take a `campaign` object and the rest still comes
-   off the concept. Everything else on these pages is fixed prose that
-   belongs to the product rather than to a campaign: the four steps, the
-   reassurance line, the section eyebrow, the legal footer. A campaign does
-   not get to rewrite what the product is, and an editor that pretended
-   otherwise would be a page builder wearing a campaign's clothes.
+   off the concept. Customer output uses only these supplied customer copy
+   fields and selected proof. Concept rationale, creative hooks and internal
+   production instructions never become customer copy. Export review notices
+   are identified separately as draft status.
 
    NOTHING IS INVENTED TO FILL A HOLE. An empty slot prints its own name in
    square brackets — [Headline], [Button] — the same contract deck-builder
@@ -46,7 +44,14 @@
    nobody notices until it is in front of a client.
    ===================================================================== */
 
-export const STORY_VERSION = "1.1.0";
+export const STORY_VERSION = "1.3.0";
+
+const FONT_DIRECTORY = "_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/fonts/";
+export const STORY_FONT_FILES = Object.freeze([
+  { weight: 400, file: "MakeItBetter-Regular.woff2" },
+  { weight: 700, file: "MakeItBetter-Bold.woff2" },
+  { weight: 800, file: "MakeItBetter-XBold.woff2" },
+].map(({ weight, file }) => Object.freeze({ weight, path: FONT_DIRECTORY + file, asset: "assets/fonts/" + file })));
 
 const C = {
   charcoal: "#333333", sand: "#FBF8F6", white: "#FFFFFF",
@@ -58,8 +63,8 @@ const C = {
 const FIELDS = {
   sand:     { bg: C.sand,     fg: C.charcoal, accent: C.teal,   logo: "",       soft: "rgba(51,51,51,.72)" },
   white:    { bg: C.white,    fg: C.charcoal, accent: C.blue, logo: "",       soft: "rgba(51,51,51,.72)" },
-  teal:     { bg: C.teal,     fg: C.charcoal, accent: C.blue, logo: "",       soft: "rgba(51,51,51,.78)" },
-  blue:     { bg: C.blue,     fg: C.charcoal, accent: C.teal, logo: "",       soft: "rgba(51,51,51,.82)" },
+  teal:     { bg: C.teal,     fg: C.charcoal, accent: C.sand, logo: "",       soft: "rgba(51,51,51,.78)" },
+  blue:     { bg: C.blue,     fg: C.charcoal, accent: C.sand, logo: "-white", soft: "rgba(51,51,51,.82)" },
   charcoal: { bg: C.charcoal, fg: C.white,    accent: C.teal,   logo: "-inverse", soft: "rgba(255,255,255,.78)" },
 };
 export function fieldOf(id) { return FIELDS[id === "purple" ? "blue" : id] || FIELDS.sand; }
@@ -68,10 +73,10 @@ function storyLogoSource(story, field) {
   if (story.logoDataUri) return story.logoDataUri;
   if (story.logoKey === "logo-professionals") {
     return field.logo === "-inverse"
-      ? "assets/logos/immoscout24-horizontal-inverse.svg"
+      ? "assets/logos/immoscout24-vertical-inverse.svg"
       : field.logo === "-white"
-        ? "assets/logos/immoscout24-horizontal-white.svg"
-        : "assets/logos/immoscout24-horizontal.svg";
+        ? "assets/logos/immoscout24-vertical-white.svg"
+        : "assets/logos/immoscout24-vertical.svg";
   }
   return `assets/${story.logoKey}${field.logo}.svg`;
 }
@@ -112,13 +117,62 @@ export const SLOTS = Object.freeze({
 export function linkOf(url) {
   const s = String(url ?? "").trim();
   if (!s) return "#";
-  if (/^https?:\/\/\S+$/i.test(s)) return s;
-  if (/^\/\S*$/.test(s)) return s;
+  if (/^https?:\/\/\S+$/i.test(s)) {
+    try { const parsed = new URL(s); if (parsed.hostname) return s; } catch (error) {}
+  }
+  if (/^\/(?![\\/])[^\s\\]*$/.test(s)) return s;
   return "#";
 }
 export function linkRefused(url) {
   const s = String(url ?? "").trim();
   return !!s && linkOf(s) === "#";
+}
+
+function emailUrl(value) {
+  try {
+    const url = new URL(String(value || "").trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch (error) { return ""; }
+}
+
+function emailLegalOf(value) {
+  const input = value && typeof value === "object" ? value : {};
+  return {
+    unsubscribeUrl: emailUrl(input.unsubscribeUrl),
+    imprintUrl: emailUrl(input.imprintUrl),
+    privacyUrl: emailUrl(input.privacyUrl),
+  };
+}
+
+export function emailReadiness(story) {
+  const legal = emailLegalOf(story.emailLegal);
+  const reasons = [];
+  if (!emailUrl(story.href)) reasons.push("Zieladresse der Hauptaktion fehlt oder ist ungültig.");
+  if (!legal.unsubscribeUrl) reasons.push("Freigegebener Abmeldelink fehlt.");
+  if (!legal.imprintUrl) reasons.push("Freigegebener Link zum Impressum fehlt.");
+  if (!legal.privacyUrl) reasons.push("Freigegebener Datenschutzlink fehlt.");
+  if (Array.isArray(story.gaps) && story.gaps.length) reasons.push("Kampagneninhalte sind noch unvollständig.");
+  // Web fonts and embedded images are not supported consistently by email clients.
+  reasons.push("Make It Better, Bilder und Darstellung müssen im Versandsystem geprüft werden.");
+  return { status: "draft", reasons, legal };
+}
+
+export function landingReadiness(story) {
+  const reasons = [];
+  if (story.urlRefused || linkOf(story.href) === "#") reasons.push("Zieladresse der Hauptaktion fehlt oder ist ungültig.");
+  const missing = [];
+  for (const [key, label, slot] of [["headline", "Überschrift", SLOTS.headline], ["subline", "Unterzeile", SLOTS.subline], ["cta", "Hauptaktion", SLOTS.cta]]) {
+    const value = String(story[key] || "").trim();
+    if (!value || value === gap(slot)) missing.push(label);
+  }
+  if (Array.isArray(story.proof) && story.proof.some(proof => !proof || !String(proof.short || "").trim()
+    || !String(proof.line || "").trim() || proof.short === gap(SLOTS.proofShort) || proof.line === gap(SLOTS.proofLine))) {
+    missing.push("Nachweis");
+  }
+  if (missing.length) reasons.push(`Noch zu ergänzen: ${missing.join(", ")}.`);
+  else if (Array.isArray(story.gaps) && story.gaps.length) reasons.push("Kampagneninhalte sind noch unvollständig.");
+  reasons.push("Inhalte, Nachweise, Bildrechte und Zieladressen benötigen eine menschliche Freigabe.");
+  return { status: "draft", reasons };
 }
 
 /* The starting point for a campaign: the product's own proof points, all of
@@ -190,8 +244,6 @@ export function storyFrom({ brief, concept, band, logoKey, proof, heroDataUri, l
        copy: nobody wrote it, and it shipped on a real page looking exactly
        like a decision. An empty button now says it is empty. */
     cta: fill(over.cta, concept.cta_de, SLOTS.cta),
-    idea: concept.big_idea || concept.storyline || "",
-    hook: concept.creative_hook || "",
     /* NO `.slice(0, 3)`. That silently dropped the fourth proof point of
        "Professionals" — the SCHUFA one — from every landing page and
        every email this Studio has ever written, with nothing on any screen
@@ -199,10 +251,11 @@ export function storyFrom({ brief, concept, band, logoKey, proof, heroDataUri, l
     proof: proofOf(c, proof, gaps),
     href: linkOf(c.url),
     urlRefused: linkRefused(c.url),
+    emailLegal: emailLegalOf(c.emailLegal),
     gaps,
     field: f, band, photoHasProfessionals,
     logoKey, heroDataUri, logoDataUri,
-    plusDataUri: photoHasProfessionals ? null : plusDataUri,
+    plusDataUri: null,
   };
 }
 
@@ -221,13 +274,13 @@ function button(label, bg, fg, size, href) {
 function checkRow(text, accent, fg, soft) {
   return `<li style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid rgba(51,51,51,.12);list-style:none">
     <span style="flex:none;width:28px;height:28px;border-radius:999px;background:${accent};color:${C.charcoal};
-      display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;margin-top:2px">&#10003;</span>
+      display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;margin-top:2px">&#10003;</span>
     <span style="font-size:19px;font-weight:700;line-height:1.45;color:${fg}">${esc(text)}</span></li>`;
 }
 
 /* ---------------------------------------------------------------------
    THE LANDING PAGE
-   Hero, proof triad, the three steps, a detail split, and a closing band.
+   Hero, supplied proof, an optional detail split, and a closing band.
    The hero repeats the ad exactly: same words, same picture, same field.
    --------------------------------------------------------------------- */
 export function buildLandingPage(story) {
@@ -238,6 +291,7 @@ export function buildLandingPage(story) {
   const close = dark ? FIELDS.sand : FIELDS.charcoal;
   const proof = story.proof;
   const href = story.href || "#";
+  const readiness = landingReadiness(story);
   const btn = (size) => button(story.cta, f.fg === C.white ? C.white : C.charcoal,
                                f.fg === C.white ? C.charcoal : C.white, size, href);
 
@@ -246,38 +300,33 @@ export function buildLandingPage(story) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(story.product)} · ${esc(story.headline)}</title>
+<meta name="professionals-export-status" content="draft">
+<title>Entwurf · ${esc(story.product)} · ${esc(story.headline)}</title>
 <style>
-  @font-face { font-family:"Make It Better"; font-weight:400; src:url("_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/fonts/MakeItBetter-Regular.woff2") format("woff2"); }
-  @font-face { font-family:"Make It Better"; font-weight:700; src:url("_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/fonts/MakeItBetter-Bold.woff2") format("woff2"); }
-  @font-face { font-family:"Make It Better"; font-weight:800; src:url("_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/fonts/MakeItBetter-XBold.woff2") format("woff2"); }
+  ${STORY_FONT_FILES.map(font => `@font-face { font-family:"Make It Better"; font-weight:${font.weight}; src:url("${font.path}") format("woff2"); }`).join("\n  ")}
   *{ box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:"Make It Better","Open Sans",Arial,sans-serif; background:${f.bg}; color:${f.fg}; line-height:1.55; }
+  body { font-family:"Make It Better"; background:${f.bg}; color:${f.fg}; line-height:1.55; }
   .wrap { max-width:1154px; margin:0 auto; padding:0 32px; }
+  .draft-notice { background:${C.sand}; color:${C.charcoal}; padding:20px 0; font-size:14px; line-height:1.5; }
+  .draft-notice ul { margin:8px 0 0; padding-left:20px; }
   .nav { display:flex; align-items:center; justify-content:space-between; padding:22px 0; gap:20px; }
   .nav img { height:26px; display:block; }
   h1 { font-size:clamp(38px,5.2vw,68px); font-weight:800; line-height:1.06; letter-spacing:-.015em; }
-  h2 { font-size:clamp(28px,3.4vw,44px); font-weight:800; line-height:1.12; letter-spacing:-.01em; }
-  h3 { font-size:22px; font-weight:800; line-height:1.25; }
+  h2 { font-size:clamp(28px,3.4vw,44px); font-weight:700; line-height:1.12; letter-spacing:-.01em; }
+  h3 { font-size:22px; font-weight:700; line-height:1.25; }
   .lead { font-size:clamp(18px,1.9vw,23px); font-weight:700; color:${f.soft}; line-height:1.5; }
-  .eyebrow { font-size:13px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:${f.soft}; }
+  .eyebrow { font-size:13px; font-weight:700; color:${f.soft}; }
   section { padding:clamp(56px,7vw,104px) 0; }
   .hero { display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(32px,5vw,72px); align-items:center; }
-  /* The frame clips the photograph to its radius; the Professionals sits outside it
-     so it can bleed off the corner the way the brand does. */
   .hero-media { position:relative; }
   .hero-frame { border-radius:20px; overflow:hidden; aspect-ratio:4/5; background:rgba(51,51,51,.06); }
   .hero-frame img { width:100%; height:100%; object-fit:cover; display:block; }
-  .hero-media .hero-plus { position:absolute; width:20%; height:auto; right:-6%; top:-6%; z-index:2; }
   /* AS MANY COLUMNS AS THERE ARE PROOF POINTS. This was a hard
      repeat(3,1fr), and three of the five products carry two proof points,
      so those pages ran with a third of the row empty and nothing saying
      why. Auto-fit takes two, three or four without a hole in the row. */
   .triad { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:clamp(24px,3vw,44px); }
   .rule { height:6px; width:80px; margin-bottom:22px; }
-  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(20px,2.4vw,36px); position:relative; }
-  .stepno { width:52px; height:52px; border-radius:999px; display:flex; align-items:center; justify-content:center;
-            font-size:22px; font-weight:800; margin-bottom:20px; }
   .split { display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,5vw,72px); align-items:center; }
   .split-media { border-radius:20px; overflow:hidden; aspect-ratio:3/2; }
   .split-media img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -285,12 +334,17 @@ export function buildLandingPage(story) {
   .foot { font-size:13px; color:${f.soft}; padding:34px 0 56px; border-top:1px solid rgba(51,51,51,.12); }
   @media (max-width:860px) {
     .hero, .split { grid-template-columns:1fr; }
-    .triad, .steps { grid-template-columns:1fr; gap:32px; }
+    .triad { grid-template-columns:1fr; gap:32px; }
     .hero-media { aspect-ratio:4/3; }
   }
 </style>
 </head>
 <body>
+
+<aside class="draft-notice" aria-label="Status des Entwurfs"><div class="wrap">
+  <strong>Entwurf. Nicht veröffentlichen.</strong>
+  <ul>${readiness.reasons.map(reason => `<li>${esc(reason)}</li>`).join("")}</ul>
+</div></aside>
 
 <div class="wrap">
   <nav class="nav">
@@ -306,21 +360,19 @@ export function buildLandingPage(story) {
       <h1>${esc(story.headline)}</h1>
       <p class="lead" style="margin-top:24px;max-width:30ch">${esc(story.subline)}</p>
       <div style="margin-top:36px">${btn("lg")}</div>
-      <p style="margin-top:18px;font-size:14px;color:${f.soft}">Für professionelle Immobilienvermarktung. Klar im Prozess, verbindlich in der Freigabe.</p>
     </div>
     <div class="hero-media">
       <div class="hero-frame">${story.heroDataUri ? `<img src="${story.heroDataUri}" alt="">` : ""}</div>
-      ${story.plusDataUri ? `<img class="hero-plus" src="${story.plusDataUri}" alt="">` : ""}
     </div>
   </div>
 </section>
 
 ${proof.length ? `<section style="background:${dark ? "rgba(255,255,255,.05)" : "rgba(51,51,51,.035)"}">
   <div class="wrap">
-    <h2 style="margin-bottom:clamp(36px,4vw,64px);max-width:18ch">${esc(story.hook || story.headline)}</h2>
+    <h2 style="margin-bottom:clamp(36px,4vw,64px);max-width:18ch">${esc(story.headline)}</h2>
     <div class="triad">
       ${proof.map((p, i) => `<div>
-        <div class="rule" style="background:${[f.accent, C.blue, C.charcoal][i % 3] === f.bg ? C.charcoal : [f.accent, C.blue, C.charcoal][i % 3]}"></div>
+        <div class="rule" style="background:${f.accent === f.bg ? C.charcoal : f.accent}"></div>
         <h3 style="margin-bottom:12px">${esc(p.short)}</h3>
         <p style="font-size:18px;font-weight:700;color:${f.soft};line-height:1.55">${esc(p.line)}</p>
       </div>`).join("")}
@@ -328,37 +380,18 @@ ${proof.length ? `<section style="background:${dark ? "rgba(255,255,255,.05)" : 
   </div>
 </section>` : ""}
 
-<section>
-  <div class="wrap">
-    <h2 style="margin-bottom:clamp(36px,4vw,64px)">In vier Schritten zur Kampagne</h2>
-    <div class="steps">
-      ${[
-        ["Briefing festlegen", "Ziel, Zielgruppe und gewünschte Wirkung klar benennen."],
-        ["Konzept wählen", "Die stärkste Route für Ihre Positionierung auswählen."],
-        ["Formate prüfen", "Platzierungen, Zuschnitte und Safe Zones kontrollieren."],
-        ["Kampagne freigeben", "Finale Inhalte vor der Veröffentlichung menschlich prüfen."],
-      ].map(([t, d], i) => `<div>
-        <div class="stepno" style="background:${i === 3 ? f.accent : (dark ? C.white : C.charcoal)};color:${i === 3 ? C.charcoal : (dark ? C.charcoal : C.white)}">${i + 1}</div>
-        <h3 style="margin-bottom:10px">${esc(t)}</h3>
-        <p style="font-size:17px;font-weight:700;color:${f.soft};line-height:1.5">${esc(d)}</p>
-      </div>`).join("")}
-    </div>
-  </div>
-</section>
-
-<section style="background:${dark ? "rgba(255,255,255,.05)" : "rgba(51,51,51,.035)"}">
+${proof.length ? `<section style="background:${dark ? "rgba(255,255,255,.05)" : "rgba(51,51,51,.035)"}">
   <div class="wrap split">
     <div class="split-media">${story.heroDataUri ? `<img src="${story.heroDataUri}" alt="">` : ""}</div>
     <div>
-      <div class="eyebrow" style="margin-bottom:18px">Ihre Vorteile</div>
-      <h2 style="margin-bottom:28px">${esc(story.idea || "Professionelle Immobilienvermarktung mit einem klaren nächsten Schritt.")}</h2>
+      <h2 style="margin-bottom:28px">${esc(story.subline)}</h2>
       ${proof.length ? `<ul style="margin:0;padding:0">
         ${proof.map(p => checkRow(p.line, f.accent, f.fg, f.soft)).join("")}
       </ul>` : ""}
       <div style="margin-top:34px">${btn("lg")}</div>
     </div>
   </div>
-</section>
+</section>` : ""}
 
 <section class="closing">
   <div class="wrap" style="text-align:center">
@@ -369,7 +402,7 @@ ${proof.length ? `<section style="background:${dark ? "rgba(255,255,255,.05)" : 
 </section>
 
 <div class="wrap"><div class="foot">
-  ImmoScout24 · ${esc(story.product)} · Finale Inhalte vor Veröffentlichung freigeben.
+  ImmoScout24 · ${esc(story.product)}
 </div></div>
 
 </body>
@@ -378,7 +411,7 @@ ${proof.length ? `<section style="background:${dark ? "rgba(255,255,255,.05)" : 
 
 /* ---------------------------------------------------------------------
    THE EMAIL
-   600px, tables, inline styles, system font fallback. Every colour is a
+   600px, tables, inline styles, Make It Better. Every colour is a
    background attribute as well as CSS, because Outlook ignores one of
    them and there is no way to know which.
    --------------------------------------------------------------------- */
@@ -391,9 +424,13 @@ export function buildEmail(story) {
      and a double quote inside a double-quoted attribute closes it early:
      every colour after font-family silently reverted to the client default,
      which is how both buttons came out as link blue on charcoal. */
-  const FONT = `'Make It Better', 'Open Sans', Arial, Helvetica, sans-serif`;
+  const FONT = `'Make It Better'`;
   const href = esc(story.href || "#");
   const proof = story.proof;
+  const readiness = emailReadiness(story);
+  const legalItem = (url, label) => url
+    ? `<a href="${esc(url)}" style="color:${f.soft}">${label}</a>`
+    : `<span>${label}: Link fehlt</span>`;
 
   const row = (inner, bg) =>
     `<tr><td align="center" bgcolor="${bg}" style="background-color:${bg};padding:0">
@@ -407,9 +444,11 @@ export function buildEmail(story) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="x-apple-disable-message-reformatting">
-<title>${esc(story.headline)}</title>
+<meta name="professionals-export-status" content="draft">
+<title>Entwurf · ${esc(story.headline)}</title>
 <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 <style>
+  ${STORY_FONT_FILES.map(font => `@font-face { font-family:"Make It Better"; font-weight:${font.weight}; src:url("${font.path}") format("woff2"); }`).join("\n  ")}
   @media only screen and (max-width:620px) {
     .w600 { width:100% !important; max-width:100% !important; }
     .px { padding-left:24px !important; padding-right:24px !important; }
@@ -426,6 +465,12 @@ export function buildEmail(story) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
        bgcolor="${f.bg}" style="background-color:${f.bg};margin:0;padding:0">
 
+  ${row(`<tr><td class="px" style="padding:24px 40px;font-family:${FONT};font-size:14px;line-height:1.5;color:${C.charcoal}">
+    <strong>Entwurf. Nicht versenden.</strong>
+    <ul style="margin:12px 0 0;padding-left:20px">${readiness.reasons.map(reason => `<li>${esc(reason)}</li>`).join("")}</ul>
+    <p style="margin:12px 0 0">Erst nach Ergänzung und menschlicher Freigabe in der E Mail Plattform verwenden.</p>
+  </td></tr>`, C.sand)}
+
   ${row(`<tr><td class="px" style="padding:28px 40px 8px 40px" align="left">
       <img src="${storyLogoSource(story, f)}" width="150" alt="${esc(story.product)}"
            style="display:block;border:0;height:auto;width:150px">
@@ -439,7 +484,7 @@ export function buildEmail(story) {
 
   ${row(`<tr><td class="px" style="padding:36px 40px 0 40px" align="left">
       <p style="margin:0 0 14px 0;font-family:${FONT};font-size:12px;font-weight:700;letter-spacing:1.2px;
-                text-transform:uppercase;color:${f.soft}">${esc(story.product)}</p>
+                color:${f.soft}">${esc(story.product)}</p>
       <h1 class="h1" style="margin:0;font-family:${FONT};font-size:38px;line-height:1.1;font-weight:800;color:${f.fg}">
         ${esc(story.headline)}</h1>
       <p style="margin:20px 0 0 0;font-family:${FONT};font-size:18px;line-height:1.55;font-weight:700;color:${f.soft}">
@@ -462,7 +507,7 @@ export function buildEmail(story) {
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr><td width="28" height="28" align="center" valign="middle" bgcolor="${f.accent}"
                       style="background-color:${f.accent};border-radius:999px;font-family:${FONT};
-                             font-size:15px;font-weight:800;color:${C.charcoal};line-height:28px">&#10003;</td></tr>
+                             font-size:15px;font-weight:700;color:${C.charcoal};line-height:28px">&#10003;</td></tr>
             </table>
           </td>
           <td valign="top" style="padding:20px 0;font-family:${FONT};font-size:17px;line-height:1.45;
@@ -473,7 +518,7 @@ export function buildEmail(story) {
 
   ${row(`<tr><td class="px" align="center" bgcolor="${dark ? C.sand : C.charcoal}"
              style="background-color:${dark ? C.sand : C.charcoal};padding:44px 40px">
-      <p style="margin:0 0 24px 0;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:800;
+      <p style="margin:0 0 24px 0;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:700;
                 color:${dark ? C.charcoal : C.white}">${esc(story.headline)}</p>
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr>
         <td bgcolor="${dark ? C.charcoal : f.accent}"
@@ -486,7 +531,7 @@ export function buildEmail(story) {
   ${row(`<tr><td class="px" align="center" style="padding:28px 40px 44px 40px;font-family:${FONT};
              font-size:12px;line-height:1.6;color:${f.soft}">
       ImmoScout24 &middot; ${esc(story.product)} &middot; Finale Inhalte vor Veröffentlichung freigeben.<br>
-      <a href="#" style="color:${f.soft}">Abmelden</a> &middot; <a href="#" style="color:${f.soft}">Impressum</a>
+      ${legalItem(readiness.legal.unsubscribeUrl, "Abmelden")} &middot; ${legalItem(readiness.legal.imprintUrl, "Impressum")} &middot; ${legalItem(readiness.legal.privacyUrl, "Datenschutz")}
     </td></tr>`, f.bg)}
 
 </table>

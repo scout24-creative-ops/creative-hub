@@ -98,7 +98,7 @@
 import { analyzeImage, bestFocal, SOFT_UPSCALE, ASPECT_TOLERANCE } from "./ad-engine.js";
 import { lookupSafeZone } from "./safe-zones.js";
 
-export const ADAPTER_VERSION = "1.0.0";
+export const ADAPTER_VERSION = "1.1.0";
 
 /* ---------------------------------------------------------------------
    The authored constants. All of them.
@@ -417,10 +417,11 @@ export function adaptFamily(input) {
      that decides whether the source was big enough for this plan. An
      outlier is drawn from the source and its enlargement is not the
      master's fault, so it is not counted here. */
-  let worst = 0, worstAt = null, micro = [];
+  let worst = 0, sourceWorst = 0, worstAt = null, micro = [];
   for (const p of onMaster) {
     const u = Math.max(p.w / renderW, p.h / renderH);
     if (u > worst) { worst = u; worstAt = p; }
+    sourceWorst = Math.max(sourceWorst, p.w / win.w, p.h / win.h);
   }
   for (const p of placements) if (p.w * p.h < MICRO_PIXELS) micro.push(p);
 
@@ -435,6 +436,7 @@ export function adaptFamily(input) {
      prints no sentence for it. The outliers say what is happening to them,
      one line each, which is the honest answer. */
   const upscale = onMaster.length ? worst : null;
+  const sourceUpscale = onMaster.length ? sourceWorst : null;
   const detail = upscale == null ? "unknown"
     : upscale <= NATIVE_TOLERANCE ? "native"
     : upscale <= SOFT_UPSCALE ? "adequate"
@@ -538,10 +540,12 @@ export function adaptFamily(input) {
   if (!measured)
     reqs.push("The photograph could not be read back off the canvas, usually a cross-origin image. Nothing here is a claim about the subject, only about the frame.");
   if (detail === "soft" || detail === "insufficient") {
-    needSource = {
+    const requiredSource = {
       w: Math.ceil(worstAt.w / (win.w / srcW)),
       h: Math.ceil(worstAt.h / (win.h / srcH)),
     };
+    const originalSufficient = sourceUpscale <= SOFT_UPSCALE;
+    needSource = originalSufficient ? null : requiredSource;
     /* AND IT NO LONGER STATES THE ENLARGEMENT ITSELF, for the reason the
        percentages left these sentences: this module cannot import
        `studio-facts.js` — that file imports this one — so a figure printed
@@ -555,7 +559,9 @@ export function adaptFamily(input) {
        the sentence directly above this one, naming the same placement. What
        is left here is the half that sentence does not carry and that a
        person can act on: the source that would fix it. */
-    reqs.push(`${worstAt.platform} ${worstAt.placement} at ${worstAt.w}x${worstAt.h} is the size that costs this family its detail. A source of at least ${needSource.w}x${needSource.h} would hold it at native detail.`);
+    reqs.push(originalSufficient
+      ? "The Studio will compose this size directly from the original instead of enlarging the reduced family preview."
+      : `The Studio will prepare this ratio family automatically for ${worstAt.platform} ${worstAt.placement} at ${worstAt.w}x${worstAt.h}. The native detail target is ${needSource.w}x${needSource.h}; the selected layout and safe zones stay intact.`);
   }
   if (method === "extend")
     reqs.push(`A source shaped closer to ${ratio}, or the same scene shot with room above and below the subject, removes the extension entirely.`);
@@ -578,7 +584,7 @@ export function adaptFamily(input) {
     window: rect,
     frameSurvival, subjectHeld: measured ? subjectHeld : null, cuts: measured ? cuts : [],
     holdable, outside,
-    upscale, upscaleAt: worstAt, detail, outliers,
+    upscale, sourceUpscale, upscaleAt: worstAt, detail, outliers,
     /* The source that would hold the worst placement at native detail, in
        pixels, or null when nothing is short. The requirement sentence above
        is written from these two numbers and nothing recomputes them. */
@@ -588,7 +594,8 @@ export function adaptFamily(input) {
     centreBias: !!(safe && safe.centreBias),
     requirements: reqs,
     micro,
-    served: method === "direct" && detail !== "insufficient" && detail !== "soft",
+    served: measured && method === "direct" && !cuts.length
+      && (detail === "native" || detail === "adequate"),
     /* THE ONE ANSWER TO "SUBJECT WHOLE AND NOTHING ENLARGED".
        `served` answers a different question — "is there anything to ask the
        owner for?" — and an `adequate` family is served precisely because a
@@ -873,7 +880,16 @@ export function familySafe(family) {
       left: Math.max(...hard.map(z => z.left || 0)),
     };
   }
-  return zones.find(z => z.centreBias) || null;
+  const centred = zones.filter(z => z.centreBias);
+  if (!centred.length) return null;
+  return {
+    kind: "soft",
+    centreBias: true,
+    top: Math.max(...centred.map(z => z.top || 0)),
+    right: Math.max(...centred.map(z => z.right || 0)),
+    bottom: Math.max(...centred.map(z => z.bottom || 0)),
+    left: Math.max(...centred.map(z => z.left || 0)),
+  };
 }
 
 /* The master itself. A straight source-rectangle draw: no resampling

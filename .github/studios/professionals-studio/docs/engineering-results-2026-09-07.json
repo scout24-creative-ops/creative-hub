@@ -1,0 +1,487 @@
+{
+  "renderer": {
+    "startedAt": "2026-09-07T12:05:20.750Z",
+    "mode": "stress",
+    "total": 1152,
+    "passed": 1152,
+    "held": 74,
+    "adapted": 698,
+    "failures": [],
+    "holds": [
+      {
+        "label": "fullbleed-negative-space · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "fullbleed-negative-space · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "fullbleed-negative-space · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "fullbleed-impact · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "fullbleed-impact · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "fullbleed-impact · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "editorial-vertical · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-vertical · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-vertical · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "editorial-angle-left · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-angle-left · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-angle-left · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "editorial-angle-right · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-angle-right · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-angle-right · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "poster-angle-photo-first · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "poster-angle-photo-first · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "poster-angle-photo-first · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "poster-angle-type-first · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "poster-angle-type-first · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "poster-angle-type-first · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "panel-photo-sliver · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "panel-photo-sliver · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "panel-photo-sliver · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "cutout-circle · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "cutout-circle · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "cutout-circle · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "statement-impact · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "gallery-photo-top · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-photo-top · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-photo-top · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "gallery-photo-bottom · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-photo-bottom · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-photo-bottom · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "gallery-portrait-left · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-portrait-left · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-portrait-left · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "gallery-portrait-right · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-portrait-right · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "gallery-portrait-right · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "editorial-horizontal · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-horizontal · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "editorial-horizontal · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "fullbleed-lower-caption · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "fullbleed-lower-caption · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "fullbleed-lower-caption · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "statement-centred · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "statement-underline · adversarial · full",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · adversarial · logo",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · adversarial · clean",
+        "reason": "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+      },
+      {
+        "label": "cutout-circle · colour · teal · #3DF5DC",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "cutout-circle · colour · teal · #24E3FF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "cutout-circle · colour · teal · #333333",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "cutout-circle · colour · teal · #FFFFFF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "cutout-circle · colour · teal · #FBF8F6",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · colour · teal · #3DF5DC",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · colour · teal · #24E3FF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · colour · teal · #333333",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · colour · teal · #FFFFFF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-impact · colour · teal · #FBF8F6",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · colour · teal · #3DF5DC",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · colour · teal · #24E3FF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · colour · teal · #333333",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · colour · teal · #FFFFFF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-centred · colour · teal · #FBF8F6",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · colour · teal · #3DF5DC",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · colour · teal · #24E3FF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · colour · teal · #333333",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · colour · teal · #FFFFFF",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      },
+      {
+        "label": "statement-underline · colour · teal · #FBF8F6",
+        "reason": "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+      }
+    ],
+    "warnings": {},
+    "designs": 18,
+    "durationMs": 11938,
+    "medianMs": 6,
+    "p95Ms": 14,
+    "finishedAt": "2026-09-07T12:05:32.689Z",
+    "renderable": 1078,
+    "heldByReason": {
+      "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported.": 56,
+      "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported.": 18
+    }
+  },
+  "pages": {
+    "startedAt": "2026-09-07T12:05:21.042Z",
+    "cases": [
+      {
+        "page": "index.html",
+        "width": 390,
+        "title": "Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "index.html",
+        "width": 768,
+        "title": "Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "index.html",
+        "width": 1280,
+        "title": "Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "brand.html",
+        "width": 390,
+        "title": "Professionals Brand Guidelines · ImmoScout24",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "brand.html",
+        "width": 768,
+        "title": "Professionals Brand Guidelines · ImmoScout24",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "brand.html",
+        "width": 1280,
+        "title": "Professionals Brand Guidelines · ImmoScout24",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "concept-studio.html",
+        "width": 390,
+        "title": "Professionals Concept Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "concept-studio.html",
+        "width": 768,
+        "title": "Professionals Concept Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "concept-studio.html",
+        "width": 1280,
+        "title": "Professionals Concept Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-social.html",
+        "width": 390,
+        "title": "Paid social templates · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-social.html",
+        "width": 768,
+        "title": "Paid social templates · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-social.html",
+        "width": 1280,
+        "title": "Paid social templates · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-landing.html",
+        "width": 390,
+        "title": "Landing page template · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-landing.html",
+        "width": 768,
+        "title": "Landing page template · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-landing.html",
+        "width": 1280,
+        "title": "Landing page template · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-email.html",
+        "width": 390,
+        "title": "Email templates · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-email.html",
+        "width": 768,
+        "title": "Email templates · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      },
+      {
+        "page": "template-email.html",
+        "width": 1280,
+        "title": "Email templates · Professionals Studio",
+        "overflow": false,
+        "brokenImages": [],
+        "badFonts": []
+      }
+    ],
+    "failures": [],
+    "finishedAt": "2026-09-07T12:05:24.542Z"
+  },
+  "scope": {
+    "visualDesigns": 18,
+    "normalGeometryCases": 720,
+    "adversarialCases": 72,
+    "colourCases": 360,
+    "pages": 6,
+    "viewportWidths": [
+      390,
+      768,
+      1280
+    ],
+    "unitTests": 34,
+    "geometryCombinationsInUnitTest": 3456,
+    "livePaidApiTested": false,
+    "realEmailClientsTested": false
+  }
+}

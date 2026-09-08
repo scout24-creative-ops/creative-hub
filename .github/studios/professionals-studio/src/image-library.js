@@ -3,27 +3,54 @@
    third party or pretending there is already a shared DAM behind the Studio. */
 const DB = "professionals_studio_image_library";
 const STORE = "images";
+const TIMEOUT_MS = 6000;
 
 function openDb() {
   return new Promise((resolve, reject) => {
-    if (!globalThis.indexedDB) return reject(new Error("IndexedDB is unavailable in this browser."));
-    const req = indexedDB.open(DB, 1);
+    let req;
+    let settled = false;
+    const finish = (fn, value) => { if (settled) return; settled = true; clearTimeout(timer); fn(value); };
+    const timer = setTimeout(() => finish(reject, new Error("The image library did not open in time. Please try again.")), TIMEOUT_MS);
+    try {
+      if (!globalThis.indexedDB) throw new Error("The image library is unavailable in this browser.");
+      req = indexedDB.open(DB, 1);
+    } catch (error) { finish(reject, error); return; }
     req.onupgradeneeded = () => {
-      const store = req.result.createObjectStore(STORE, { keyPath: "id" });
-      store.createIndex("createdAt", "createdAt");
+      if (settled) { try { req.transaction.abort(); } catch (error) {} return; }
+      if (!req.result.objectStoreNames.contains(STORE)) {
+        const store = req.result.createObjectStore(STORE, { keyPath: "id" });
+        store.createIndex("createdAt", "createdAt");
+      }
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error || new Error("Could not open the image library."));
+    req.onsuccess = () => {
+      const db = req.result;
+      if (settled) { db.close(); return; }
+      db.onversionchange = () => db.close();
+      finish(resolve, db);
+    };
+    req.onerror = () => finish(reject, req.error || new Error("Could not open the image library."));
+    req.onblocked = () => finish(reject, new Error("Another tab is holding the image library open. Close that tab and try again."));
   });
 }
 
 function transact(mode, work) {
   return openDb().then(db => new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, mode);
-    const result = work(tx.objectStore(STORE));
-    tx.oncomplete = () => { db.close(); resolve(result); };
-    tx.onerror = () => { db.close(); reject(tx.error || new Error("Image library transaction failed.")); };
-    tx.onabort = () => { db.close(); reject(tx.error || new Error("Image library transaction stopped.")); };
+    let tx, result, settled = false;
+    const finish = (fn, value) => { if (settled) return; settled = true; clearTimeout(timer); db.close(); fn(value); };
+    const timer = setTimeout(() => {
+      try { tx?.abort(); } catch (error) {}
+      finish(reject, new Error("The image library did not respond in time. Please try again."));
+    }, TIMEOUT_MS);
+    try {
+      tx = db.transaction(STORE, mode);
+      tx.oncomplete = () => finish(resolve, result);
+      tx.onerror = () => finish(reject, tx.error || new Error("Image library transaction failed."));
+      tx.onabort = () => finish(reject, tx.error || new Error("Image library transaction stopped."));
+      work(tx.objectStore(STORE), value => { result = value; });
+    } catch (error) {
+      try { tx?.abort(); } catch (abortError) {}
+      finish(reject, error);
+    }
   }));
 }
 
@@ -48,11 +75,8 @@ export async function saveStudioImage(record) {
 }
 
 export async function allStudioImages() {
-  return transact("readonly", store => {
+  return transact("readonly", (store, done) => {
     const req = store.getAll();
-    return new Promise((resolve, reject) => {
-      req.onsuccess = () => resolve((req.result || []).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))));
-      req.onerror = () => reject(req.error || new Error("Could not read the image library."));
-    });
+    req.onsuccess = () => done((req.result || []).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))));
   });
 }

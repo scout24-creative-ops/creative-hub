@@ -19,15 +19,16 @@
       does anything reach the canvas. Every mark reports its exact ink
       box, so safe-zone compliance is arithmetic, not a claim.
 
-   3. TWO KINDS OF MARGIN, AND ONLY ONE OF THEM CAN BLOCK.
-      A platform's reserved UI strip is a hard fact: content inside it
-      is invisible to a real user, so the engine will not export it. A
-      house margin is taste. Taste never blocks a file.
+   3. EVERY SAFETY ZONE PROTECTS THE OUTPUT.
+      Platform interface strips and studio crop guides have different
+      sources, but essential content stays inside both. Anything outside
+      either boundary is held before export.
 
    Everything customer facing stays German. This file is English.
    ===================================================================== */
 
 import { lookupSafeZone, SAFE_ZONE_VERSION } from "./safe-zones.js";
+import approvedTokens from "./brand-tokens.json" with { type: "json" };
 /* The one sentence about an enlarged file, imported rather than written
    again here. This is a cycle on paper — studio-facts.js reads this file's
    tables — and it is safe in practice because neither side touches the
@@ -45,7 +46,36 @@ export const BRAND = {
   plusMaxRotation: 30,
 };
 
-export const ENGINE_VERSION = "2.1.0";
+/* These are application roles, not a second token catalogue. Supporting
+   advertising copy uses the approved body role; Extra Bold is for page H1s. */
+export const ASSET_TYPE_ROLES = Object.freeze({
+  headline: Object.freeze({
+    role: "display", family: approvedTokens.fontFamily.headline.$value,
+    weight: approvedTokens.fontWeight.display.$value,
+    minPx: parseFloat(approvedTokens.fontSize.minimumAdHeadline.$value),
+    lineHeight: approvedTokens.lineHeight.displayMin.$value,
+    smallLineHeight: approvedTokens.lineHeight.displayMax.$value,
+  }),
+  subline: Object.freeze({
+    role: "body", family: approvedTokens.fontFamily.body.$value,
+    weight: approvedTokens.fontWeight.body.$value,
+    minPx: parseFloat(approvedTokens.fontSize.minimumAdBody.$value),
+    lineHeight: approvedTokens.lineHeight.body.$value,
+  }),
+  cta: Object.freeze({
+    role: "caption", family: approvedTokens.fontFamily.body.$value,
+    weight: approvedTokens.fontWeight.caption.$value,
+    minPx: parseFloat(approvedTokens.fontSize.minimumAdBody.$value),
+  }),
+  kicker: Object.freeze({
+    role: "caption", family: approvedTokens.fontFamily.body.$value,
+    weight: approvedTokens.fontWeight.caption.$value,
+    minPx: parseFloat(approvedTokens.fontSize.minimumAdBody.$value),
+    lineHeight: approvedTokens.lineHeight.displayMax.$value,
+  }),
+});
+
+export const ENGINE_VERSION = "2.5.0";
 
 /* WCAG 2.2 AA for normal text. Large bold display type is allowed 3:1 by the
    standard, but the whole set is held to 4.5:1 so the promise is one number
@@ -81,6 +111,7 @@ export const ASPECT_TOLERANCE = 0.08;
    gone: `finish` hands the measurement to `fileEnlargement` and pushes the
    sentence it gets back, so the boundary is applied in one place. */
 export const SOFT_UPSCALE = 1.45;
+export const MIN_PHOTO_RETAINED = 0.25;
 
 /* ---------------------------------------------------------------------
    Palettes. The field colour decides the type colour and which logo file
@@ -89,10 +120,25 @@ export const SOFT_UPSCALE = 1.45;
 export const BAND_CHOICES = [
   { id: "sand",     bg: COLORS.sand,     fg: COLORS.charcoal, logo: "",       accent: COLORS.teal,   label: "Sand" },
   { id: "white",    bg: COLORS.white,    fg: COLORS.charcoal, logo: "",       accent: COLORS.blue, label: "White" },
-  { id: "teal",     bg: COLORS.teal,     fg: COLORS.charcoal, logo: "",       accent: COLORS.blue, label: "Brand Teal" },
-  { id: "blue",     bg: COLORS.blue,     fg: COLORS.charcoal, logo: "",       accent: COLORS.teal, label: "Professionals Blue" },
+  { id: "teal",     bg: COLORS.teal,     fg: COLORS.charcoal, logo: "",       accent: COLORS.sand, label: "Brand Teal" },
   { id: "charcoal", bg: COLORS.charcoal, fg: COLORS.white,    logo: "-inverse", accent: COLORS.teal, label: "Charcoal" },
 ];
+
+/* A colour choice is an intent, not permission to create an unreadable
+   control. Resolve the button as one unit: field contrast first, then its
+   text. The returned colours are all approved brand colours. */
+export function resolveAssetPalette(band, requestedCtaBg) {
+  const b = band || BAND_CHOICES[0];
+  let bg = requestedCtaBg || (b.id === "charcoal" ? COLORS.blue : COLORS.charcoal);
+  const tooClose = contrastRatio(hexL(bg), hexL(b.bg)) < 3;
+  const tealBlue = (b.bg === COLORS.teal && bg === COLORS.blue)
+    || (b.bg === COLORS.blue && bg === COLORS.teal);
+  if (tooClose || tealBlue) bg = b.id === "charcoal" ? COLORS.blue : COLORS.charcoal;
+  const dark = contrastRatio(hexL(COLORS.charcoal), hexL(bg));
+  const light = contrastRatio(hexL(COLORS.white), hexL(bg));
+  return { band: b, ctaBg: bg, ctaFg: dark >= light ? COLORS.charcoal : COLORS.white,
+    adjusted: bg !== requestedCtaBg };
+}
 
 export const VARIANTS = [
   { id: "clean", label: "Image only",   logo: false, copy: false },
@@ -104,9 +150,9 @@ export const VARIANTS = [
 export const LOGO_FILES = {
   "Professionals": "logo-professionals",
 };
-/* The compact mark. Used when a wide wordmark cannot meet the 24px minimum
-   inside the space a placement leaves, which is a real situation on banners. */
-const COMPACT_LOGO = "logo-professionals";
+/* The stacked mark is the default. Small banners use the horizontal master
+   only when the stacked logo cannot meet its approved minimum size. */
+const COMPACT_LOGO = "logo-professionals-horizontal";
 
 /* ---------------------------------------------------------------------
    Text policy. Only two of these are actual platform rules; the rest are
@@ -182,31 +228,46 @@ export function assetUrl(path) {
 }
 
 const imgCache = new Map();
+const MAX_CACHED_IMAGES = 48;
 export function loadImg(src) {
   const url = assetUrl(src);
-  if (imgCache.has(url)) return imgCache.get(url);
+  if (imgCache.has(url)) {
+    const cached = imgCache.get(url);
+    imgCache.delete(url); imgCache.set(url, cached);
+    return cached;
+  }
   const p = new Promise((res, rej) => {
     const i = new Image();
+    const label = /^(data:|blob:)/.test(url) ? "the selected image" : String(src).split("?")[0];
+    const timeout = setTimeout(() => {
+      i.onload = null; i.onerror = null;
+      i.src = "";
+      rej(new Error("Image loading timed out for " + label + ". Try selecting it again."));
+    }, 15000);
     i.crossOrigin = "anonymous";
-    i.onload = () => res(i);
-    i.onerror = () => rej(new Error("Could not load " + url));
+    i.onload = () => { clearTimeout(timeout); res(i); };
+    i.onerror = () => { clearTimeout(timeout); rej(new Error("Could not load " + label + ". Try selecting it again.")); };
     i.src = url;
   });
   imgCache.set(url, p);
+  p.catch(() => { if (imgCache.get(url) === p) imgCache.delete(url); });
+  while (imgCache.size > MAX_CACHED_IMAGES) imgCache.delete(imgCache.keys().next().value);
   return p;
 }
 
 /* A missing colourway must not take the whole build down. Fall back to the
    charcoal artwork, and say so, rather than throwing on one placement. */
 async function loadLogo(key, suffix, notes) {
-  const canonical = key === "logo-professionals"
+  const professional = key === "logo-professionals" || key === "logo-professionals-horizontal";
+  const orientation = key === "logo-professionals-horizontal" ? "horizontal" : "vertical";
+  const canonical = professional
     ? (suffix === "-inverse"
-      ? "assets/logos/immoscout24-horizontal-inverse.svg"
+      ? `assets/logos/immoscout24-${orientation}-inverse.svg`
       : suffix === "-white"
-        ? "assets/logos/immoscout24-horizontal-white.svg"
-        : "assets/logos/immoscout24-horizontal.svg")
+        ? `assets/logos/immoscout24-${orientation}-white.svg`
+        : `assets/logos/immoscout24-${orientation}.svg`)
     : `assets/${key}${suffix || ""}.svg`;
-  if (!suffix || key === "logo-professionals") return loadImg(canonical);
+  if (!suffix || professional) return loadImg(canonical);
   try {
     return await loadImg(canonical);
   } catch (e) {
@@ -220,13 +281,19 @@ export function preloadFonts() {
   if (fontsReady) return fontsReady;
   fontsReady = (async () => {
     try {
-      await Promise.all([
+      const faces = await Promise.all([
         document.fonts.load('800 64px "Make It Better"'),
         document.fonts.load('700 32px "Make It Better"'),
         document.fonts.load('400 32px "Make It Better"'),
       ]);
       await document.fonts.ready;
-    } catch (e) { /* the fallback stack still measures, it just looks wrong */ }
+      if (faces.some(group => !group.length || group.some(face => face.status !== "loaded"))) {
+        throw new Error("The Make It Better font is not available.");
+      }
+    } catch (e) {
+      fontsReady = null;
+      throw new Error("The brand font could not be loaded. Reload the Studio before building assets.");
+    }
   })();
   return fontsReady;
 }
@@ -258,12 +325,12 @@ export function tokens(w, h, safe) {
   let ideal = 0.440 * Math.pow(ref, 0.753);
   /* A very flat canvas cannot carry type sized from its area alone. */
   ideal = Math.min(ideal, short * 0.26);
-  ideal = Math.max(ideal, 11);
+  ideal = Math.max(ideal, ASSET_TYPE_ROLES.headline.minPx);
 
   const pad = Math.max(8, Math.round(ideal * 0.62));
   return {
     ref, short, ideal: Math.round(ideal),
-    floor: Math.max(11, Math.round(ideal * 0.55)),   /* below this, change the layout, not the type */
+    floor: Math.max(ASSET_TYPE_ROLES.headline.minPx, Math.round(ideal * 0.55)),
     pad,
     gutter: Math.round(pad * 1.15),
     radius: Math.round(ref * 0.028),
@@ -301,8 +368,8 @@ const SUPPORTS_TRACKING = typeof CanvasRenderingContext2D !== "undefined" &&
 function trackingEm(px) {
   return Math.max(-0.03, Math.min(0.04, 0.0686 - 0.01955 * Math.log(px)));
 }
-function setFont(ctx, weight, px) {
-  ctx.font = `${weight} ${px}px "Make It Better", "Open Sans", Arial, sans-serif`;
+function setFont(ctx, weight, px, family = ASSET_TYPE_ROLES.headline.family) {
+  ctx.font = `${weight} ${px}px "${family}"`;
   if (SUPPORTS_TRACKING) ctx.letterSpacing = (trackingEm(px) * px).toFixed(2) + "px";
 }
 
@@ -315,77 +382,35 @@ function measureLine(ctx, text) {
   };
 }
 
-/* German compounds are long. Break on spaces, and on existing hyphens, and
-   only as a last resort inside a word, with a real hyphen so it reads as a
-   break rather than a mistake. */
-function splitTokens(text) {
-  const out = [];
-  for (const chunk of String(text || "").split(/\s+/).filter(Boolean)) {
-    const parts = chunk.split(/(?<=[-\u2013\/])/);
-    for (const p of parts) out.push(p);
+/* Words stay intact. A requested emphasis phrase is also kept together when
+   it matches complete words. A phrase that cannot fit makes the fit fail. */
+function splitTokens(text, emphasis) {
+  const words = String(text || "").trim().split(/\s+/).filter(Boolean);
+  const phrase = String(emphasis || "").trim().split(/\s+/).filter(Boolean);
+  if (phrase.length > 1) {
+    const at = words.findIndex((word, index) => phrase.every((part, offset) => words[index + offset] === part));
+    if (at >= 0) words.splice(at, phrase.length, phrase.join(" "));
   }
-  return out;
+  return words;
 }
 
-/* Breaking inside a word is a last resort, and a break that strands one or
-   two letters reads as a mistake rather than as hyphenation. */
-const MIN_PIECE = 3;
-function hardBreak(ctx, word, maxW) {
-  const out = [];
-  let cur = "";
-  for (const ch of word) {
-    if (ctx.measureText(cur + ch + "-").width > maxW && cur.length >= MIN_PIECE) {
-      out.push(cur + "-"); cur = ch;
-    } else cur += ch;
-  }
-  if (cur) {
-    if (cur.length < MIN_PIECE && out.length) {
-      const prev = out.pop().replace(/-$/, "");
-      const keep = Math.max(MIN_PIECE, prev.length - (MIN_PIECE - cur.length));
-      out.push(prev.slice(0, keep) + "-");
-      cur = prev.slice(keep) + cur;
-    }
-    out.push(cur);
-  }
-  return out;
-}
-
-/* Returns the lines, and records whether it had to break inside a word so the
-   fitter can prefer smaller type over a hyphen. */
-function wrap(ctx, text, maxW) {
-  const toks = splitTokens(text);
+function wrap(ctx, text, maxW, emphasis) {
+  const toks = splitTokens(text, emphasis);
   const lines = [];
   lines.broke = false;
   let cur = "";
-  for (let t of toks) {
-    const joiner = cur && !/[-\u2013\/]$/.test(cur) ? " " : "";
-    const test = cur + joiner + t;
-    if (!cur) {
-      if (ctx.measureText(t).width > maxW) {
-        const pieces = hardBreak(ctx, t, maxW);
-        cur = pieces.pop();
-        lines.push(...pieces);
-        lines.broke = true;
-      } else cur = t;
-    } else if (ctx.measureText(test).width <= maxW) {
-      cur = test;
-    } else {
-      lines.push(cur);
-      if (ctx.measureText(t).width > maxW) {
-        const pieces = hardBreak(ctx, t, maxW);
-        cur = pieces.pop();
-        lines.push(...pieces);
-        lines.broke = true;
-      } else cur = t;
-    }
+  for (const t of toks) {
+    const test = cur ? cur + " " + t : t;
+    if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = t; }
+    else cur = test;
   }
   if (cur) lines.push(cur);
   return lines;
 }
 
-function blockAt(ctx, text, weight, px, maxW, lhRatio) {
-  setFont(ctx, weight, px);
-  const raw = wrap(ctx, text, maxW);
+function blockAt(ctx, text, weight, px, maxW, lhRatio, emphasis, role) {
+  setFont(ctx, weight, px, role && role.family);
+  const raw = wrap(ctx, text, maxW, emphasis);
   const lines = raw.map(t => ({ t, ...measureLine(ctx, t) }));
   lines.broke = raw.broke;
   const lh = px * lhRatio;
@@ -394,6 +419,7 @@ function blockAt(ctx, text, weight, px, maxW, lhRatio) {
   const last = lines[lines.length - 1] || first;
   return {
     px, lh, lines, widest, broke: !!lines.broke,
+    weight, role: role ? role.role : null, minPx: role ? role.minPx : null,
     h: lines.length ? first.asc + (lines.length - 1) * lh + last.desc : 0,
     firstAsc: first.asc,
   };
@@ -405,14 +431,16 @@ function blockAt(ctx, text, weight, px, maxW, lhRatio) {
    whole block fits the column and the height it has been given. */
 export function fitStack(ctx, content, colW, maxH, tk, opts) {
   const o = opts || {};
+  if (!Number.isFinite(colW) || !Number.isFinite(maxH) || colW <= 0 || maxH <= 0) return null;
   const wantSub = o.subline !== false && !!content.subline;
   const wantCta = o.cta !== false && !!content.cta;
   const wantKicker = !!o.kicker && !!content.kicker;
   const maxLines = o.maxLines || 3;
+  const roles = ASSET_TYPE_ROLES;
   /* An option may ask for larger type, which is the whole point of the
      typographic style. Capped so it can never run away from the scale. */
-  const startPx = Math.max(11, Math.min(Math.round(o.startPx || tk.ideal), Math.round(tk.ideal * 1.5)));
-  const floorPx = Math.max(o.floorPx || tk.floor, 11);
+  const startPx = Math.max(roles.headline.minPx, Math.min(Math.round(o.startPx || tk.ideal), Math.round(tk.ideal * 1.5)));
+  const floorPx = Math.max(o.floorPx || tk.floor, roles.headline.minPx);
 
   /* Measure, in characters per line. Display type reads best between 20 and
      40 characters; a headline set across a 2560px hero would run to 70 and
@@ -420,57 +448,54 @@ export function fitStack(ctx, content, colW, maxH, tk, opts) {
      the cap moves with the size rather than being a fixed pixel width. */
   const maxCPL = o.maxCPL || 36;
 
-  for (let px = startPx; px >= floorPx - 0.5; px = Math.max(floorPx, Math.round(px * 0.94)) - (px <= floorPx ? 1 : 0)) {
-    const hlLh = px >= 34 ? 1.055 : 1.14;
-    setFont(ctx, 800, px);
-    const avgChar = ctx.measureText(content.headline).width / Math.max(1, String(content.headline).length);
-    const effW = Math.min(colW, Math.max(px * 4.5, avgChar * maxCPL));
-    const hl = blockAt(ctx, content.headline, 800, px, effW, hlLh);
-    /* Shrink before hyphenating. Only at the floor does a break inside a word
-       become the better of two bad options. */
-    if (hl.lines.length > maxLines || hl.widest > colW + 0.5 || (hl.broke && px > floorPx)) {
-      if (px <= floorPx) break;
-      continue;
-    }
+  /* Complete content gets every acceptable size before supporting copy can
+     be omitted. An unfittable CTA never turns into a successful silent drop. */
+  const passes = wantSub && !o.sublineRequired ? [true, false] : [wantSub];
+  for (const includeSub of passes) {
+    for (let px = startPx; px >= floorPx; px = Math.max(floorPx, Math.round(px * 0.94)) - (px <= floorPx ? 1 : 0)) {
+      const hlLh = px >= parseFloat(approvedTokens.fontSize.headlineMin.$value)
+        ? roles.headline.lineHeight : roles.headline.smallLineHeight;
+      setFont(ctx, roles.headline.weight, px, roles.headline.family);
+      const text = String(content.headline || "");
+      const avgChar = ctx.measureText(text).width / Math.max(1, text.length);
+      const effW = Math.min(colW, Math.max(px * 4.5, avgChar * maxCPL));
+      const hl = blockAt(ctx, text, roles.headline.weight, px, effW, hlLh,
+        o.emphasis || content.emphasis, roles.headline);
+      if (hl.lines.length > maxLines || hl.widest > effW) continue;
 
-    let total = hl.h, sub = null, cta = null, kicker = null;
-    const gapSub = px * 0.46, gapCta = px * 0.66, gapKicker = px * 0.40;
-
-    if (wantKicker) {
-      const kpx = Math.max(9, Math.round(px * tk.kickerRatio));
-      kicker = blockAt(ctx, content.kicker, 800, kpx, colW, 1.2);
-      if (kicker.lines.length > 1 || kicker.widest > colW) kicker = null;
-      else total += kicker.h + gapKicker;
-    }
-    if (wantSub) {
-      const spx = Math.max(10, Math.round(px * tk.sublineRatio));
-      /* Smaller type needs more leading, not less. */
-      const s = blockAt(ctx, content.subline, 700, spx, Math.min(colW, effW * 1.12), 1.4);
-      if (s.lines.length <= (o.sublineLines || 2) && s.widest <= colW + 0.5) {
-        sub = s; total += gapSub + s.h;
+      let total = hl.h, sub = null, cta = null, kicker = null;
+      const gapSub = px * 0.46, gapCta = px * 0.66, gapKicker = px * 0.40;
+      if (wantKicker) {
+        const kpx = Math.max(roles.kicker.minPx, Math.round(px * tk.kickerRatio));
+        kicker = blockAt(ctx, content.kicker, roles.kicker.weight, kpx, colW,
+          roles.kicker.lineHeight, null, roles.kicker);
+        if (kicker.lines.length > 1 || kicker.widest > colW) kicker = null;
+        else total += kicker.h + gapKicker;
+      }
+      if (includeSub) {
+        const spx = Math.max(roles.subline.minPx, Math.round(px * tk.sublineRatio));
+        sub = blockAt(ctx, content.subline, roles.subline.weight, spx, Math.min(colW, effW * 1.12),
+          roles.subline.lineHeight, null, roles.subline);
+        if (sub.lines.length > (o.sublineLines || 2) || sub.widest > colW) continue;
+        total += gapSub + sub.h;
+      }
+      if (wantCta) {
+        const cpx = Math.max(roles.cta.minPx, Math.round(px * tk.ctaRatio));
+        setFont(ctx, roles.cta.weight, cpx, roles.cta.family);
+        const m = measureLine(ctx, content.cta);
+        const cw = Math.ceil(m.w + cpx * 2.5), ch = Math.ceil(cpx * 2.5);
+        if (cw > colW) continue;
+        cta = { px: cpx, w: cw, h: ch, text: content.cta, asc: m.asc,
+          weight: roles.cta.weight, role: roles.cta.role, minPx: roles.cta.minPx };
+        total += gapCta + ch;
+      }
+      if (total <= maxH) {
+        const stackW = Math.max(effW, sub ? sub.widest : 0, cta ? cta.w : 0, kicker ? kicker.widest : 0);
+        return buildStack({ hl, sub, cta, kicker, gapSub, gapCta, gapKicker, total, px,
+          colW: stackW, align: o.align, tk, droppedSub: wantSub && !sub, droppedCta: false,
+          fitMode: wantSub && !sub ? "without-subline" : "complete" });
       }
     }
-    if (wantCta) {
-      const cpx = Math.max(10, Math.round(px * tk.ctaRatio));
-      setFont(ctx, 700, cpx);
-      const m = measureLine(ctx, content.cta);
-      const cw = Math.round(m.w + cpx * 2.5), ch = Math.round(cpx * 2.5);
-      if (cw <= colW) { cta = { px: cpx, w: cw, h: ch, text: content.cta, asc: m.asc }; total += gapCta + ch; }
-    }
-
-    if (total <= maxH + 0.5) {
-      return buildStack({ hl, sub, cta, kicker, gapSub, gapCta, gapKicker, total, px, colW: effW, align: o.align, tk,
-                          droppedSub: wantSub && !sub, droppedCta: wantCta && !cta });
-    }
-    /* Too tall at this size. Shed the least important element before
-       shrinking type any further, so nothing ends up illegible. */
-    if (sub && total - gapSub - sub.h <= maxH + 0.5) {
-      const t2 = total - gapSub - sub.h;
-      return buildStack({ hl, sub: null, cta, kicker, gapSub, gapCta, gapKicker, total: t2, px,
-                          colW: effW, align: o.align, tk,
-                          droppedSub: true, droppedCta: wantCta && !cta });
-    }
-    if (px <= floorPx) break;
   }
   return null;
 }
@@ -482,16 +507,18 @@ function buildStack(s) {
   return {
     h: s.total, headlinePx: s.px, colW: s.colW, align: s.align,
     droppedSub: !!s.droppedSub, droppedCta: !!s.droppedCta,
+    fitMode: s.fitMode,
     lineCount: hl.lines.length,
     measureChars: Math.round(hl.lines.reduce((a, l) => a + l.t.length, 0) / Math.max(1, hl.lines.length)),
     parts: { hl, sub, cta, kicker },
+    gaps: { sub: gapSub, cta: gapCta, kicker: gapKicker },
     /* Draw at a top-left origin. Cap height sits flush with y, which is
        what makes a block of display type look aligned to its container. */
     draw(ctx, x, y, C, ink) {
       let cy = y;
       const fgc = C.fg;
       if (kicker) {
-        setFont(ctx, 800, kicker.px);
+        setFont(ctx, kicker.weight, kicker.px, ASSET_TYPE_ROLES.kicker.family);
         ctx.fillStyle = C.accentInk || C.fg;
         ctx.globalAlpha = 0.9;
         let by = cy + kicker.firstAsc;
@@ -504,20 +531,42 @@ function buildStack(s) {
         ctx.globalAlpha = 1;
         cy += kicker.h + gapKicker;
       }
-      setFont(ctx, 800, hl.px);
-      ctx.fillStyle = C.fg;
+      setFont(ctx, hl.weight, hl.px, ASSET_TYPE_ROLES.headline.family);
       let by = cy + hl.firstAsc;
-      for (const l of hl.lines) {
+      for (let i = 0; i < hl.lines.length; i++) {
+        const l = hl.lines[i];
+        const lineColour = C.headlineLineColours && C.headlineLineColours[i]
+          ? C.headlineLineColours[i] : C.fg;
         const lx = ax(x, l.w);
-        ctx.fillText(l.t, lx, by);
-        ink(lx, by - l.asc, l.w, l.asc + l.desc, fgc);
+        const run = C.headlineRuns && C.headlineRuns[i];
+        if (run && Number.isInteger(run.start) && Number.isInteger(run.end)
+            && run.start >= 0 && run.end > run.start && run.end <= l.t.length) {
+          const segments = [
+            { start: 0, end: run.start, colour: C.fg },
+            { start: run.start, end: run.end, colour: run.colour },
+            { start: run.end, end: l.t.length, colour: C.fg },
+          ];
+          for (const segment of segments) {
+            const text = l.t.slice(segment.start, segment.end);
+            if (!text) continue;
+            const sx = lx + measureLine(ctx, l.t.slice(0, segment.start)).w;
+            const metrics = measureLine(ctx, text);
+            ctx.fillStyle = segment.colour;
+            ctx.fillText(text, sx, by);
+            ink(sx, by - metrics.asc, metrics.w, metrics.asc + metrics.desc, segment.colour);
+          }
+        } else {
+          ctx.fillStyle = lineColour;
+          ctx.fillText(l.t, lx, by);
+          ink(lx, by - l.asc, l.w, l.asc + l.desc, lineColour);
+        }
         by += hl.lh;
       }
       cy += hl.h;
       if (sub) {
         cy += gapSub;
-        setFont(ctx, 700, sub.px);
-        ctx.fillStyle = C.fg; ctx.globalAlpha = 0.78;
+        setFont(ctx, sub.weight, sub.px, ASSET_TYPE_ROLES.subline.family);
+        ctx.fillStyle = C.fg;
         let sy = cy + sub.firstAsc;
         for (const l of sub.lines) {
           const lx = ax(x, l.w);
@@ -534,7 +583,7 @@ function buildStack(s) {
         ctx.fillStyle = C.ctaBg;
         pill(ctx, bx, cy, cta.w, cta.h);
         ctx.fill();
-        setFont(ctx, 700, cta.px);
+        setFont(ctx, cta.weight, cta.px, ASSET_TYPE_ROLES.cta.family);
         ctx.fillStyle = C.ctaFg;
         ctx.fillText(cta.text, bx + cta.px * 1.25, cy + cta.h / 2 + cta.asc / 2);
         ink(bx, cy, cta.w, cta.h, null);   /* a solid pill, measured against its own fill */
@@ -743,7 +792,8 @@ function interp(cum, p) {
 
 /* Cover-draw the photo into a box around a focal point. */
 export function drawPhoto(ctx, img, box, focal) {
-  const fx = focal ? focal.x : 0.5, fy = focal ? focal.y : 0.42;
+  const fx = Number.isFinite(focal && focal.x) ? Math.max(0, Math.min(1, focal.x)) : 0.5;
+  const fy = Number.isFinite(focal && focal.y) ? Math.max(0, Math.min(1, focal.y)) : 0.42;
   const s = Math.max(box.w / img.width, box.h / img.height);
   const dw = img.width * s, dh = img.height * s;
   let x = box.x + box.w / 2 - dw * fx;
@@ -756,6 +806,56 @@ export function drawPhoto(ctx, img, box, focal) {
   ctx.drawImage(img, x, y, dw, dh);
   ctx.restore();
   return s;
+}
+
+/* Quality is derived from the actual decoded source and destination, even
+   when a caller supplies a focal point without analysis metadata. */
+export function photoFitMetrics(img, box) {
+  const sourceWidth = Number(img && (img.naturalWidth || img.width));
+  const sourceHeight = Number(img && (img.naturalHeight || img.height));
+  if (!(sourceWidth > 0 && sourceHeight > 0 && box && box.w > 0 && box.h > 0)) {
+    return { sourceWidth, sourceHeight, upscale: Infinity, retained: 0, usable: false };
+  }
+  const upscale = Math.max(box.w / sourceWidth, box.h / sourceHeight);
+  const retained = Math.min(1, (box.w * box.h) / (sourceWidth * sourceHeight * upscale * upscale));
+  return { sourceWidth, sourceHeight, upscale, retained,
+    usable: upscale <= SOFT_UPSCALE && retained >= MIN_PHOTO_RETAINED };
+}
+
+/* A manual focal point is measured where it actually crops, not credited
+   with the automatic crop's score. Saliency is a framing aid, not a face or
+   legal-content detector, so this score never certifies subject identity. */
+export function focalCoverage(img, box, focal) {
+  const a = analyzeImage(img);
+  if (!a.ok || !(a.total > 0)) return null;
+  const scale = Math.max(box.w / img.width, box.h / img.height);
+  const spanX = Math.min(1, box.w / (img.width * scale));
+  const spanY = Math.min(1, box.h / (img.height * scale));
+  const fx = Number.isFinite(focal && focal.x) ? focal.x : 0.5;
+  const fy = Number.isFinite(focal && focal.y) ? focal.y : 0.42;
+  const left = Math.max(0, Math.min(1 - spanX, fx - spanX / 2)) * a.w;
+  const top = Math.max(0, Math.min(1 - spanY, fy - spanY / 2)) * a.h;
+  const right = left + spanX * a.w, bottom = top + spanY * a.h;
+  let mass = 0;
+  for (let y = Math.floor(top); y < Math.ceil(bottom); y++) {
+    for (let x = Math.floor(left); x < Math.ceil(right); x++) {
+      if (x < 0 || x >= a.w || y < 0 || y >= a.h) continue;
+      const shareX = Math.max(0, Math.min(x + 1, right) - Math.max(x, left));
+      const shareY = Math.max(0, Math.min(y + 1, bottom) - Math.max(y, top));
+      mass += a.sal[y * a.w + x] * shareX * shareY;
+    }
+  }
+  return Math.max(0, Math.min(1, mass / a.total));
+}
+
+/* Keep the complete photograph, at no more than its native resolution.
+   The remaining space belongs to the layout's solid field. It is never
+   filled by stretching, mirroring or blurring the photograph. */
+export function containPhotoBox(img, slot) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const scale = Math.min(1, slot.w / iw, slot.h / ih);
+  const w = iw * scale, h = ih * scale;
+  return { x: slot.x + (slot.w - w) / 2, y: slot.y + (slot.h - h) / 2, w, h };
 }
 
 /* =====================================================================
@@ -785,61 +885,80 @@ export function pill(ctx, x, y, w, h) {
   roundRect(ctx, x, y, w, h, h / 2);
 }
 
-const PLUS_TEAL = ["plus-teal-1", "plus-teal-2", "plus-teal-3", "plus-teal-4"];
-const PLUS_PURPLE = ["plus-purple-1", "plus-purple-2", "plus-purple-3", "plus-purple-4"];
-function plusFile(color, i) {
-  const set = color === "blue" ? PLUS_PURPLE : PLUS_TEAL;
-  return `assets/${set[((i % set.length) + set.length) % set.length]}.svg`;
+/* Layouts may use an angled seam or a circular crop, but the photograph is
+   still the same editable source. Keeping the clipping shape in the plan
+   means every format is rebuilt rather than flattening a reference image. */
+function tracePolygon(ctx, points) {
+  if (!points || points.length < 3) return false;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+  ctx.closePath();
+  return true;
 }
-async function drawProfessionals(ctx, color, i, cx, cy, size, rotDeg) {
-  return;
-  const img = await loadImg(plusFile(color, i));
-  const w = size, h = size * (img.height / img.width);
+
+function polygonArea(points) {
+  return Math.abs(points.reduce((sum, p, i) => {
+    const next = points[(i + 1) % points.length];
+    return sum + p.x * next.y - next.x * p.y;
+  }, 0)) / 2;
+}
+
+function pointInPolygon(point, points) {
+  let inside = false;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const a = points[i], b = points[j];
+    if (((a.y > point.y) !== (b.y > point.y))
+      && point.x < (b.x - a.x) * (point.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
+
+const HIGHLIGHTER_FILES = {
+  straight: "assets/highlighters/IS24_Straight_Highlighter_01.svg",
+  underline: "assets/highlighters/IS24_Underline_01.svg",
+  arrow: "assets/highlighters/IS24_Arrow_03.svg",
+  rise: "assets/highlighters/IS24_Arrow_uprising_01.svg",
+};
+
+/* The supplied SVG remains the silhouette master. Recolouring happens on an
+   offscreen canvas with source-in, so the artwork is never redrawn or warped. */
+async function drawTintedHighlighter(ctx, kind, colour, box, rotation, safeBounds) {
+  const src = HIGHLIGHTER_FILES[kind];
+  if (!src || !box || !(box.w > 0)) return null;
+  const img = await loadImg(src);
+  let dw = box.w;
+  let dh = dw * (img.height / img.width);
+  if (box.maxH && dh > box.maxH) {
+    const s = box.maxH / dh;
+    dw *= s; dh *= s;
+  }
+  const radians = (rotation || 0) * Math.PI / 180;
+  const cos = Math.abs(Math.cos(radians)), sin = Math.abs(Math.sin(radians));
+  if (safeBounds) {
+    const scale = Math.min(1, safeBounds.w / (dw * cos + dh * sin), safeBounds.h / (dw * sin + dh * cos));
+    dw *= scale; dh *= scale;
+  }
+  const off = document.createElement("canvas");
+  off.width = Math.max(2, Math.round(dw));
+  off.height = Math.max(2, Math.round(dh));
+  const ox = off.getContext("2d");
+  ox.drawImage(img, 0, 0, off.width, off.height);
+  ox.globalCompositeOperation = "source-in";
+  ox.fillStyle = colour;
+  ox.fillRect(0, 0, off.width, off.height);
+  const boundsW = dw * cos + dh * sin, boundsH = dw * sin + dh * cos;
+  let cx = box.x + box.w / 2, cy = box.y + (box.h || dh) / 2;
+  if (safeBounds) {
+    cx = Math.max(safeBounds.x + boundsW / 2, Math.min(safeBounds.x + safeBounds.w - boundsW / 2, cx));
+    cy = Math.max(safeBounds.y + boundsH / 2, Math.min(safeBounds.y + safeBounds.h - boundsH / 2, cy));
+  }
   ctx.save();
   ctx.translate(cx, cy);
-  if (rotDeg) ctx.rotate(Math.max(-BRAND.plusMaxRotation, Math.min(BRAND.plusMaxRotation, rotDeg)) * Math.PI / 180);
-  ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  if (rotation) ctx.rotate(radians);
+  ctx.drawImage(off, -dw / 2, -dh / 2, dw, dh);
   ctx.restore();
-}
-async function drawPhotoInProfessionals(ctx, photoImg, color, i, box, focal) {
-  const glyph = await loadImg(plusFile(color, i));
-  const off = document.createElement("canvas");
-  off.width = Math.max(2, Math.round(box.w));
-  off.height = Math.max(2, Math.round(box.h));
-  const o = off.getContext("2d");
-  const gh = off.width * (glyph.height / glyph.width);
-  o.drawImage(glyph, 0, (off.height - gh) / 2, off.width, gh);
-  o.globalCompositeOperation = "source-in";
-  const scale = drawPhoto(o, photoImg, { x: 0, y: 0, w: off.width, h: off.height }, focal);
-  ctx.drawImage(off, box.x, box.y);
-  return scale;
-}
-
-/* THE PLUS AS A TEXTURE.
-
-   The brand allows a low density Professionals pattern as background texture, and
-   forbids it behind body text. Both halves matter, so the tile skips a
-   clearance rectangle around the copy: the field stays one flat colour there,
-   which is an absence of texture rather than a block behind the words. */
-async function drawProfessionalsPattern(ctx, rect, color, cell, alpha, clear) {
-  return;
-  const img = await loadImg(plusFile(color, 0));
-  const ar = img.height / img.width;
-  const size = cell * 0.44;
-  ctx.save();
-  ctx.beginPath(); ctx.rect(rect.x, rect.y, rect.w, rect.h); ctx.clip();
-  ctx.globalAlpha = alpha;
-  let row = 0;
-  for (let y = rect.y - cell; y < rect.y + rect.h + cell; y += cell, row++) {
-    const off = row % 2 ? cell / 2 : 0;
-    for (let x = rect.x - cell; x < rect.x + rect.w + cell; x += cell) {
-      const cx = x + off;
-      if (clear && cx + size > clear.x - cell * 0.3 && cx < clear.x + clear.w + cell * 0.3 &&
-          y + size * ar > clear.y - cell * 0.3 && y < clear.y + clear.h + cell * 0.3) continue;
-      ctx.drawImage(img, cx, y, size, size * ar);
-    }
-  }
-  ctx.restore();
+  return { x: cx - boundsW / 2, y: cy - boundsH / 2, w: boundsW, h: boundsH };
 }
 
 /* A small deterministic generator. Seeded from the placement so a composition
@@ -1005,25 +1124,27 @@ function ensureContrast(ctx, backdrop, rect, textHex, target, w, h) {
 
 /* =====================================================================
    5. STYLES
-   Six structural ideas, each with designed geometry for every aspect
+   Three approved visual families, expressed through four structural planners,
+   each with designed geometry for every aspect
    class. A style never "fails at this size": it has an answer for banner,
    wide, square, tall and story, and the copy is measured before the
    geometry is fixed, so the panel is built around the words rather than
    the words being crushed into a panel.
    ===================================================================== */
 export const LAYOUTS = [
-  { id: "anchor",    label: "Anchored block", blurb: "Photograph above a solid colour block that is sized to the words. The workhorse: survives every crop and reads at any size." },
   { id: "editorial", label: "Editorial split", blurb: "Photograph and colour field meet on one hard edge, with a kicker above the headline. Magazine structure." },
-  { id: "frame",     label: "Floating card",  blurb: "Full-bleed photograph with a solid card set inside the safe area. The most air of the seven." },
   { id: "fullbleed", label: "Full bleed",     blurb: "Nothing but the photograph, with the words set straight onto it. The picture is darkened or lightened until every line clears 4.5:1, and never with a block behind the text." },
-  { id: "panel",     label: "Colour field",   blurb: "Colour leads and the photograph becomes an inset panel. The answer when a hard crop would ruin the picture." },
-  { id: "mosaic",    label: "Modular grid",   blurb: "A grid of squares: some hold the photograph, some hold flat accent, and the copy runs through a clear channel. Seeded per placement, so every size in a set gets its own arrangement." },
   { id: "poster",    label: "Poster",         blurb: "Headline on top, a full-width band of photograph under it, button and mark on a footer line. Three tiers, read top to bottom." },
   { id: "statement", label: "Typography only",blurb: "No photograph. The headline carries the composition with a clear hierarchy and generous space." },
 ];
 /* Old ids kept working, so saved sessions and filenames do not break. */
-const LAYOUT_ALIAS = { band: "anchor", split: "editorial", card: "frame", field: "panel", mask: "cutout", type: "statement", bleed: "fullbleed", grid: "mosaic" };
-export function normaliseLayout(id) { return LAYOUT_ALIAS[id] || id || "anchor"; }
+const LAYOUT_ALIAS = {
+  band: "editorial", anchor: "editorial", split: "editorial",
+  card: "editorial", frame: "editorial", field: "editorial", panel: "editorial",
+  mask: "fullbleed", cutout: "fullbleed", grid: "editorial", mosaic: "editorial",
+  gallery: "editorial", type: "statement", bleed: "fullbleed",
+};
+export function normaliseLayout(id) { return LAYOUT_ALIAS[id] || id || "editorial"; }
 
 /* THE STRUCTURES NOBODY PICKS. Three compositions exist that are not in the
    library above, because they are not choices: the engine reaches for them
@@ -1047,28 +1168,10 @@ export function structureLabel(id) {
 
 /* THE DESIGN LIBRARY.
 
-   A design is a structure plus the decisions taken inside it: which side the
-   colour field takes, where the seam sits, how dense the grid is. Nine
-   structures with those decisions fixed is nine designs; nine structures with
-   the decisions opened up is twenty-six, and twenty-six is enough that a team
-   can run a new one every campaign for most of a year without repeating
-   itself.
-
-   WHY NOT MORE, WHICH IS THE QUESTION EVERYONE ASKS SECOND. Crossing every
-   parameter with every other one enumerates thirty-two. The six that are not
-   here are absent on purpose: each renders identically to a design that is
-   already in the list, so shipping them would pad the count and give a team
-   nothing new to run.
-
-     - `editorial` reads `copy` only on a letterbox, banner or square, and
-       `seam` only on a portrait or story. The two are on opposite sides of
-       the same branch and never bind in one frame, so a design carrying both
-       is `editorial-left` at the first three shapes and `editorial-high` or
-       `editorial-low` at the other two, and never a sixth thing.
-     - `mosaic` keeps one row either side of its copy channel, which gives the
-       high, middle and low variants genuinely different weight at every
-       shipped size. The channel × density crossings are therefore real
-       creative choices, not duplicate names.
+   Professionals uses only typography, split screens and full bleed imagery.
+   Every public design below is one executable variation of those three
+   families. Circular crops, modular grids, inset photographs and floating
+   cards are deliberately absent from the library.
 
    ONE DESIGN PER SET. Every placement in a campaign shares it, so the set
    reads as one campaign rather than a shelf of samples. The variety belongs
@@ -1079,34 +1182,18 @@ export function structureLabel(id) {
    marks what has run, and offers what has not. Nothing is deleted; a retired
    design can be chosen again deliberately, it just stops being suggested. */
 export const DESIGNS = [
-  { id: "anchor-bottom",     style: "anchor",    params: {},                          label: "Anchored block",            note: "Photograph above a solid block sized to the words. The workhorse." },
-  { id: "anchor-top",        style: "anchor",    params: { side: "top" },             label: "Anchored block, inverted",  note: "The block on top, the photograph running out beneath it." },
-  { id: "anchor-left",       style: "anchor",    params: { side: "left" },            label: "Anchored block, left",      note: "On a letterbox, the colour column takes the left." },
-  { id: "editorial-right",   style: "editorial", params: {},                          label: "Editorial split",           note: "Hard vertical edge, photograph left, kicker above the headline." },
-  { id: "editorial-left",    style: "editorial", params: { copy: "left" },            label: "Editorial split, mirrored", note: "The same edge with the words on the left." },
-  { id: "editorial-high",    style: "editorial", params: { seam: "high" },            label: "Editorial, high seam",      note: "On a portrait the seam sits high, giving the words the larger half." },
-  { id: "editorial-low",     style: "editorial", params: { seam: "low" },             label: "Editorial, low seam",       note: "The seam drops, the photograph takes the frame." },
-  { id: "frame-bottom",      style: "frame",     params: {},                          label: "Floating card",             note: "Full-bleed photograph, solid card low in the safe area." },
-  { id: "frame-top",         style: "frame",     params: { card: "top" },             label: "Floating card, high",       note: "The card at the top, the subject framed below it." },
-  { id: "fullbleed-bottom",  style: "fullbleed", params: {},                          label: "Full bleed",                note: "Words straight on the picture, low. Veiled until they clear 4.5:1." },
-  { id: "fullbleed-top",     style: "fullbleed", params: { copy: "top" },             label: "Full bleed, high",          note: "The lockup at the top, the subject held in the lower half." },
-  { id: "fullbleed-middle",  style: "fullbleed", params: { copy: "middle" },          label: "Full bleed, centred",       note: "Centred on the picture. The most poster-like of the three." },
-  { id: "panel-top",         style: "panel",     params: {},                          label: "Colour field",              note: "Colour leads, the photograph is an inset panel above the words." },
-  { id: "panel-bottom",      style: "panel",     params: { photo: "bottom" },         label: "Colour field, inverted",    note: "Words first, the photograph panel beneath them." },
-  { id: "panel-left",        style: "panel",     params: { photo: "left" },           label: "Colour field, panel left",  note: "On a letterbox the panel takes the left." },
-  { id: "mosaic-mid",        style: "mosaic",    params: {},                          label: "Modular grid",              note: "Squares on a field, the words running through a clear channel." },
-  { id: "mosaic-high",       style: "mosaic",    params: { channel: "high" },         label: "Modular grid, high channel",note: "The channel near the top, the grid weighted below it." },
-  { id: "mosaic-low",        style: "mosaic",    params: { channel: "low" },          label: "Modular grid, low channel", note: "The channel near the foot, the grid stacked above." },
-  { id: "mosaic-dense",      style: "mosaic",    params: { density: "dense" },        label: "Modular grid, dense",       note: "Most cells filled. Closest to a printed schedule." },
-  { id: "mosaic-sparse",     style: "mosaic",    params: { density: "sparse" },       label: "Modular grid, sparse",      note: "A handful of cells and a lot of air." },
-  { id: "mosaic-high-dense", style: "mosaic",    params: { channel: "high", density: "dense" }, label: "Modular grid, high & dense", note: "A headline near the top with a busy image field below." },
-  { id: "mosaic-high-sparse",style: "mosaic",    params: { channel: "high", density: "sparse" }, label: "Modular grid, high & sparse", note: "A high copy channel with plenty of breathing room." },
-  { id: "mosaic-low-dense",  style: "mosaic",    params: { channel: "low", density: "dense" }, label: "Modular grid, low & dense", note: "A dense editorial grid weighted above the message." },
-  { id: "mosaic-low-sparse", style: "mosaic",    params: { channel: "low", density: "sparse" }, label: "Modular grid, low & sparse", note: "A quiet grid with the message held near the foot." },
-  { id: "poster-type-first", style: "poster",    params: {},                          label: "Poster",                    note: "Headline, band of photograph, footer line with the mark and button." },
-  { id: "poster-photo-first",style: "poster",    params: { order: "photo-first" },    label: "Poster, picture first",     note: "The picture opens, the line explains it, the footer closes." },
-  { id: "statement-top",     style: "statement", params: {},                          label: "Typography only",           note: "No photograph. The headline carries the frame at full scale." },
-  { id: "statement-middle",  style: "statement", params: { align: "middle" },         label: "Typography, centred",       note: "The same, held in the middle of the frame." },
+  { id: "editorial-vertical",style: "editorial", params: { copy: "left", axis: "vertical" }, label: "Hard vertical split", note: "A vertical message field and photograph at every social ratio." },
+  { id: "editorial-angle-left", style: "editorial", params: { copy: "left", angled: true }, label: "Angled split", note: "A sloped seam gives the message field and photograph different weight." },
+  { id: "editorial-angle-right", style: "editorial", params: { copy: "right", angled: true }, label: "Angled split, mirrored", note: "The angled seam mirrored with the message on the right." },
+  { id: "fullbleed-negative-space", style: "fullbleed", params: { copy: "top", negativeSpace: "left", highlight: "underline", highlightColour: "blue" }, label: "Negative space portrait", note: "The person is held to one side and the message uses the clear side of the photograph." },
+  { id: "fullbleed-impact", style: "fullbleed", params: { copy: "top", impact: true, highlight: "straight", highlightColour: "teal" }, label: "Oversized photo message", note: "Oversized sentence case type and one approved highlighter sit directly on the photograph." },
+  { id: "poster-angle-type-first", style: "poster", params: { angled: true }, label: "Angled message cap", note: "A large message field cuts diagonally into the photograph below." },
+  { id: "poster-angle-photo-first", style: "poster", params: { order: "photo-first", angled: true }, label: "Angled image cap", note: "The photograph opens the composition with an angled edge into the message." },
+  { id: "statement-impact",  style: "statement", params: { impact: true, highlight: "straight", highlightColour: "blue" }, label: "Type statement", note: "A bold type led frame with one highlighted line and generous open space." },
+  { id: "editorial-horizontal", style: "editorial", params: { axis: "horizontal" }, label: "Hard horizontal split", note: "The photograph fills the upper section; a solid message field closes the composition." },
+  { id: "fullbleed-lower-caption", style: "fullbleed", params: { copy: "bottom", caption: true }, label: "Quiet photo caption", note: "A restrained caption at the lower left gives the photograph room to lead." },
+  { id: "statement-centred", style: "statement", params: { align: "middle", textAlign: "center", restrained: true }, label: "Centred statement", note: "A centred benefit, supporting sentence and logo with generous surrounding space." },
+  { id: "statement-underline", style: "statement", params: { align: "bottom", highlight: "underline", highlightColour: "teal" }, label: "Underlined statement", note: "A statement anchored low in the frame with one supplied underline." },
 ];
 
 export function designById(id) {
@@ -1148,7 +1235,7 @@ export function freshDesigns(usedIds) {
    it is cut, so no picture is disqualified. It has designed geometry for every
    aspect class, and it is the one photographic style that adds no Professionals glyph
    of its own, because the photograph has already been cut into one. */
-export const ROTATION_POOL = ["anchor", "editorial", "frame", "fullbleed", "panel", "mosaic", "poster"];
+export const ROTATION_POOL = ["editorial", "fullbleed", "poster"];
 
 export function rotationSet(count, seed, pool) {
   const src = (pool && pool.length ? pool : ROTATION_POOL).slice();
@@ -1216,8 +1303,7 @@ const STYLE_PLANNERS = {
         photo: left ? { x: fieldW, y: 0, w: w - fieldW, h } : { x: 0, y: 0, w: fieldX, h },
         inner: { x: innerX, y: C.y, w: colW, h: C.h },
         vAlign: "center",
-        plusses: [{ color: G.band.id === "teal" ? "purple" : "teal", i: 0,
-                    cx: left ? fieldW : fieldX, cy: h * 0.15, size: Math.min(w, h) * 0.16, rot: -12 }],
+        plusses: [],
       });
     }
 
@@ -1236,9 +1322,7 @@ const STYLE_PLANNERS = {
         photo: { x: 0, y: fieldBot, w, h: Math.max(1, h - fieldBot) },
         inner: { x: C.x, y: C.y, w: colW0, h: fieldBot - pad - C.y },
         vAlign: "top", stack: stack0, logo: logo0,
-        plusses: [{ color: G.band.id === "teal" ? "purple" : "teal", i: 0,
-                    cx: w - Math.max(safe.right, tk.ref * 0.045) - Math.min(w, h) * 0.075,
-                    cy: fieldBot, size: Math.min(w, h) * 0.15, rot: -12 }],
+        plusses: [],
       });
     }
 
@@ -1277,9 +1361,7 @@ const STYLE_PLANNERS = {
       focalTargetY: story ? Math.max(0.16, Math.min(0.46, (fieldTop * 0.52) / h)) : undefined,
       inner: { x: C.x, y: fieldTop + pad, w: colW, h: bottom - (fieldTop + pad) },
       vAlign: "top", stack, logo,
-      plusses: [{ color: G.band.id === "teal" ? "purple" : "teal", i: 0,
-                  cx: w - Math.max(safe.right, tk.ref * 0.045) - Math.min(w, h) * 0.075,
-                  cy: fieldTop, size: Math.min(w, h) * 0.15, rot: -12 }],
+      plusses: [],
     });
   },
 
@@ -1289,6 +1371,66 @@ const STYLE_PLANNERS = {
     const C = contentRect(w, h, safe, tk);
     const pad = tk.pad;
     const dp = G.dp || {};
+    if (dp.axis === "horizontal") {
+      const seam = Math.round(C.y + C.h * 0.46);
+      return blockPlan(G, fit, {
+        field: { x: 0, y: seam, w, h: h - seam },
+        photo: { x: 0, y: 0, w, h: seam },
+        inner: { x: C.x, y: seam + pad, w: C.w, h: C.y + C.h - seam - pad },
+        vAlign: "center", tightLines: 3, logoPhotoCorner: "top-right", plusses: [],
+      });
+    }
+    /* Portrait placements need a wide photographic area. A narrow side crop
+       would discard most landscape source images, so vertical and angled
+       concepts become a top/bottom split while keeping their seam character. */
+    if ((cls === "story" || cls === "tall") && (dp.angled || dp.axis === "vertical")) {
+      const seam = Math.round(h * 0.48);
+      const sweep = dp.angled ? Math.round(Math.min(w * 0.07, h * 0.055)) : 0;
+      const risesRight = dp.copy !== "right";
+      const seamLeft = seam + (risesRight ? sweep : -sweep);
+      const seamRight = seam - (risesRight ? sweep : -sweep);
+      const photoBottom = Math.max(seamLeft, seamRight);
+      const copyTop = Math.max(seamLeft, seamRight) + pad;
+      return blockPlan(G, fit, {
+        field: { x: 0, y: 0, w, h },
+        photo: { x: 0, y: 0, w, h: photoBottom },
+        photoClip: [{ x: 0, y: 0 }, { x: w, y: 0 }, { x: w, y: seamRight }, { x: 0, y: seamLeft }],
+        inner: { x: C.x, y: copyTop, w: C.w, h: C.y + C.h - copyTop },
+        vAlign: "center", kicker: true,
+        focalTargetX: risesRight ? 0.62 : 0.38,
+        logoPhotoCorner: risesRight ? "top-right" : "top-left",
+        plusses: [],
+      });
+    }
+    /* On wider placements the references use a vertical split, plus a true
+       angled alternative. Both are geometry, not a decorative stripe: the
+       photograph is clipped to one side and the field owns the other. */
+    if (dp.angled || dp.axis === "vertical") {
+      const left = dp.copy !== "right";
+      const fieldShare = cls === "story" ? 0.66 : cls === "tall" ? 0.61
+        : cls === "square" ? 0.55 : 0.49;
+      const seam = Math.round(w * (left ? fieldShare : 1 - fieldShare));
+      const sweep = dp.angled ? Math.round(Math.min(w * 0.09, h * 0.12)) : 0;
+      const seamTop = seam + (left ? sweep : -sweep);
+      const seamBottom = seam - (left ? sweep : -sweep);
+      const narrow = left ? Math.min(seamTop, seamBottom) : Math.max(seamTop, seamBottom);
+      const photo = left
+        ? { x: Math.max(0, Math.min(seamTop, seamBottom)), y: 0, w: w - Math.max(0, Math.min(seamTop, seamBottom)), h }
+        : { x: 0, y: 0, w: Math.min(w, Math.max(seamTop, seamBottom)), h };
+      const photoClip = left
+        ? [{ x: seamTop, y: 0 }, { x: w, y: 0 }, { x: w, y: h }, { x: seamBottom, y: h }]
+        : [{ x: 0, y: 0 }, { x: seamTop, y: 0 }, { x: seamBottom, y: h }, { x: 0, y: h }];
+      const inner = left
+        ? { x: C.x, y: C.y, w: narrow - C.x - pad * 1.05, h: C.h }
+        : { x: narrow + pad * 1.05, y: C.y, w: C.x + C.w - narrow - pad * 1.05, h: C.h };
+      return blockPlan(G, fit, {
+        field: { x: 0, y: 0, w, h }, photo, photoClip, inner,
+        vAlign: "center", kicker: true,
+        focalTargetX: left ? 0.74 : 0.26,
+        logoPhotoCorner: left ? "bottom-right" : "bottom-left",
+        plusses: [],
+      });
+    }
     if (cls === "wide" || cls === "banner" || cls === "square") {
       const colW = Math.round(C.w * (cls === "square" ? 0.52 : 0.48));
       const left = dp.copy === "left";
@@ -1299,9 +1441,7 @@ const STYLE_PLANNERS = {
         photo: left ? { x: split, y: 0, w: w - split, h } : { x: 0, y: 0, w: split, h },
         inner: { x: innerX, y: C.y, w: colW, h: C.h },
         vAlign: "center", kicker: true,
-        plusses: [{ color: G.band.id === "blue" ? "teal" : "blue", i: 2,
-                    cx: left ? Math.min(w, h) * 0.05 : w - Math.min(w, h) * 0.05,
-                    cy: h - Math.min(w, h) * 0.07, size: Math.min(w, h) * 0.28, rot: 14 }],
+        plusses: [],
       });
     }
     /* Tall and story: the seam runs horizontally, high enough that the
@@ -1313,8 +1453,7 @@ const STYLE_PLANNERS = {
       photo: { x: 0, y: 0, w, h: seam },
       inner: { x: C.x, y: Math.max(seam + pad, C.y), w: C.w, h: (C.y + C.h) - Math.max(seam + pad, C.y) },
       vAlign: "top", kicker: true,
-      plusses: [{ color: G.band.id === "blue" ? "teal" : "blue", i: 2,
-                  cx: w - Math.min(w, h) * 0.06, cy: seam, size: Math.min(w, h) * 0.22, rot: 14 }],
+      plusses: [],
     });
   },
 
@@ -1356,8 +1495,7 @@ const STYLE_PLANNERS = {
       focalTargetY: dp.card === "top"
         ? Math.max(0.54, Math.min(0.86, (cy + cardH + (h - cy - cardH) / 2) / h))
         : Math.max(0.18, Math.min(0.46, (cy * 0.55) / h)),
-      plusses: [{ color: G.band.id === "teal" ? "purple" : "teal", i: 1,
-                  cx: cx + cardW, cy: cy, size: Math.min(w, h) * 0.16, rot: -18 }],
+      plusses: [],
     });
   },
 
@@ -1367,27 +1505,40 @@ const STYLE_PLANNERS = {
     const C = contentRect(w, h, safe, tk);
     const pad = tk.pad;
     const r = Math.round(tk.ref * 0.035);
+    const dp = G.dp || {};
+    if (dp.photo === "sliver") {
+      const seamTop = Math.round(w * (cls === "wide" || cls === "banner" ? 0.68 : 0.73));
+      const seamBottom = Math.round(w * (cls === "wide" || cls === "banner" ? 0.58 : 0.64));
+      const photo = { x: seamBottom, y: 0, w: w - seamBottom, h };
+      return blockPlan(G, fit, {
+        field: { x: 0, y: 0, w, h },
+        photo,
+        photoClip: [{ x: seamTop, y: 0 }, { x: w, y: 0 }, { x: w, y: h }, { x: seamBottom, y: h }],
+        inner: { x: C.x, y: C.y, w: seamBottom - C.x - pad * 1.2, h: C.h },
+        vAlign: "top", bigType: true, startScale: 1.42, tightLines: 4, maxCPL: 18,
+        focalTargetX: 0.72, logoPhotoCorner: "bottom-right",
+        plusses: [],
+      });
+    }
     if (cls === "wide" || cls === "banner") {
-      const dp1 = G.dp || {};
       const pw = Math.round(C.w * 0.40);
-      const pLeft = dp1.photo === "left";
+      const pLeft = dp.photo === "left";
       const photo = { x: pLeft ? C.x : C.x + C.w - pw, y: C.y, w: pw, h: C.h, r };
       const inner = { x: pLeft ? C.x + pw + pad * 1.2 : C.x, y: C.y, w: C.w - pw - pad * 1.2, h: C.h };
       return blockPlan(G, fit, {
         field: { x: 0, y: 0, w, h }, photo, photoRound: true, inner, vAlign: "center",
-        plusses: [{ color: G.band.id === "blue" ? "teal" : "blue", i: 3, cx: photo.x, cy: photo.y + photo.h, size: Math.min(w, h) * 0.17, rot: 16 }],
+        plusses: [],
       });
     }
-    const dp2 = G.dp || {};
     const ph = Math.round(C.h * (cls === "story" ? 0.44 : 0.50));
-    const low = dp2.photo === "bottom";
+    const low = dp.photo === "bottom";
     const photo = { x: C.x, y: low ? C.y + C.h - ph : C.y, w: C.w, h: ph, r };
     const inner = low
       ? { x: C.x, y: C.y, w: C.w, h: (C.y + C.h - ph - pad * 1.2) - C.y }
       : { x: C.x, y: C.y + ph + pad * 1.2, w: C.w, h: (C.y + C.h) - (C.y + ph + pad * 1.2) };
     return blockPlan(G, fit, {
       field: { x: 0, y: 0, w, h }, photo, photoRound: true, inner, vAlign: low ? "bottom" : "top",
-      plusses: [{ color: G.band.id === "blue" ? "teal" : "blue", i: 3, cx: photo.x, cy: low ? photo.y : photo.y + photo.h, size: Math.min(w, h) * 0.16, rot: 16 }],
+      plusses: [],
     });
   },
 
@@ -1399,6 +1550,33 @@ const STYLE_PLANNERS = {
     const { w, h, safe, tk, cls } = G;
     const C = contentRect(w, h, safe, tk);
     const pad = tk.pad;
+    const dpc = G.dp || {};
+    if (dpc.circle) {
+      if (cls === "wide" || cls === "banner" || cls === "square") {
+        const side = Math.min(C.h * 0.82, C.w * 0.43);
+        const photo = { x: C.x + C.w - side, y: C.y + (C.h - side) / 2, w: side, h: side };
+        return blockPlan(G, fit, {
+          field: { x: 0, y: 0, w, h }, photo, photoEllipse: true,
+          inner: { x: C.x, y: C.y, w: C.w * 0.46, h: C.h },
+          vAlign: "center", bigType: true, startScale: 1.40, tightLines: 3, maxCPL: 18,
+          decorations: dpc.arrow ? [{ kind: "rise", colour: "teal", box: {
+            x: C.x + C.w * 0.48, y: C.y + C.h * 0.43, w: C.w * 0.11, h: C.h * 0.18,
+          } }] : [],
+          plusses: [],
+        });
+      }
+      const side = Math.min(C.w * 0.66, C.h * 0.43);
+      const photo = { x: C.x + C.w - side, y: C.y + C.h - side, w: side, h: side };
+      return blockPlan(G, fit, {
+        field: { x: 0, y: 0, w, h }, photo, photoEllipse: true,
+        inner: { x: C.x, y: C.y, w: C.w * 0.84, h: C.h * 0.48 },
+        vAlign: "top", bigType: true, startScale: 1.36, tightLines: 3, maxCPL: 18,
+        decorations: dpc.arrow ? [{ kind: "rise", colour: "teal", box: {
+          x: C.x + C.w * 0.10, y: C.y + C.h * 0.54, w: C.w * 0.21, h: C.h * 0.16,
+        } }] : [],
+        plusses: [],
+      });
+    }
     if (cls === "wide" || cls === "banner") {
       const side = Math.min(C.w * 0.42, C.h);
       const photo = { x: C.x + C.w - side, y: C.y + (C.h - side) / 2, w: side, h: side };
@@ -1408,7 +1586,6 @@ const STYLE_PLANNERS = {
         vAlign: "center",
       });
     }
-    const dpc = G.dp || {};
     const side = Math.min(C.w * 0.86, C.h * 0.46);
     const low = dpc.mask === "bottom";
     const photo = { x: C.x + (C.w - side) / 2, y: low ? C.y + C.h - side : C.y, w: side, h: side };
@@ -1421,6 +1598,35 @@ const STYLE_PLANNERS = {
     });
   },
 
+  /* A simple editorial mat respects the photograph's own ratio. These four
+     recipes also provide the repair geometry when a cover crop would lose
+     the subject or need an unacceptably soft enlargement. */
+  gallery(G, fit) {
+    const { w, h, safe, tk } = G;
+    const C = contentRect(w, h, safe, tk);
+    const gap = tk.gutter;
+    const direction = (G.dp || {}).gallery || (C.w > C.h * 1.25 ? "right" : "top");
+    const vertical = direction === "top" || direction === "bottom";
+    let photo, inner;
+    if (vertical) {
+      const ph = Math.max(1, (C.h - gap) * 0.46);
+      const photoFirst = direction === "top";
+      photo = { x: C.x, y: photoFirst ? C.y : C.y + C.h - ph, w: C.w, h: ph };
+      inner = { x: C.x, y: photoFirst ? C.y + ph + gap : C.y, w: C.w, h: C.h - ph - gap };
+    } else {
+      const pw = Math.max(1, (C.w - gap) * 0.43);
+      const photoFirst = direction === "left";
+      photo = { x: photoFirst ? C.x : C.x + C.w - pw, y: C.y, w: pw, h: C.h };
+      inner = { x: photoFirst ? C.x + pw + gap : C.x, y: C.y, w: C.w - pw - gap, h: C.h };
+    }
+    return blockPlan(G, fit, {
+      field: { x: 0, y: 0, w, h }, photo, photoContain: true, inner,
+      vAlign: "center", tightLines: 4, maxCPL: vertical ? 30 : 22,
+      textAlign: safe.centreBias ? "center" : undefined,
+      logoPhotoCorner: direction === "left" ? "bottom-left" : "bottom-right", plusses: [],
+    });
+  },
+
   /* ---- Full bleed ------------------------------------------------------
      The photograph is the whole design. No field, no card, no block behind
      the words. Legibility comes from the picture itself being veiled where
@@ -1428,25 +1634,39 @@ const STYLE_PLANNERS = {
   fullbleed(G, fit) {
     const { w, h, safe, tk, cls } = G;
     const C = contentRect(w, h, safe, tk);
+    const dp = G.dp || {};
+    const impact = !!dp.impact;
     if (cls === "wide" || cls === "banner") {
       /* Words in one half, picture readable in the other. */
-      const colW = Math.round(C.w * 0.52);
+      const colW = Math.round(C.w * (dp.caption ? 0.60 : impact ? 0.47 : 0.52));
       return blockPlan(G, fit, {
         photo: { x: 0, y: 0, w, h },
         inner: { x: C.x, y: C.y, w: colW, h: C.h },
-        vAlign: "center", autoPolarity: true,
+        vAlign: dp.caption ? "bottom" : "center", autoPolarity: true,
+        copyOverPhoto: true, logoOnPhoto: true, logoPhotoCorner: "bottom-right",
+        bigType: impact, startScale: dp.caption ? 0.82 : impact ? 1.50 : undefined,
+        tightLines: impact ? 3 : undefined, maxCPL: impact ? 18 : 28,
+        highlight: dp.highlight ? { kind: dp.highlight, colour: dp.highlightColour || "teal", line: "shortest" } : null,
         focalTargetX: Math.min(0.82, (C.x + colW + (w - C.x - colW) / 2) / w),
       });
     }
     /* Portrait, square and story: the lockup sits low by default, the way a
        poster does, and the subject is framed into the clear part away from it. */
-    const dp = G.dp || {};
-    const colW = Math.round(Math.min(C.w, tk.ideal * 11));
-    const at = dp.copy === "top" ? "top" : dp.copy === "middle" ? "center" : "bottom";
+    const colW = dp.caption ? Math.round(C.w * 0.76) : impact
+      ? Math.round(C.w * 0.78)
+      : dp.negativeSpace ? Math.round(C.w * 0.57)
+      : Math.round(Math.min(C.w, tk.ideal * 11));
+    const at = impact || dp.copy === "top" ? "top" : dp.copy === "middle" ? "center" : "bottom";
     return blockPlan(G, fit, {
       photo: { x: 0, y: 0, w, h },
       inner: { x: C.x, y: C.y, w: colW, h: C.h },
       vAlign: at, autoPolarity: true,
+      copyOverPhoto: true, logoOnPhoto: true, logoPhotoCorner: "bottom-right",
+      bigType: impact, startScale: dp.caption ? 0.82 : impact ? 1.50 : undefined,
+      tightLines: impact ? 3 : undefined,
+      maxCPL: impact ? 18 : dp.negativeSpace ? 24 : undefined,
+      highlight: dp.highlight ? { kind: dp.highlight, colour: dp.highlightColour || "teal", line: impact ? "shortest" : "last" } : null,
+      focalTargetX: dp.negativeSpace || impact ? 0.76 : undefined,
       focalTargetY: at === "top" ? (cls === "story" ? 0.70 : 0.66)
                   : at === "center" ? 0.5
                   : (cls === "story" ? 0.30 : 0.34),
@@ -1525,33 +1745,63 @@ const STYLE_PLANNERS = {
     const pad = tk.pad;
     const logo = v.logo && G.logoImg ? logoPlan(G, { w: C.w, h }, "left", "bottom") : null;
     const footerH = Math.round(Math.max(logo ? logo.h : 0, tk.ideal * 1.25));
-    const topRoom = C.h - footerH - pad * 2 - Math.round(C.h * (cls === "wide" ? 0.32 : 0.40));
-    const stack = v.copy
-      ? fit(C.w, Math.max(tk.ideal * 1.2, topRoom), { maxLines: 3, cta: false, kicker: true })
-      : null;
     const dp = G.dp || {};
-    const topH = stack ? stack.h : 0;
+    const footerY = Math.round(C.y + C.h - footerH);
+    const usableBottom = footerY - pad * 0.75;
+    const usableH = Math.max(tk.ideal * 2.8, usableBottom - C.y);
+    const copyShare = cls === "wide" || cls === "banner" ? 0.48 : cls === "story" ? 0.34 : 0.39;
+    const copyH = Math.max(tk.ideal * 2.25, Math.round(usableH * copyShare));
+    const highlightColour = G.band.id === "teal" ? "sand" : G.band.id === "white" ? "blue" : "teal";
     /* The band can sit above the words instead: picture first, then the line
        that explains it. A different read, same three tiers. */
     if (dp.order === "photo-first") {
-      const bandH2 = Math.max(1, Math.round(C.h - topH - footerH - pad * 2));
+      const bandH2 = Math.max(1, Math.round(usableH - copyH - pad));
+      const sweep = dp.angled ? Math.round(Math.min(h * 0.055, w * 0.08)) : 0;
+      const photoBottomLeft = Math.round(C.y + bandH2 + sweep);
+      const photoBottomRight = Math.round(C.y + bandH2 - sweep);
+      const messageY = Math.max(photoBottomLeft, photoBottomRight) + pad;
       return blockPlan(G, fit, {
         field: { x: 0, y: 0, w, h },
-        photo: { x: 0, y: Math.round(C.y), w, h: bandH2 },
-        inner: { x: C.x, y: Math.round(C.y + bandH2 + pad), w: C.w, h: Math.max(topH, tk.ideal) },
-        vAlign: "top", stack, noLogoReserve: true,
-        footer: { x: C.x, y: Math.round(C.y + C.h - footerH), w: C.w, h: footerH },
+        photo: { x: 0, y: Math.round(C.y), w, h: Math.max(1, Math.max(photoBottomLeft, photoBottomRight) - C.y) },
+        photoClip: dp.angled ? [
+          { x: 0, y: C.y }, { x: w, y: C.y },
+          { x: w, y: photoBottomRight }, { x: 0, y: photoBottomLeft },
+        ] : null,
+        inner: { x: C.x, y: messageY, w: C.w, h: Math.max(tk.ideal * 2.25, usableBottom - messageY) },
+        vAlign: "center", noLogoReserve: true,
+        footer: { x: C.x, y: footerY, w: C.w, h: footerH },
+        bigType: !!dp.angled, startScale: dp.angled ? 1.18 : undefined,
+        tightLines: 4, maxCPL: dp.angled ? 22 : undefined,
+        cta: false,
+        highlight: dp.angled ? { kind: "underline", colour: highlightColour, line: "last" } : null,
+        logoPhotoCorner: "top-right",
         plusses: [],
       });
     }
-    const bandY = Math.round(C.y + topH + (topH ? pad : 0));
-    const bandH = Math.max(1, Math.round((C.y + C.h - footerH - pad * 0.8) - bandY));
+    const bandY = Math.round(C.y + copyH + pad);
+    const sweep = dp.angled ? Math.round(Math.min(h * 0.055, w * 0.08)) : 0;
+    const photoTopLeft = bandY + sweep;
+    const photoTopRight = bandY - sweep;
+    const photoTop = Math.min(photoTopLeft, photoTopRight);
+    /* The photograph continues to the bottom edge. The footer remains the
+       safe placement for the CTA and logo, but it now overlays the image
+       instead of exposing another colour strip below it. */
+    const photoBottom = h;
     return blockPlan(G, fit, {
       field: { x: 0, y: 0, w, h },
-      photo: { x: 0, y: bandY, w, h: bandH },
-      inner: { x: C.x, y: C.y, w: C.w, h: Math.max(topH, tk.ideal) },
-      vAlign: "top", stack, noLogoReserve: true,
-      footer: { x: C.x, y: Math.round(C.y + C.h - footerH), w: C.w, h: footerH },
+      photo: { x: 0, y: photoTop, w, h: Math.max(1, photoBottom - photoTop) },
+      photoClip: dp.angled ? [
+        { x: 0, y: photoTopLeft }, { x: w, y: photoTopRight },
+        { x: w, y: photoBottom }, { x: 0, y: photoBottom },
+      ] : null,
+      inner: { x: C.x, y: C.y, w: C.w, h: copyH },
+      vAlign: "center", noLogoReserve: true,
+      footer: { x: C.x, y: footerY, w: C.w, h: footerH },
+      bigType: !!dp.angled, startScale: dp.angled ? 1.18 : undefined,
+      tightLines: 4, maxCPL: dp.angled ? 22 : undefined,
+      cta: false,
+      highlight: dp.angled ? { kind: "underline", colour: highlightColour, line: "last" } : null,
+      logoOnPhoto: true, logoPhotoCorner: "bottom-left",
       plusses: [],
     });
   },
@@ -1560,16 +1810,18 @@ const STYLE_PLANNERS = {
   statement(G, fit) {
     const { w, h, safe, tk, cls } = G;
     const C = contentRect(w, h, safe, tk);
-    const s = Math.min(w, h);
+    const dp = G.dp || {};
     return blockPlan(G, fit, {
       field: { x: 0, y: 0, w, h },
       inner: { x: C.x, y: C.y, w: C.w, h: C.h },
-      vAlign: (G.dp && G.dp.align === "middle") || cls === "banner" ? "center" : "top",
-      kicker: true, noPhoto: true, bigType: true,
-      plusses: [
-        { color: "teal", i: 1, cx: w - s * 0.10, cy: h * 0.10, size: s * 0.34, rot: -16 },
-        { color: "blue", i: 2, cx: w - s * 0.05, cy: h * 0.88, size: s * 0.26, rot: 22 },
-      ],
+      vAlign: dp.align === "middle" || cls === "banner" ? "center" : dp.align === "bottom" ? "bottom" : "top",
+      textAlign: dp.textAlign,
+      kicker: !dp.restrained, noPhoto: true, bigType: !dp.restrained,
+      startScale: dp.restrained ? 1.05 : dp.impact ? 1.50 : 1.35,
+      maxCPL: dp.impact ? 18 : 28,
+      tightLines: dp.impact ? 4 : undefined,
+      highlight: dp.highlight ? { kind: dp.highlight, colour: dp.highlightColour || "teal", line: "shortest" } : null,
+      plusses: [],
     });
   },
 
@@ -1606,8 +1858,13 @@ function blockPlan(G, fit, p) {
   const { tk, v } = G;
   const notes = [];
   const inner = p.inner;
-  inner.w = Math.max(1, Math.round(inner.w));
-  inner.h = Math.max(1, Math.round(inner.h));
+  const safeRight = G.w - G.safe.right, safeBottom = G.h - G.safe.bottom;
+  const right = Math.min(safeRight, inner.x + inner.w);
+  const bottom = Math.min(safeBottom, inner.y + inner.h);
+  inner.x = Math.max(G.safe.left, inner.x);
+  inner.y = Math.max(G.safe.top, inner.y);
+  inner.w = Math.max(1, Math.floor(right - inner.x));
+  inner.h = Math.max(1, Math.floor(bottom - inner.y));
 
   /* If the box a style has produced could not hold one line of type at a
      legible size, do not squeeze: this canvas wants an end frame. Deciding
@@ -1659,8 +1916,12 @@ function blockPlan(G, fit, p) {
     const opts = {
       maxLines: baseLines,
       kicker: !!p.kicker,
-      align: G.safe && G.safe.centreBias ? "center" : undefined,
-      startPx: p.bigType ? Math.round(tk.ideal * 1.35) : tk.ideal,
+      align: !G.strictDesign && G.safe && G.safe.centreBias ? "center" : p.textAlign,
+      startPx: p.startScale ? Math.round(tk.ideal * p.startScale)
+        : p.bigType ? Math.round(tk.ideal * 1.35) : tk.ideal,
+      maxCPL: p.maxCPL,
+      subline: p.subline,
+      cta: p.cta,
     };
     stack = p.stack && p.stack.h <= avail ? p.stack : fit(inner.w, avail, opts);
     /* An extra line of type at full size beats the same words shrunk to fit
@@ -1669,12 +1930,8 @@ function blockPlan(G, fit, p) {
       const longer = fit(inner.w, avail, { ...opts, maxLines: baseLines + 1 });
       if (longer && (!stack || longer.headlinePx > stack.headlinePx)) stack = longer;
     }
-    if (!stack) stack = fit(inner.w, avail, { ...opts, maxLines: baseLines + 1, cta: false });
-    if (!stack) stack = fit(inner.w, avail, { ...opts, maxLines: baseLines + 1, cta: false, subline: false });
-    if (!stack) {
-      stack = fit(inner.w, avail, { ...opts, cta: false, subline: false, maxLines: 2, floorPx: Math.max(11, tk.floor * 0.82) });
-      if (stack) notes.push({ level: "info", text: "Only the headline fits at this size." });
-    }
+    // A selected recipe cannot discard its action to make a layout fit.
+    // Poster recipes explicitly put that action in their footer instead.
     if (!stack) {
       /* Nothing legible fits. That is not a failure to report on every tile,
          it is a different design: a brand end frame. */
@@ -1756,11 +2013,14 @@ export function resolveSafeBox(pl, w, h) {
   return lookupSafeZone(pl && pl.platform, pl && pl.placement, w, h);
 }
 
-export async function composeAsset(spec) {
+async function composeAssetOnce(spec) {
+  await preloadFonts();
   const {
     w, h, variant, photo, band, headline, subline, cta, kicker,
-    logoKey, placement, focal, showSafe,
+    logoKey, placement, focal: requestedFocal, showSafe,
   } = spec;
+  const focal = requestedFocal && Number.isFinite(requestedFocal.x) && Number.isFinite(requestedFocal.y)
+    ? { ...requestedFocal, x: Math.max(0, Math.min(1, requestedFocal.x)), y: Math.max(0, Math.min(1, requestedFocal.y)) } : null;
   /* A design id carries the structure and the decisions inside it. A bare
      layout id still works, and resolves to that structure's first design.
 
@@ -1778,7 +2038,10 @@ export async function composeAsset(spec) {
      follows the canvas, and is what `finish()` reports as `layout`. The
      seed stays on `requested`, so a rebuild still reproduces byte for
      byte. */
-  const design = spec.design ? designById(spec.design) : null;
+  const design = spec.design ? DESIGNS.find(item => item.id === spec.design) : null;
+  const strictDesign = !!spec.design;
+  let compatibilityReason = strictDesign && !design
+    ? "This selected design is unavailable. Choose a design from the current library. Not exported." : null;
   const requested = normaliseLayout(design ? design.style : spec.layout);
   const noPhotoRoute = requested === "statement" || requested === "pattern";
   let drawn = requested;
@@ -1826,10 +2089,17 @@ export async function composeAsset(spec) {
   const pickImg = (bw, bh) => {
     if (!master || !srcImg || !(bw > 0 && bh > 0)) return img;
     const ma = master.width / master.height;
-    return Math.abs((bw / bh) / ma - 1) <= ASPECT_TOLERANCE ? master : srcImg;
+    if (Math.abs((bw / bh) / ma - 1) > ASPECT_TOLERANCE) return srcImg;
+    /* The master is the adapter's final crop for this ratio. Comparing its
+       pixel dimensions with the original here used to select the original
+       again whenever a placement was larger than the source. That bypassed
+       the adapter and surfaced the exact repair request it had already
+       resolved. Matching shape is the contract: use the prepared master for
+       that family and let the export canvas perform the final resampling. */
+    return master;
   };
   let logoImg = null, compactLogoImg = null;
-  if (v.logo) {
+  if (v.logo || (strictDesign && variant !== "clean")) {
     logoImg = await loadLogo(logoKey, band.logo, notes);
     compactLogoImg = logoKey === COMPACT_LOGO ? logoImg : await loadLogo(COMPACT_LOGO, band.logo, notes);
   } else if (v.copy) {
@@ -1838,25 +2108,33 @@ export async function composeAsset(spec) {
        exports as a flat rectangle with a button and no brand on it at all. */
     compactLogoImg = await loadLogo(COMPACT_LOGO, band.logo, notes);
   }
-  /* Full bleed decides its own polarity from the photograph, so both
-     colourways of the mark have to be on hand. */
+  /* A photograph can carry the mark in split and angled layouts too, so both
+     colourways stay available wherever a logo may move off the colour field. */
   const altSuffix = band.logo === "-inverse" ? "" : "-inverse";
   let logoAltImg = null, compactAltImg = null;
-  if (v.logo && normaliseLayout(spec.layout) === "fullbleed") {
+  if (v.logo || (strictDesign && variant !== "clean")) {
     logoAltImg = await loadLogo(logoKey, altSuffix, notes);
     compactAltImg = logoKey === COMPACT_LOGO ? logoAltImg : await loadLogo(COMPACT_LOGO, altSuffix, notes);
   }
 
+  const requestedCtaBg = spec.ctaBg || (band.id === "charcoal" ? COLORS.white : COLORS.charcoal);
+  const invalidCtaPair = (band.bg === COLORS.teal && (requestedCtaBg === COLORS.blue || requestedCtaBg === COLORS.teal))
+    || (band.bg === COLORS.blue && (requestedCtaBg === COLORS.teal || requestedCtaBg === COLORS.blue));
+  const resolvedCtaBg = invalidCtaPair ? COLORS.charcoal : requestedCtaBg;
+  if (invalidCtaPair) notes.push({ level: "info", text: "The button was changed to Charcoal because Teal and Professionals Blue may not sit on each other." });
   const C = {
-    headline, subline, cta, kicker,
+    headline, subline, cta, kicker: strictDesign ? "" : kicker,
+    emphasis: String(spec.emphasis || "").trim(),
     fg: band.fg,
     accentInk: band.id === "charcoal" ? band.accent : COLORS.charcoal,
-    ctaBg: spec.ctaBg || (band.id === "charcoal" ? COLORS.white : COLORS.charcoal),
-    ctaFg: spec.ctaFg || (band.id === "charcoal" ? COLORS.charcoal : COLORS.white),
+    ctaBg: resolvedCtaBg,
+    ctaFg: resolvedCtaBg === COLORS.charcoal ? COLORS.white : COLORS.charcoal,
+    headlineLineColours: {},
   };
 
   const INK = [];
   const ink = (x, y, iw, ih, colour) => INK.push({ x, y, w: iw, h: ih, colour });
+  const safeBounds = { x: safe.left, y: safe.top, w: w - safe.left - safe.right, h: h - safe.top - safe.bottom };
 
   /* The approved library already has the Professionals shapes composed into the
      photography. Knowing that stops the engine from adding a fourth. */
@@ -1864,12 +2142,24 @@ export async function composeAsset(spec) {
   /* Seeded from what this file actually is, so a composition is stable for a
      given placement and different across the set. */
   const seed = seedOf(`${spec.design || requested}|${w}x${h}|${(placement && placement.platform) || ""}|${(placement && placement.placement) || ""}|${spec.rotationSeed || ""}`);
-  const G = { w, h, safe, tk, cls, v, band, logoImg, compactLogoImg, photoImg: img, photoHasProfessionals, seed, dp: designParams };
-  const fit = makeFitter(ctx, C, tk);
+  // Plan one full composition. Logo/copy variants hide their content only
+  // at paint time, so their photo area, seam and alignment cannot jump.
+  const planningVariant = strictDesign && variant !== "clean" ? VARIANTS[3] : v;
+  const G = { w, h, safe, tk, cls, strictDesign, v: planningVariant, band, logoImg, compactLogoImg, photoImg: img, photoHasProfessionals, seed, dp: designParams };
+  const rawFit = makeFitter(ctx, C, tk);
+  const fit = (width, height, options = {}) => rawFit(width, height, {
+    ...options, sublineRequired: strictDesign || options.sublineRequired,
+  });
 
   /* Declared before the early return below, because the report is built the
      same way for every variant. */
   let cropCoverage = 1, upscale = 1, cropZoom = 1, plan = null, photoDrawn = false;
+  let photoRect = null, photoSourceSize = null, photoAdaptation = null, logoDrawn = false;
+  let headlineDrawn = false, sublineDrawn = false, ctaDrawn = false;
+  let emphasisDrawn = false;
+  let emphasisKind = null, emphasisColour = null;
+  const textBounds = [];
+  let geometry = null;
   /* Which picture the photograph was actually drawn from. The adapter's
      family master and the original source are both legitimate answers
      and they mean different things to anyone reading these numbers: a
@@ -1880,94 +2170,189 @@ export async function composeAsset(spec) {
   let contrast = contrastRatio(hexL(band.fg), hexL(band.bg));
   let veilAlpha = 0, backdrop = null, refreshBackdrop = () => {};
 
+  if (compatibilityReason) return finish();
+
   /* The clean variant is the photograph and nothing else. No planner runs,
      so no structure is drawn: reporting the requested one here would credit
      a design with a file it had no hand in. */
-  if (!v.copy && !v.logo && img && !noPhotoRoute) {
+  if (!v.copy && !v.logo && img) {
     drawn = "photo";
-    const pi = pickImg(w, h);
-    const f = focal || bestFocal(pi, w, h);
+    let pi = pickImg(w, h);
+    let box = { x: 0, y: 0, w, h };
+    const quality = photoFitMetrics(pi, box);
+    let f = focal ? { ...focal, coverage: focalCoverage(pi, box, focal) } : bestFocal(pi, w, h);
+    if (!quality.usable || (f.coverage != null && f.coverage < 0.42)) {
+      pi = srcImg || img;
+      box = containPhotoBox(pi, contentRect(w, h, safe, tk));
+      f = { x: 0.5, y: 0.5, coverage: 1, zoom: 1 };
+      photoAdaptation = "contained-original";
+      notes.push({ level: "info", text: "The complete original is fitted inside a solid field to preserve its detail and framing." });
+    }
     cropCoverage = f.coverage != null ? f.coverage : 1;
-    cropZoom = f.zoom != null ? f.zoom : 1;
-    upscale = drawPhoto(ctx, pi, { x: 0, y: 0, w, h }, f);
+    cropZoom = photoFitMetrics(pi, box).retained;
+    upscale = drawPhoto(ctx, pi, box, f);
+    photoRect = { ...box };
+    photoSourceSize = { w: pi.naturalWidth || pi.width, h: pi.naturalHeight || pi.height };
     drewFrom = pi === master ? "master" : "source";
     photoDrawn = true;
     if (showSafe) drawSafeOutline();
     return finish();
   }
 
-  if (safe.centreBias && v.copy && img && !noPhotoRoute) {
+  if (!strictDesign && safe.centreBias && v.copy && img && !noPhotoRoute) {
     drawn = "centred";
     plan = blockPlan(G, fit, centreLockupPlan(G, fit));
     notes.push({ level: "info", text: "This publisher re-crops the file into several widget shapes, so the words sit in the centred band its own guidance asks for." });
   } else {
     /* An unknown structure falls back to the anchor. It draws an anchor, so
        it has to say anchor. */
-    if (!STYLE_PLANNERS[drawn]) drawn = "anchor";
+    if (!STYLE_PLANNERS[drawn]) drawn = "editorial";
     plan = STYLE_PLANNERS[drawn](G, fit);
   }
   /* Typographic and pattern-led routes have no photograph by definition;
      every other style needs one. */
   if (!img && drawn !== "statement" && drawn !== "pattern") {
+    if (strictDesign) {
+      compatibilityReason = "This design needs a photograph. Add a suitable original or explicitly choose a typography design. Not exported.";
+      return finish();
+    }
     drawn = "statement";
     plan = STYLE_PLANNERS.statement(G, fit);
     notes.push({ level: "info", text: "No photograph on this concept, so it is set typographically." });
   }
   if (plan && plan.micro && (v.copy || v.logo)) {
+    if (strictDesign) {
+      compatibilityReason = "The selected design cannot fit its headline, action and logo safely in this format. Shorten the copy, remove this format or choose another design. Not exported.";
+      return finish();
+    }
     drawn = "micro";
     plan = microPlan(G);
     notes.push({ level: "info", text: v.copy
       ? "Too small for a sentence, so this size runs as a brand end frame: mark and button only."
       : "Too small for a laid-out logo lockup, so this size runs as a brand end frame." });
   }
+
+  /* A crop warning should change the composition. Quality is assessed at
+     export dimensions, before painting, then the actual original is fitted
+     into a source-sized rectangle. Copy which used to sit over that photo
+     moves to an independent field so no text is left floating over a mat. */
+  if (img && plan.photo && !plan.noPhoto) {
+    let pi = pickImg(plan.photo.w, plan.photo.h);
+    const quality = photoFitMetrics(pi, plan.photo);
+    const analysis = focal ? { ...focal, coverage: focalCoverage(pi, plan.photo, focal) }
+      : bestFocal(pi, plan.photo.w, plan.photo.h, plan.focalTargetY, plan.focalTargetX);
+    const clippedFraction = plan.photoEllipse ? Math.PI / 4
+      : plan.photoClip ? polygonArea(plan.photoClip) / (plan.photo.w * plan.photo.h) : 1;
+    const needsRepair = !quality.usable || quality.retained * clippedFraction < MIN_PHOTO_RETAINED
+      || (analysis.coverage != null && analysis.coverage < 0.42);
+    const adaptedMaster = pi === master;
+    if (adaptedMaster && needsRepair) {
+      photoAdaptation = "ratio-family-master";
+      notes.push({ level: "info", text: "The size adapter prepared this photograph for the placement family automatically." });
+    }
+    if (needsRepair && strictDesign && !plan.photoContain && !adaptedMaster) {
+      compatibilityReason = quality.upscale > SOFT_UPSCALE
+        ? "The original is too small for this design's photo area. Supply a larger original or choose another design. The selected layout was not replaced. Not exported."
+        : "This photograph loses too much of its framing in the selected design. Choose a photograph closer to this shape or another design. The selected layout was not replaced. Not exported.";
+    }
+    if ((!strictDesign && needsRepair) || plan.photoContain) {
+      const overlay = plan.copyOverPhoto || plan.microOverPhoto || plan.fieldOver || plan.card || !plan.field;
+      if (needsRepair && overlay && !plan.micro) {
+        const area = contentRect(w, h, safe, tk);
+        const gallery = designParams.negativeSpace ? "right"
+          : area.w > area.h * 1.25 ? (designParams.copy === "right" ? "left" : "right")
+          : plan.vAlign === "top" ? "bottom" : "top";
+        const next = STYLE_PLANNERS.gallery({ ...G, dp: { gallery } }, fit);
+        if (!next.micro) { plan = next; drawn = "gallery"; }
+        else if (area.w > area.h * 1.7) {
+          /* A narrow banner cannot support two full columns. Use its compact
+             structure, with the complete photograph in a small side slot
+             and the logo/button on the existing neutral field. */
+          plan = microPlan(G);
+          drawn = "micro";
+          notes.push({ level: "info", text: "This narrow size uses a compact logo and button beside the complete photograph." });
+        }
+      }
+      if (!(plan.micro && plan.microOverPhoto)) {
+        pi = srcImg || img;
+        const r = plan.photo;
+        const slot = {
+          x: Math.max(safe.left, r.x), y: Math.max(safe.top, r.y),
+          w: Math.max(1, Math.min(w - safe.right, r.x + r.w) - Math.max(safe.left, r.x)),
+          h: Math.max(1, Math.min(h - safe.bottom, r.y + r.h) - Math.max(safe.top, r.y)),
+        };
+        plan.photo = containPhotoBox(pi, slot);
+        plan.photoImage = pi;
+        plan.photoContain = true;
+        if (!strictDesign) { plan.photoClip = null; plan.photoEllipse = false; plan.photoRound = false; }
+        plan.field = plan.field || { x: 0, y: 0, w, h };
+        plan.photoFocal = { x: 0.5, y: 0.5, coverage: 1, zoom: 1 };
+        photoAdaptation = needsRepair ? "contained-original" : "complete-original";
+        if (needsRepair) notes.push({ level: "info", text: "The photo area was adapted to keep the complete original sharp. The message and logo stay inside the safe area." });
+      }
+    }
+  }
   notes.push(...(plan.notes || []));
+  geometry = {
+    photo: plan.photo ? { ...plan.photo } : null,
+    photoClip: plan.photoClip ? plan.photoClip.map(point => ({ ...point })) : null,
+    photoEllipse: !!plan.photoEllipse, photoRound: !!plan.photoRound,
+    field: plan.field ? { ...plan.field } : null,
+    fieldPolygon: plan.fieldPolygon ? plan.fieldPolygon.map(point => ({ ...point })) : null,
+    copy: plan.inner ? { ...plan.inner } : null,
+    logo: null, recipeParams: { ...designParams },
+    highlight: plan.highlight ? { ...plan.highlight } : null,
+  };
 
   /* ---- paint ---- */
   const paintField = () => {
     if (!plan.field) return;
     ctx.fillStyle = band.bg;
-    ctx.fillRect(plan.field.x, plan.field.y, plan.field.w, plan.field.h);
+    if (plan.fieldPolygon && tracePolygon(ctx, plan.fieldPolygon)) ctx.fill();
+    else ctx.fillRect(plan.field.x, plan.field.y, plan.field.w, plan.field.h);
   };
   if (!plan.fieldOver) paintField();
 
-  if (plan.patternOnly && plan.field) {
-    const clear = plan.inner ? { x: plan.inner.x - tk.pad * 0.65, y: plan.inner.y - tk.pad * 0.65,
-                                 w: plan.inner.w + tk.pad * 1.3, h: plan.inner.h + tk.pad * 1.3 } : null;
-    await drawProfessionalsPattern(ctx, plan.field, band.accent === COLORS.teal ? "teal" : "blue",
-      plan.patternCell, plan.patternAlpha, clear);
-  }
-
-  /* Optional Professionals texture on the colour field. Low density, palette colour,
-     and it stops short of the copy: the brand allows it as texture and forbids
-     it behind body text, and both halves of that are enforced here. */
-  if (spec.pattern && plan.field && !plan.noPhoto) {
-    const clear = plan.inner ? { x: plan.inner.x - tk.pad * 0.5, y: plan.inner.y - tk.pad * 0.5,
-                                 w: plan.inner.w + tk.pad, h: plan.inner.h + tk.pad } : null;
-    await drawProfessionalsPattern(ctx, plan.field, band.accent === COLORS.teal ? "teal" : "blue",
-      Math.max(24, Math.round(tk.ref * 0.16)), band.id === "charcoal" ? 0.16 : 0.10, clear);
-  }
-
   if (img && plan.photo && !plan.noPhoto) {
     const box = plan.photo;
-    const pi = pickImg(box.w, box.h);
-    const f = focal || bestFocal(pi, box.w, box.h, plan.focalTargetY, plan.focalTargetX);
+    const pi = plan.photoImage || pickImg(box.w, box.h);
+    const f = plan.photoFocal || (focal ? { ...focal, coverage: focalCoverage(pi, box, focal) }
+      : bestFocal(pi, box.w, box.h, plan.focalTargetY, plan.focalTargetX));
     cropCoverage = f.coverage != null ? f.coverage : 1;
-    cropZoom = f.zoom != null ? f.zoom : 1;
-    if (plan.photoRound) { ctx.save(); roundRect(ctx, box.x, box.y, box.w, box.h, box.r || tk.radius); ctx.clip(); }
+    const clippedFraction = plan.photoEllipse ? Math.PI / 4
+      : plan.photoClip ? polygonArea(plan.photoClip) / (box.w * box.h) : 1;
+    cropZoom = photoFitMetrics(pi, box).retained * clippedFraction;
+    const clipped = !!(plan.photoRound || plan.photoClip || plan.photoEllipse);
+    if (clipped) {
+      ctx.save();
+      if (plan.photoClip && tracePolygon(ctx, plan.photoClip)) ctx.clip();
+      if (plan.photoEllipse) {
+        ctx.beginPath();
+        ctx.ellipse(box.x + box.w / 2, box.y + box.h / 2, box.w / 2, box.h / 2, 0, 0, Math.PI * 2);
+        ctx.clip();
+      }
+      if (plan.photoRound) { roundRect(ctx, box.x, box.y, box.w, box.h, box.r || tk.radius); ctx.clip(); }
+    }
     upscale = drawPhoto(ctx, pi, box, f);
+    photoRect = { x: box.x, y: box.y, w: box.w, h: box.h };
+    photoSourceSize = { w: pi.naturalWidth || pi.width, h: pi.naturalHeight || pi.height };
     drewFrom = pi === master ? "master" : "source";
     photoDrawn = true;
-    if (plan.photoRound) ctx.restore();
+    if (clipped) ctx.restore();
   }
   if (plan.fieldOver) paintField();
-  if (img && plan.mask) {
-    const pi = pickImg(plan.mask.w, plan.mask.h);
-    const f = focal || bestFocal(pi, plan.mask.w, plan.mask.h);
-    cropCoverage = f.coverage != null ? f.coverage : 1;
-    cropZoom = f.zoom != null ? f.zoom : 1;
-    upscale = await drawPhotoInProfessionals(ctx, pi, band.id === "blue" ? "teal" : "blue", 0, plan.mask, f);
-    drewFrom = pi === master ? "master" : "source";
-    photoDrawn = true;
+
+  /* Directional gestures use only supplied highlighter SVGs. A requested
+     colour is ignored when it would place Teal on Blue or Blue on Teal. */
+  for (const d of (plan.decorations || [])) {
+    const colour = COLORS[d.colour] || band.accent;
+    const conflicts = (band.bg === COLORS.teal && colour === COLORS.blue)
+      || (band.bg === COLORS.blue && colour === COLORS.teal)
+      || colour === band.bg;
+    if (!conflicts) {
+      const mark = await drawTintedHighlighter(ctx, d.kind, colour, d.box, d.rotation || 0, safeBounds);
+      if (mark) ink(mark.x, mark.y, mark.w, mark.h, null);
+    }
   }
   /* The modular grid's flat cells. Drawn after the photograph so a cell can
      sit over the picture's edge the way the reference does. */
@@ -1993,24 +2378,17 @@ export async function composeAsset(spec) {
     ctx.fill();
     ctx.restore();
   }
-  /* Restraint with the signature. The approved library already has the Professionals
-     shapes built into the photography, and stacking more on top is exactly
-     the over-branding that makes a native ad look like an ad. One glyph on
-     the colour field, or none when the picture already carries them. */
-  const glyphs = [];
-  for (const p of glyphs) {
-    if (p.size < tk.ref * 0.05) continue;
-    await drawProfessionals(ctx, p.color, p.i, p.cx, p.cy, p.size, p.rot);
-  }
-
   /* Type sits on a solid field in every style, so contrast is a property of
      the palette, not a hope. The one exception is a logo dropped onto the
      photograph, which gets measured and scrimmed if the picture is busy. */
   const inner = plan.inner;
-  const overPhoto = !plan.field && !plan.card;
+  const overPhoto = plan.copyOverPhoto != null ? plan.copyOverPhoto : !plan.field && !plan.card;
 
   if (plan.micro) {
-    const mark = compactLogoImg || logoImg;
+    const mark = band.id === "teal" && !plan.microOverPhoto ? null : (compactLogoImg || logoImg);
+    if (v.logo && band.id === "teal" && !plan.microOverPhoto) {
+      notes.push({ level: "info", text: "The logo was omitted because no approved logo colourway may sit directly on the Teal field." });
+    }
     const gap = Math.max(4, Math.round(tk.pad * 0.6));
     /* The mark is sized first and the button gets what is left. The other
        way round produces a thumbnail-sized logo beside a huge pill, which
@@ -2054,13 +2432,17 @@ export async function composeAsset(spec) {
         backdrop = snap;
       }
       ctx.drawImage(mark, x0, ly, Math.round(lw), Math.round(lh));
+      logoDrawn = v.logo && lh >= BRAND.logoMinPx - 0.5;
       ink(x0, ly, Math.round(lw), Math.round(lh), band.fg);
       if (lh < BRAND.logoMinPx - 0.5) notes.push({ level: "warn", text: "This size cannot hold the logo at the 24px brand minimum." });
     } else if (!ctaW) {
       /* Neither a mark nor a button fits. Shipping a blank colour rectangle
          would be worse than an ugly one, so set the headline at the floor. */
       const last = fitStack(ctx, C, inner.w, inner.h, tk, { maxLines: 2, cta: false, subline: false, floorPx: 11, startPx: tk.floor });
-      if (last) last.draw(ctx, inner.x, Math.round(inner.y + (inner.h - last.h) / 2), C, ink);
+      if (last) {
+        last.draw(ctx, inner.x, Math.round(inner.y + (inner.h - last.h) / 2), C, ink);
+        headlineDrawn = true;
+      }
       else notes.push({ level: "warn", text: "Nothing legible fits on a canvas this small. Do not ship this size." });
     }
     if (ctaW) {
@@ -2073,6 +2455,7 @@ export async function composeAsset(spec) {
       const m = measureLine(ctx, cta);
       ctx.fillStyle = C.ctaFg;
       ctx.fillText(cta, bx + ctaPx * 1.2, by + ctaH / 2 + m.asc / 2);
+      ctaDrawn = true;
       ink(bx, by, ctaW, ctaH);
     }
     if (showSafe) drawSafeOutline();
@@ -2080,11 +2463,31 @@ export async function composeAsset(spec) {
   }
 
   let stackTop = inner.y;
-  const logo = plan.logo;
-  const footerLogo = !!plan.footer;
-  const contentH = (plan.stack ? plan.stack.h : 0) + (logo && !footerLogo ? logo.h + (v.copy ? tk.pad * 0.85 : 0) : 0);
+  const stackX = plan.stack && plan.stack.align === "center"
+    ? Math.round(inner.x + Math.max(0, (inner.w - plan.stack.colW) / 2)) : inner.x;
+  let logo = plan.logo;
+
+  /* Teal is the main field colour, but none of the approved logo masters is
+     intended to sit directly on it. When a photograph is available, the mark
+     moves into that photographic area. A flat Teal statement simply omits the
+     mark and reports why; drawing a white logo or inventing a backplate would
+     break the brand rule in a different way. */
+  const logoCanLiveOnPhoto = !!(logo && img && plan.photo && !plan.noPhoto && !plan.photoEllipse);
+  const logoOnPhoto = !!(logo && (plan.logoOnPhoto || (band.id === "teal" && logoCanLiveOnPhoto)));
+  if (logo && band.id === "teal" && !logoOnPhoto) {
+    logo = null;
+    notes.push({ level: "info", text: "The logo was omitted because no approved logo colourway may sit directly on the Teal field." });
+  }
+  const footerLogo = !!(plan.footer && !logoOnPhoto);
+  const inlineLogo = !!(logo && !footerLogo && !logoOnPhoto);
+  const contentH = (plan.stack ? plan.stack.h : 0) + (inlineLogo ? logo.h + (planningVariant.copy ? tk.pad * 0.85 : 0) : 0);
   if (plan.vAlign === "center") stackTop = Math.round(inner.y + Math.max(0, (inner.h - contentH) / 2));
   else if (plan.vAlign === "bottom") stackTop = Math.round(inner.y + Math.max(0, inner.h - contentH));
+  /* A fractional measured stack height must round inward at the lower safe
+     edge. Rounding its origin up can otherwise spill the final glyph by a
+     fraction of a pixel even though the fit itself was correct. */
+  stackTop = Math.max(Math.ceil(inner.y), Math.min(stackTop,
+    Math.floor(Math.min(inner.y + inner.h, h - safe.bottom) - contentH)));
 
   /* A copy of the frame with no type on it. Every mark's contrast is measured
      against this afterwards, so the number in the report is what a person
@@ -2099,17 +2502,58 @@ export async function composeAsset(spec) {
   };
 
   const centredLockup = plan.stack ? plan.stack.align === "center" : !!safe.centreBias;
-  const logoY = logo ? Math.round(plan.vAlign === "center" && !v.copy
+  let logoY = logo ? Math.round(plan.vAlign === "center" && !planningVariant.copy
     ? inner.y + (inner.h - logo.h) / 2
     : inner.y + inner.h - logo.h) : 0;
-  const logoX = logo ? Math.round(centredLockup ? inner.x + (inner.w - logo.w) / 2 : inner.x) : 0;
+  let logoX = logo ? Math.round(centredLockup ? inner.x + (inner.w - logo.w) / 2 : inner.x) : 0;
+
+  /* A logo on photography gets its own corner and its own polarity. The box
+     stays inside both the photograph and the platform safe area, including on
+     angled crops. */
+  if (logo && logoOnPhoto) {
+    const pb = plan.photo;
+    const inset = Math.max(6, Math.round(tk.pad * 0.72));
+    const leftEdge = Math.max(safe.left, pb.x + inset);
+    const topEdge = Math.max(safe.top, pb.y + inset);
+    const rightEdge = Math.min(w - safe.right, pb.x + pb.w - inset);
+    const bottomEdge = Math.min(h - safe.bottom, pb.y + pb.h - inset);
+    const maxW = Math.max(1, rightEdge - leftEdge);
+    const maxH = Math.max(1, bottomEdge - topEdge);
+    const scale = Math.min(1, maxW / logo.w, maxH / logo.h);
+    logo.w = Math.round(logo.w * scale);
+    logo.h = Math.round(logo.h * scale);
+    if (logo.h < BRAND.logoMinPx - 0.5) {
+      logo = null;
+      notes.push({ level: "warn", text: "The photographic area cannot hold the logo at the 24px brand minimum, so this size ships without it." });
+    } else {
+      const corner = plan.logoPhotoCorner || "bottom-right";
+      const right = corner.includes("right");
+      const bottom = corner.includes("bottom");
+      logoX = Math.round(right ? rightEdge - logo.w : leftEdge);
+      logoY = Math.round(bottom ? bottomEdge - logo.h : topEdge);
+      if (plan.photoClip) {
+        const xs = right ? [rightEdge - logo.w, leftEdge] : [leftEdge, rightEdge - logo.w];
+        const ys = bottom ? [bottomEdge - logo.h, topEdge] : [topEdge, bottomEdge - logo.h];
+        const fits = (x, y) => [[x,y], [x + logo.w,y], [x,y + logo.h], [x + logo.w,y + logo.h]]
+          .every(([px, py]) => pointInPolygon({ x: px, y: py }, plan.photoClip));
+        const candidates = ys.flatMap(y => xs.map(x => ({ x, y }))).filter(b => fits(b.x, b.y));
+        if (candidates.length) { logoX = Math.round(candidates[0].x); logoY = Math.round(candidates[0].y); }
+        else {
+          logo = null;
+          notes.push({ level: "warn", text: "The angled photo area cannot hold the logo inside the safe area. Choose a layout with a separate logo area." });
+        }
+      }
+    }
+  }
+
+  let logoUsesInverse = band.logo === "-inverse";
 
   /* Which way round reads better on THIS photograph. A bright interior wants
      charcoal type and a light touch; a dark room wants white. Choosing by
      measurement beats defaulting, and it means far less veiling either way. */
-  if (plan.autoPolarity && overPhoto && (plan.stack || logo)) {
+  if (plan.autoPolarity && overPhoto && plan.stack) {
     const t = plan.stack ? stackTop : logoY;
-    const b = logo ? logoY + logo.h : stackTop + contentH;
+    const b = stackTop + (plan.stack ? plan.stack.h : 0);
     const probe = { x: inner.x, y: t, w: inner.w, h: Math.max(1, b - t) };
     const forWhite = worstBackdrop(backdrop, probe, true);
     const forDark = worstBackdrop(backdrop, probe, false);
@@ -2119,11 +2563,25 @@ export async function composeAsset(spec) {
     C.fg = wantWhite ? COLORS.white : COLORS.charcoal;
     C.accentInk = C.fg;
     if (logoImg && logoAltImg) {
-      const isInverseNow = band.logo === "-inverse";
-      if (wantWhite !== isInverseNow) {
+      if (!logoOnPhoto && wantWhite !== logoUsesInverse) {
         const swap = logoImg; logoImg = logoAltImg; logoAltImg = swap;
         const swapC = compactLogoImg; compactLogoImg = compactAltImg; compactAltImg = swapC;
+        logoUsesInverse = wantWhite;
       }
+    }
+  }
+
+  if (logo && logoOnPhoto && logoImg && logoAltImg) {
+    const probe = { x: logoX, y: logoY, w: logo.w, h: logo.h };
+    const forWhite = worstBackdrop(backdrop, probe, true);
+    const forDark = worstBackdrop(backdrop, probe, false);
+    const aWhite = solveScrimAlpha(forWhite.rgb, true, hexL(COLORS.white), WCAG_AA * 1.06);
+    const aDark = solveScrimAlpha(forDark.rgb, false, hexL(COLORS.charcoal), WCAG_AA * 1.06);
+    const wantInverse = aWhite <= aDark;
+    if (wantInverse !== logoUsesInverse) {
+      const swap = logoImg; logoImg = logoAltImg; logoAltImg = swap;
+      const swapC = compactLogoImg; compactLogoImg = compactAltImg; compactAltImg = swapC;
+      logoUsesInverse = wantInverse;
     }
   }
 
@@ -2131,11 +2589,11 @@ export async function composeAsset(spec) {
      photograph" was a guess, and it missed a flat accent square landing under a
      headline in the modular grid. Measuring costs one read of the canvas and
      never lies. */
-  if (plan.stack || logo) {
-    /* One veil for the whole lockup, not one per element, so the picture is
-       touched once and the words sit in a single pool of light. */
+  if (plan.stack || inlineLogo) {
+    /* One veil for the copy lockup. A mark in the photograph is checked
+       separately because it may be on the opposite side of the composition. */
     const top = plan.stack ? stackTop : logoY;
-    const bot = logo ? logoY + logo.h : stackTop + contentH;
+    const bot = inlineLogo ? logoY + logo.h : stackTop + contentH;
     const veilRect = {
       x: inner.x - tk.pad * 0.6, y: top - tk.pad * 0.6,
       w: inner.w + tk.pad * 1.2, h: (bot - top) + tk.pad * 1.2,
@@ -2152,38 +2610,166 @@ export async function composeAsset(spec) {
     }
   }
 
-  if (v.copy && plan.stack) plan.stack.draw(ctx, inner.x, stackTop, C, ink);
+  if (logo && logoOnPhoto) {
+    const logoInk = logoUsesInverse ? COLORS.white : COLORS.charcoal;
+    const inset = Math.max(4, Math.round(tk.pad * 0.38));
+    const res = ensureContrast(ctx, backdrop, {
+      x: logoX - inset, y: logoY - inset,
+      w: logo.w + inset * 2, h: logo.h + inset * 2,
+    }, logoInk, WCAG_AA * 1.06, w, h);
+    veilAlpha = Math.max(veilAlpha, res.alpha);
+  }
+
+  /* Emphasis is authored once for the campaign, never inferred from which
+     line happens to be shortest at this ratio. Empty means no highlighter. */
+  if (v.copy && plan.stack && plan.highlight && C.emphasis) {
+    const lines = plan.stack.parts.hl.lines;
+    const phrase = C.emphasis.replace(/\s+/g, " ");
+    const runs = lines.flatMap((line, index) => {
+      const start = line.t.indexOf(phrase);
+      if (start < 0 || line.t.indexOf(phrase, start + 1) >= 0) return [];
+      const before = line.t[start - 1] || "", after = line.t[start + phrase.length] || "";
+      if (/[\p{L}\p{N}]/u.test(before) || /[\p{L}\p{N}]/u.test(after)) return [];
+      return [{ index, start, end: start + phrase.length }];
+    });
+    const normalizedHeadline = String(headline).replace(/\s+/g, " ");
+    const uniquePhrase = normalizedHeadline.indexOf(phrase) === normalizedHeadline.lastIndexOf(phrase);
+    const run = runs.length === 1 && uniquePhrase ? runs[0] : null;
+    const lineIndex = run ? run.index : -1;
+    const line = lines[lineIndex];
+    const kind = plan.highlight.kind;
+    const colour = COLORS[plan.highlight.colour] || band.accent;
+    const conflicts = colour === band.bg
+      || (band.bg === COLORS.teal && colour === COLORS.blue)
+      || (band.bg === COLORS.blue && colour === COLORS.teal);
+    if (!run) {
+      compatibilityReason = "The emphasis phrase must appear once in the headline and fit on one line. Choose a shorter exact phrase or clear the emphasis field. Not exported.";
+    } else if (conflicts) {
+      compatibilityReason = "The selected highlighter cannot be used on this background. Choose a neutral background or clear the emphasis field. Not exported.";
+    } else if (line) {
+      setFont(ctx, plan.stack.parts.hl.weight, plan.stack.headlinePx);
+      const prefixWidth = ctx.measureText(line.t.slice(0, run.start)).width;
+      const phraseWidth = ctx.measureText(phrase).width;
+      const kickerOffset = plan.stack.parts.kicker
+        ? plan.stack.parts.kicker.h + plan.stack.gaps.kicker : 0;
+      const lineTop = stackTop + kickerOffset + lineIndex * plan.stack.parts.hl.lh;
+      const lineX = (plan.stack.align === "center"
+        ? stackX + Math.round((plan.stack.colW - line.w) / 2) : stackX) + prefixWidth;
+      const underline = kind === "underline";
+      const underlineBox = () => ({
+        x: lineX, y: lineTop + plan.stack.parts.hl.firstAsc + line.desc + plan.stack.headlinePx * 0.08,
+            w: phraseWidth, h: plan.stack.parts.hl.lh * 0.14,
+            maxH: plan.stack.parts.hl.lh * 0.12,
+      });
+      const box = underline
+        ? underlineBox()
+        : { x: lineX - plan.stack.headlinePx * 0.10,
+            y: lineTop - plan.stack.headlinePx * 0.06,
+            w: phraseWidth + plan.stack.headlinePx * 0.22,
+            h: plan.stack.parts.hl.lh * 1.05,
+            maxH: plan.stack.parts.hl.lh * 1.02 };
+      // Keep the selected artwork. Never swap it or highlight other words
+      // when the chosen phrase does not fit the intact master.
+      refreshBackdrop();
+      const underlineRotation = C.fg === COLORS.white ? 0 : -1.2;
+      const mark = await drawTintedHighlighter(ctx, kind, colour, box, underline ? underlineRotation : -0.6, safeBounds);
+      if (!underline) {
+        const probe = {
+          x: lineX, y: lineTop + plan.stack.parts.hl.firstAsc - line.asc,
+          w: phraseWidth, h: line.asc + line.desc,
+        };
+        const worst = worstBackdrop(c, probe, false);
+        if (contrastRatio(hexL(COLORS.charcoal), worst.l) < WCAG_AA) {
+          ctx.drawImage(backdrop, 0, 0);
+          compatibilityReason = "The selected highlighter cannot keep this phrase readable at its original proportions. Use a shorter phrase or a neutral background. Not exported.";
+        }
+      }
+      if (mark && !compatibilityReason) {
+        ink(mark.x, mark.y, mark.w, mark.h, null);
+        emphasisDrawn = true;
+        emphasisKind = kind;
+        emphasisColour = colour;
+        if (!underline) C.headlineRuns = { [lineIndex]: { ...run, colour: COLORS.charcoal } };
+      } else if (!mark) {
+        compatibilityReason = "The selected highlighter does not fit inside the safe area. Shorten the emphasis phrase or choose another format. Not exported.";
+      }
+      refreshBackdrop();
+    }
+  }
+
+  if (v.copy && plan.stack) {
+    const stack = plan.stack, parts = stack.parts;
+    let top = stackTop;
+    const addTextBounds = (kind, part) => {
+      if (!part) return;
+      let baseline = top + part.firstAsc;
+      for (const line of part.lines) {
+        const x = stackX + (stack.align === "center" ? Math.round((stack.colW - line.w) / 2) : 0);
+        textBounds.push({ kind, x, y: baseline - line.asc, w: line.w, h: line.asc + line.desc });
+        baseline += part.lh;
+      }
+      top += part.h;
+    };
+    if (parts.kicker) { addTextBounds("kicker", parts.kicker); top += stack.gaps.kicker; }
+    addTextBounds("headline", parts.hl);
+    if (parts.sub) { top += stack.gaps.sub; addTextBounds("subline", parts.sub); }
+    if (parts.cta) {
+      top += stack.gaps.cta;
+      textBounds.push({ kind: "cta", x: stackX + (stack.align === "center" ? Math.round((stack.colW - parts.cta.w) / 2) : 0),
+        y: top, w: parts.cta.w, h: parts.cta.h });
+    }
+    plan.stack.draw(ctx, stackX, stackTop, C, ink);
+    headlineDrawn = !!plan.stack.parts.hl.lines.length;
+    sublineDrawn = !!plan.stack.parts.sub;
+    ctaDrawn = !!plan.stack.parts.cta;
+  }
 
   if (plan.footer) {
     /* A footer line carries the mark and the button side by side, which is the
        structure a poster reads fastest and the one a stacked lockup cannot do. */
     const f = plan.footer;
     let cx2 = f.x;
-    if (logo && logoImg) {
+    if (footerLogo && logo && logoImg) {
       const src = logo.usedCompact ? compactLogoImg : logoImg;
       const ly2 = Math.round(f.y + (f.h - logo.h) / 2);
-      ctx.drawImage(src, Math.round(f.x), ly2, logo.w, logo.h);
-      ink(Math.round(f.x), ly2, logo.w, logo.h, C.fg);
+      if (v.logo) {
+        ctx.drawImage(src, Math.round(f.x), ly2, logo.w, logo.h);
+        logoDrawn = true;
+        ink(Math.round(f.x), ly2, logo.w, logo.h, logoUsesInverse ? COLORS.white : COLORS.charcoal);
+        textBounds.push({ kind: "logo", x: Math.round(f.x), y: ly2, w: logo.w, h: logo.h });
+      }
+      if (geometry) geometry.logo = { x: Math.round(f.x), y: ly2, w: logo.w, h: logo.h };
       cx2 = f.x + logo.w + tk.pad;
     }
     if (v.copy && cta) {
-      const cpx = Math.max(11, Math.round(tk.ideal * tk.ctaRatio));
-      setFont(ctx, 700, cpx);
-      const m2 = measureLine(ctx, cta);
+      let cpx = Math.max(ASSET_TYPE_ROLES.cta.minPx, Math.min(Math.floor(f.h / 2.5), Math.round((plan.stack ? plan.stack.headlinePx : tk.ideal) * tk.ctaRatio)));
+      setFont(ctx, ASSET_TYPE_ROLES.cta.weight, cpx);
+      let m2 = measureLine(ctx, cta);
+      while (m2.w + cpx * 2.5 > f.x + f.w - cx2 && cpx > ASSET_TYPE_ROLES.cta.minPx) {
+        cpx--;
+        setFont(ctx, ASSET_TYPE_ROLES.cta.weight, cpx);
+        m2 = measureLine(ctx, cta);
+      }
       const bw = Math.round(m2.w + cpx * 2.5), bh = Math.round(cpx * 2.5);
-      if (bw <= f.x + f.w - cx2) {
+      if (bw <= f.x + f.w - cx2 && bh <= f.h) {
         const bx2 = Math.round(f.x + f.w - bw), by2 = Math.round(f.y + (f.h - bh) / 2);
         ctx.fillStyle = C.ctaBg; pill(ctx, bx2, by2, bw, bh); ctx.fill();
         setFont(ctx, 700, cpx);
         ctx.fillStyle = C.ctaFg;
         ctx.fillText(cta, bx2 + cpx * 1.25, by2 + bh / 2 + m2.asc / 2);
+        ctaDrawn = true;
         ink(bx2, by2, bw, bh, null);
+        textBounds.push({ kind: "cta", x: bx2, y: by2, w: bw, h: bh });
       }
     }
-  } else if (logo && logoImg) {
+  }
+  if (logo && !footerLogo && geometry) geometry.logo = { x: logoX, y: logoY, w: logo.w, h: logo.h };
+  if (v.logo && logo && logoImg && !footerLogo) {
     const src = logo.usedCompact ? compactLogoImg : logoImg;
     ctx.drawImage(src, logoX, logoY, logo.w, logo.h);
-    ink(logoX, logoY, logo.w, logo.h, C.fg);
+    logoDrawn = true;
+    ink(logoX, logoY, logo.w, logo.h, logoUsesInverse ? COLORS.white : COLORS.charcoal);
+    textBounds.push({ kind: "logo", x: logoX, y: logoY, w: logo.w, h: logo.h });
   }
 
   if (showSafe) drawSafeOutline();
@@ -2219,17 +2805,20 @@ export async function composeAsset(spec) {
   }
 
   function finish() {
-    /* HARD RULE. Only a platform's own reserved area can block a file. A
-       house margin is taste, and taste does not get to delete work. */
-    const tol = 1.5;
+    /* Every essential mark must fit inside the recorded safe rectangle.
+       Its provenance remains explicit, including studio crop guides. */
+    const tol = 0.01;
     const outside = INK.filter(k =>
       k.x < safe.left - tol || k.y < safe.top - tol ||
       k.x + k.w > w - safe.right + tol || k.y + k.h > h - safe.bottom + tol);
-    const hard = safe.kind === "hard";
-    const blocked = hard && outside.length > 0;
-    if (outside.length && !hard) {
-      notes.push({ level: "info", text: "Sits slightly wider than the studio margin at this size. No platform rule is broken." });
-    }
+    const missingLogo = v.logo && !logoDrawn;
+    const failedPhoto = photoDrawn && drewFrom !== "master"
+      && (upscale > SOFT_UPSCALE + 1e-6 || cropZoom < MIN_PHOTO_RETAINED - 1e-6);
+    const emptyComposition = !photoDrawn && !logoDrawn && !headlineDrawn && !sublineDrawn && !ctaDrawn;
+    const requiredCopyMissing = strictDesign && v.copy && (!headlineDrawn || (!!subline && !sublineDrawn) || (!!cta && !ctaDrawn));
+    const wc = verifyContrast();
+    const failedContrast = !(wc.min >= WCAG_AA - 0.05);
+    const blocked = !!compatibilityReason || outside.length > 0 || missingLogo || failedPhoto || emptyComposition || requiredCopyMissing || failedContrast;
     /* THE SOFTNESS SENTENCE IS NOT WRITTEN HERE ANY MORE.
        This engine measured the upscale while drawing and then drew its own
        conclusion in its own words, while `fileEnlargement` stated the same
@@ -2237,8 +2826,8 @@ export async function composeAsset(spec) {
        build could call a file soft in two vocabularies, and step 2 could
        call the family fine while step 3 called its files soft. The
        measurement is this engine's; the sentence is the module's. */
-    const enlarged = fileEnlargement({ upscale, hasPhoto: !!img });
-    if (enlarged.warns) notes.push({ level: "warn", text: enlarged.sentence });
+    const enlarged = fileEnlargement({ upscale, hasPhoto: photoDrawn, source: photoSourceSize });
+    if (enlarged.warns && drewFrom !== "master") notes.push({ level: "warn", text: enlarged.sentence });
     /* An extreme ratio always throws most of a photograph away. Saying so on
        a 728x90 is noise; saying so on a feed post is useful. */
     /* One line per kind of problem, not one per file. Exact percentages read
@@ -2246,11 +2835,17 @@ export async function composeAsset(spec) {
     if (cls !== "banner" && !(plan && plan.micro)) {
       if (cropCoverage < 0.42)
         notes.push({ level: "warn", text: "This ratio cuts into the subject. A photograph shaped closer to this family would hold together better." });
-      if (cropZoom < 0.22)
+      if (cropZoom < MIN_PHOTO_RETAINED)
         notes.push({ level: "warn", text: "Less than a quarter of the photograph survives this ratio. It is the wrong shape for this placement." });
     }
     const st = plan && plan.stack;
-    const wc = verifyContrast();
+    const copyDropped = {
+      headline: !!(v.copy && headline && !headlineDrawn),
+      subline: !!(v.copy && subline && !sublineDrawn),
+      cta: !!(v.copy && cta && !ctaDrawn),
+    };
+    const omitted = Object.entries(copyDropped).filter(([, dropped]) => dropped).map(([name]) => name === "cta" ? "button" : name);
+    if (omitted.length) notes.push({ level: "info", text: `This layout omits the ${omitted.join(" and ")}. Check that the remaining message is complete for this placement.` });
     if (!(wc.min >= WCAG_AA - 0.05)) {
       notes.push({ level: "warn", text: `Lowest measured text contrast is ${wc.min.toFixed(1)}:1, under the 4.5:1 this system holds itself to.` });
     }
@@ -2261,13 +2856,24 @@ export async function composeAsset(spec) {
          compares the two. */
       canvas: c, safe, layout: drawn, requestedLayout: requested,
       substituted: drawn !== requested,
-      design: design ? design.id : null, cls, tk, notes,
+      design: design ? design.id : null, cls, tk, notes, geometry,
       blocked,
       blockedReason: blocked
-        ? `${outside.length} element${outside.length > 1 ? "s" : ""} could not be kept out of the platform's reserved area at ${w}x${h}. Not exported.`
+        ? compatibilityReason || (outside.length ? `${outside.length} element${outside.length > 1 ? "s" : ""} could not be kept inside the safe area at ${w}x${h}. Not exported.`
+          : missingLogo ? "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
+          : requiredCopyMissing ? "The complete message does not fit this design at the approved minimum sizes. Shorten the copy or choose another format. Not exported."
+          : emptyComposition ? "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
+          : failedContrast ? "The text cannot stay readable on this photograph or colour field. Choose a different photograph or a neutral field. Not exported."
+          : "This photograph cannot retain enough detail and framing in the chosen layout. Choose a complete photo layout or a larger original. Not exported.")
         : null,
       ink: INK,
       metrics: {
+        designPreserved: variant === "clean" ? null : !!(design && drawn === requested && !compatibilityReason),
+        emphasisPhrase: C.emphasis, emphasisDrawn, textBounds,
+        emphasisKind, emphasisColour,
+        emphasisSupported: !!(v.copy && plan && plan.highlight),
+        headlineWeight: st ? st.parts.hl.weight : null,
+        sublineWeight: st && st.parts.sub ? st.parts.sub.weight : null,
         headlinePx: st ? st.headlinePx : 0,
         idealPx: tk.ideal,
         scaleRatio: st ? +(st.headlinePx / tk.ideal).toFixed(3) : null,
@@ -2287,7 +2893,15 @@ export async function composeAsset(spec) {
         veil: +veilAlpha.toFixed(2),
         cropCoverage: +cropCoverage.toFixed(3),
         cropZoom: +cropZoom.toFixed(3),
-        upscale: +upscale.toFixed(2),
+        upscale,
+        sourceWidth: photoSourceSize ? photoSourceSize.w : null,
+        sourceHeight: photoSourceSize ? photoSourceSize.h : null,
+        photoRect,
+        photoAdaptation,
+        safeViolations: outside.length,
+        logoDrawn,
+        emptyComposition,
+        copyDropped,
         drewFrom,
         safeKind: safe.kind,
         marks: INK.length,
@@ -2297,4 +2911,42 @@ export async function composeAsset(spec) {
       },
     };
   }
+}
+
+/* Public composition is self-correcting for approved colour combinations.
+   The design geometry and copy never change. If a Teal field cannot carry an
+   approved logo colourway, the renderer tries the neutral fields itself and
+   returns the first complete, safe result. */
+export async function composeAsset(spec) {
+  const requestedBand = spec.band || BAND_CHOICES[0];
+  const palette = resolveAssetPalette(requestedBand, spec.ctaBg);
+  const prepared = { ...spec, band: palette.band, ctaBg: palette.ctaBg, ctaFg: palette.ctaFg };
+  let result = await composeAssetOnce(prepared);
+  let resolvedBand = requestedBand;
+  let resolvedPalette = palette;
+  let colourAdjusted = palette.adjusted;
+  const colourBlocked = result.blocked && /logo|background|colour field|contrast|readable/i.test(result.blockedReason || "");
+  if (colourBlocked) {
+    const candidates = ["sand", "white", "charcoal", "teal"]
+      .filter(id => id !== requestedBand.id)
+      .map(id => BAND_CHOICES.find(candidate => candidate.id === id)).filter(Boolean);
+    for (const candidate of candidates) {
+      const nextPalette = resolveAssetPalette(candidate, spec.ctaBg);
+      const next = await composeAssetOnce({ ...spec, band: candidate,
+        ctaBg: nextPalette.ctaBg, ctaFg: nextPalette.ctaFg });
+      if (!next.blocked) {
+        result.canvas.width = result.canvas.height = 1;
+        result = next; resolvedBand = candidate; resolvedPalette = nextPalette; colourAdjusted = true;
+        result.notes.unshift({ level: "info", text: `Colours were resolved automatically for this format using the approved ${candidate.label} field.` });
+        break;
+      }
+      next.canvas.width = next.canvas.height = 1;
+    }
+  }
+  result.metrics = { ...(result.metrics || {}),
+    requestedBand: requestedBand.id, resolvedBand: resolvedBand.id,
+    requestedCtaBg: spec.ctaBg || null, resolvedCtaBg: resolvedPalette.ctaBg,
+    colourAdjusted,
+  };
+  return result;
 }

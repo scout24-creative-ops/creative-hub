@@ -77,7 +77,7 @@ import {
   rotationSet, seedOf, normaliseLayout, allowedVariants, withheldVariants,
 } from "./ad-engine.js";
 
-export const FACTS_VERSION = "1.0.0";
+export const FACTS_VERSION = "1.1.0";
 
 /* ---------------------------------------------------------------- shaping */
 /* Tolerant readers. Every function here is handed something a browser built
@@ -556,10 +556,12 @@ function adapterSentenceOf(c, source) {
    many rows it counted and how many carried no structure at all, and the
    caller picks its list once. */
 export function structureFacts(rows) {
-  const list = arr(rows).map(obj);
+  const list = arr(rows).map(obj).filter(r => !r.blocked);
+  const photoOnly = list.filter(r => r.vId === "clean" || r.variant === "clean" || r.style === "photo");
+  const designed = list.filter(r => !photoOnly.includes(r));
   const drawn = list.map(r => str(r.style)).filter(Boolean);
   const ids = uniq(drawn);
-  const designs = uniq(list.map(r => str(r.design)).filter(Boolean));
+  const designs = uniq(designed.map(r => str(r.design)).filter(Boolean));
   /* ONE READING OF "THIS FRAME IS NOT WHAT WAS ASKED FOR", and the count and
      the frame now share it. This filter used to compare the two ids itself
      and hand back a bare pair, so the aggregate knew a thing no frame could
@@ -589,8 +591,8 @@ export function structureFacts(rows) {
      brackets an id it cannot name rather than borrowing a label. */
   const designLabels = designs.map(id => labelOf("design", id).label);
   const drewFrom = !designLabels.length ? ""
-    : designLabels.length === 1 ? `Every file was drawn from ${designLabels[0]}. `
-    : `${countPhrase(designLabels.length, null, "design")} drew this set. `;
+    : designLabels.length === 1 ? `${countPhrase(designed.length, null, "designed file")} ${designed.length === 1 ? "was" : "were"} drawn from ${designLabels[0]}. `
+    : `${countPhrase(designLabels.length, null, "design")} drew the designed variants in this set. `;
   /* KNOWN, RATHER THAN ZERO. A history row written before `structures`
      existed carries an empty array, and the row printed
      `(h.structures||[]).length || ROTATION_POOL.length` — eight, a number
@@ -605,6 +607,11 @@ export function structureFacts(rows) {
     rotated: designs.length > 1,
     substituted, substitutedCount: substituted.length,
     counted: list.length,
+    designFiles: designed.length,
+    photoOnlyFiles: photoOnly.length,
+    photoOnlySentence: photoOnly.length
+      ? `${countPhrase(photoOnly.length, null, "image-only file")} ${photoOnly.length === 1 ? "contains" : "contain"} the photograph without the selected layout, logo or copy. These are separate photo outputs, not designed variants.`
+      : "",
     withoutStructure: list.length - drawn.length,
     phrase: known ? countPhrase(ids.length, null, "structure") : "",
     sentence: ids.length > 1
@@ -619,48 +626,19 @@ export function structureFacts(rows) {
        tool ignoring an instruction. It ends by pointing at the frames,
        because the frames now carry the same fact one at a time. */
     substitutedSentence: substituted.length
-      ? `${countPhrase(substituted.length, null, "frame")} of ${list.length} could not take the structure asked for, `
-        + `so the engine drew one that fits. Each of those frames says which.`
+      ? `${countPhrase(substituted.length, null, "frame")} of ${list.length} used a different layout from the selected design. Review or rebuild these outputs. Each frame names the layout that was actually drawn.`
       : "",
   };
 }
 
-/* WHAT ONE FRAME WAS DRAWN IN, WHEN THAT IS NOT WHAT IT WAS ASKED FOR.
+/* A selected layout is no longer replaced automatically. Held rows have no
+   rendered design. A clean photo is an explicit variant, not a successful
+   rendition of the selected template and not an accidental substitution.
+   Historical rows can still describe an actual substitution; name it as a
+   different layout rather than defending it as an unchanged design.
 
-   `structureFacts` counts these across a set. This names ONE, and it exists
-   because the count was the only place the fact was ever stated. The
-   behaviour is right and is not changing: a concept with no photograph is
-   set typographically, a canvas too small for a sentence runs as an end
-   frame, the image-only variant carries no structure at all. What was wrong
-   is that it was explained only in aggregate, in a paragraph, while the grid
-   of preview frames visibly disagreeing with the chosen design said nothing
-   at all. The product owner read that as the tool ignoring the choice —
-   "Preview changes the designs throughout the set" — which is the one
-   reading this behaviour cannot afford.
-
-   REGISTER, AND IT IS NOT AN ERROR. The withheld-files card sets the voice:
-   state the fact, then say whose fact it is. A frame drawn as a brand end
-   frame is the engine protecting a headline that would not have fitted, not
-   a build that went wrong, and nothing here may read as a warning.
-
-   WHY THE REASON IS NOT IN THE SENTENCE, WHICH IS THE ONE JUDGEMENT CALL
-   HERE. The reason is already authored twice in this product: once as each
-   structure's blurb in ENGINE_STRUCTURES and LAYOUTS, reachable through
-   `labelOf(...).note`, and once as the info note `composeAsset` pushes onto
-   the frame while it substitutes — "Too small for a sentence, so the canvas
-   runs as a mark and a button" against "Too small for a sentence, so this
-   size runs as a brand end frame: mark and button only". Same fact, two
-   vocabularies, and the big preview prints the engine's one directly under
-   where this sentence lands. Folding a third phrasing in here, or stacking
-   the blurb on top of the note, is precisely the defect this module exists
-   to end. So this states what happened and leaves the reason to the one
-   surface that already carries it.
-
-   Takes a row in either of the two shapes this product holds: the build's
-   own `{ style, requestedStyle }` and the `{ drawn, requested }` pair
-   `structureFacts` hands out. Both ids go through `normaliseLayout`, so a
-   saved session carrying the old `band` id is not reported as a substitution
-   for the `anchor` it is a spelling of. */
+   Both persisted {style, requestedStyle} and live {drawn, requested} shapes
+   are supported. Alias normalization keeps older band/anchor rows readable. */
 export function substitutionFacts(row) {
   const r = obj(row);
   const drawn = str(r.drawn) || str(r.style);
@@ -668,13 +646,23 @@ export function substitutionFacts(row) {
   /* A file that was never composed has no drawn structure, and a frame that
      got what it asked for has nothing to say. Neither is a substitution, and
      both must return the same empty shape rather than a half-filled one. */
-  if (!drawn || !requested || normaliseLayout(drawn) === normaliseLayout(requested))
-    return { substituted: false, drawn, requested, drawnLabel: "", requestedLabel: "", short: "", line: "", sentence: "" };
+  if (r.blocked || !drawn)
+    return { substituted: false, intentionalPhoto: false, drawn, requested, drawnLabel: "", requestedLabel: "", short: "", line: "", sentence: "" };
+  if (r.vId === "clean" || r.variant === "clean" || drawn === "photo")
+    return {
+      substituted: false, intentionalPhoto: true, drawn, requested,
+      drawnLabel: labelOf("structure", "photo").label, requestedLabel: requested ? labelOf("structure", requested).label : "",
+      short: "Image only. No design applied.",
+      line: "Image only. The photograph is exported without layout, logo or copy.",
+      sentence: "Image only is an intentional photo output. It contains no layout, logo or copy and is not counted as a designed variant of your selected template.",
+    };
+  if (!requested || normaliseLayout(drawn) === normaliseLayout(requested))
+    return { substituted: false, intentionalPhoto: false, drawn, requested, drawnLabel: "", requestedLabel: "", short: "", line: "", sentence: "" };
   const d = labelOf("structure", drawn);
   const q = labelOf("structure", requested);
   const line = `Drawn as ${d.label}, not ${q.label}.`;
   return {
-    substituted: true, drawn, requested,
+    substituted: true, intentionalPhoto: false, drawn, requested,
     drawnLabel: d.label, requestedLabel: q.label,
     /* Three lengths, because the surfaces are three sizes. `short` is a chip
        beside a 38px thumbnail, `line` is a caption under a card, `sentence`
@@ -682,8 +670,7 @@ export function substitutionFacts(row) {
        a frame and the card above it cannot name two different structures. */
     short: `Drawn as ${d.label}`,
     line,
-    sentence: `${line} The engine substitutes whenever the structure asked for cannot be drawn `
-      + `on the canvas in front of it. That is a fact about this frame, not a change of design.`,
+    sentence: `${line} This is a different layout from the selected design. Rebuild this format to retain your selection.`,
   };
 }
 
@@ -750,15 +737,33 @@ export function plannedStructures(designId, conceptId, placementCount) {
 
    `prediction: true` for the same reason `plannedStructures` carries it:
    what ships is counted from the files. */
+const PAGE_KINDS = ["landingpage", "email"];
+const PAGE_NOUNS = { landingpage: "landing page", email: "email", other: "page file" };
+
+function pageCountsOf(pages) {
+  const counts = { landingpage: 0, email: 0, other: 0 };
+  for (const page of pages) counts[PAGE_KINDS.includes(page.kind) ? page.kind : "other"]++;
+  return counts;
+}
+
+function pageCountPhrase(counts) {
+  return andList(Object.keys(PAGE_NOUNS).filter(kind => counts[kind] > 0)
+    .map(kind => countPhrase(counts[kind], null, PAGE_NOUNS[kind])));
+}
+
 export function plannedBuild(input) {
   const i = obj(input);
   const concepts = arr(i.concepts).map(obj);
   const places = arr(i.placements).map(obj);
-  /* Every build writes one landing page and one email per concept. They
-     always shipped; the count left them out, so the bar promised 24 files
-     and handed over 26, and the two nobody counted were the two nobody
-     found. */
-  const perConcept = num(i.pagesPerConcept) == null ? 2 : Math.max(0, i.pagesPerConcept);
+  /* An explicit selection is authoritative, including an empty selection.
+     Legacy callers still get their existing default pair or numeric count.
+     A legacy numeric count other than two cannot identify document kinds. */
+  const hasPageKinds = Object.prototype.hasOwnProperty.call(i, "pageKinds");
+  const legacyCount = num(i.pagesPerConcept) == null ? 2 : Math.max(0, i.pagesPerConcept);
+  const pageKinds = hasPageKinds
+    ? PAGE_KINDS.filter(kind => arr(i.pageKinds).includes(kind))
+    : legacyCount === 2 ? [...PAGE_KINDS] : legacyCount === 0 ? [] : null;
+  const perConcept = hasPageKinds ? pageKinds.length : legacyCount;
 
   /* Three things the build withholds, and all three are withheld here or the
      bar promises files that never come: the image-only variant of a concept
@@ -800,15 +805,31 @@ export function plannedBuild(input) {
     if (w) hold(w.ids.length, `takes ${w.takes}`, at);
   }
   const pages = concepts.length * perConcept;
+  const pageCounts = {
+    landingpage: pageKinds?.includes("landingpage") ? concepts.length : 0,
+    email: pageKinds?.includes("email") ? concepts.length : 0,
+    other: pageKinds === null ? pages : 0,
+  };
   const files = ads + pages;
   const heldReasons = [...byReason.values()].sort((a, b) => b.files - a.files);
   const heldAt = (byReason.get(NO_STILL) || { placements: [] }).placements;
   const many = concepts.length > 1;
+  const pageNames = Object.keys(PAGE_NOUNS).filter(kind => pageCounts[kind] > 0);
+  const pagesDefinite = pages
+    ? "The " + andList(pageNames.map((kind, index) =>
+      (index ? "the " : "") + plural(pageCounts[kind], PAGE_NOUNS[kind])))
+    : "";
+  const perConceptPhrase = pageKinds === null
+    ? countPhrase(perConcept, null, "page file")
+    : andList(pageKinds.map(kind => kind === "email" ? "an email" : "a landing page"));
+  const pagesIndefinite = pages
+    ? perConceptPhrase + (many ? " for each concept" : " from the same concept")
+    : "";
 
   return {
     prediction: true,
     concepts: concepts.length, placements: places.length,
-    ads, held, pages, files, heldAt, heldReasons,
+    ads, held, pages, files, heldAt, heldReasons, pageKinds, pageCounts,
     phrases: {
       files: countPhrase(files, null, "file"),
       ads: countPhrase(ads, null, "ad"),
@@ -826,9 +847,9 @@ export function plannedBuild(input) {
              single list of unrelated things. */
           + heldReasons.map(r =>
             `${andList(r.placements)} ${r.placements.length === 1 ? "" : "each "}${r.reason}`).join("; ") + ".",
-      pagesDefinite: many ? "The landing pages and the emails" : "The landing page and the email",
-      pagesIndefinite: many ? "a landing page and an email for each concept"
-                            : "a landing page and an email from the same concept",
+      pages: pageCountPhrase(pageCounts),
+      pagesDefinite,
+      pagesIndefinite,
     },
   };
 }
@@ -960,7 +981,7 @@ function safeSentenceOf({ box, W, H, kind, centreBias, house, platforms, weakest
   const rect = `top ${box.top} / right ${box.right} / bottom ${box.bottom} / left ${box.left} on ${W}×${H}`;
   if (house) {
     return `No platform publishes a safe zone for ${platformsClause(platforms, "these placements")}, so a studio margin is applied: `
-      + `${rect}, ${Math.round(BRAND_MARGIN_RATIO * 1000) / 10}% of the short edge. It shapes the layout and never blocks a file.`;
+      + `${rect}, ${Math.round(BRAND_MARGIN_RATIO * 1000) / 10}% of the short edge. Professionals keeps essential content inside this Studio margin before export.`;
   }
   if (kind === "hard") {
     const who = platforms.length > 1
@@ -1150,6 +1171,7 @@ export function buildFacts(input) {
   const i = obj(input);
   const built = arr(i.built).map(obj);
   const pages = arr(i.pages).map(obj);
+  const pageCounts = pageCountsOf(pages);
   const rows = arr(i.rows).map(obj);
   const planned = num(i.planned);
 
@@ -1182,6 +1204,7 @@ export function buildFacts(input) {
     files: built.length + pages.length,
     ads: built.length,
     pageFiles: pages.length,
+    pageCounts,
     placementsPlanned: planned,
     placementsBuilt,
     blocked: blockedRows.length,
@@ -1208,12 +1231,7 @@ export function buildFacts(input) {
     files: countPhrase(facts.files, null, "file"),
     ads: countPhrase(facts.ads, null, "ad"),
     placements: countPhrase(placementsBuilt, planned, "placement"),
-    /* Every build writes one landing page and one email per concept, which
-       is what makes this a count of pairs. If that ever stops being true the
-       honest answer is the file count, not half of an odd number. */
-    pages: !pages.length ? ""
-      : pages.length % 2 ? countPhrase(pages.length, null, "page file")
-      : `${countPhrase(pages.length / 2, null, "landing page")} and ${plural(pages.length / 2, "email")}`,
+    pages: pageCountPhrase(pageCounts),
     blocked: facts.blocked
       ? `${countPhrase(facts.blocked, null, "file")} ${facts.blocked === 1 ? "was" : "were"} not exported`
       : "",
@@ -1268,7 +1286,7 @@ export function buildFacts(input) {
    fourth copy of that literal. */
 export function softnessOf(upscale) {
   const u = num(upscale);
-  if (u == null) return "unknown";
+  if (u == null || u <= 0) return "unknown";
   if (u <= NATIVE_TOLERANCE) return "native";
   if (u <= SOFT_UPSCALE) return "adequate";
   if (u <= HARD_UPSCALE) return "soft";
@@ -1279,7 +1297,7 @@ export function softnessOf(upscale) {
 export function enlargementFacts(verdict) {
   const v = obj(verdict);
   const u = num(v.upscale);
-  if (v.mixed || u == null) {
+  if (v.mixed || u == null || u <= 0) {
     return {
       scope: "family-plan", prediction: true,
       upscale: null, at: null, band: "n/a", sentence: "", needSource: null,
@@ -1291,11 +1309,13 @@ export function enlargementFacts(verdict) {
     : null;
   const where = at ? ` on ${at.platform} ${at.placement} at ${at.w}×${at.h}` : "";
   const x = timesPhrase(u).text;
+  const originalSufficient = u > SOFT_UPSCALE && num(v.sourceUpscale) > 0 && v.sourceUpscale <= SOFT_UPSCALE;
   const sentence =
-    band === "native" ? "Every size in this family comes off the master without being enlarged."
-    : band === "adequate" ? `The largest size in this family enlarges the master ${x}${where}, inside the ${SOFT_UPSCALE}× this system calls soft.`
-    : band === "soft" ? `The largest size in this family enlarges the master ${x}${where}, past ${SOFT_UPSCALE}×, so those files will look soft.`
-    : `The largest size in this family enlarges the master ${x}${where}. That is past ${HARD_UPSCALE}×, where the resampler is inventing most of the detail.`;
+    originalSufficient ? "The Studio uses the original directly for this family instead of enlarging the reduced family preview."
+    : band === "native" ? "Every size in this family comes off the master without being enlarged."
+    : band === "adequate" ? `The largest size in this family uses ${x} enlargement${where}. The final design is checked again at export size.`
+    : band === "soft" ? `The ratio master uses ${x} enlargement${where}. The Studio prepares it automatically and keeps the selected layout.`
+    : `The ratio master uses ${x} enlargement${where}. The Studio prepares it automatically and checks the finished export.`;
 
   /* WHAT SOURCE WOULD FIX IT, in pixels, because "supply a larger original"
      is not actionable and "supply at least 2882x1920" is. READ OFF THE
@@ -1317,20 +1337,33 @@ export function fileEnlargement(metrics) {
      clean variant of a photoless concept is never built. There is no
      enlargement to report and reporting 1.00x would be a claim about a
      draw that never happened. */
-  if (u == null || m.hasPhoto === false) {
+  if (m.hasPhoto === false) {
     return { scope: "file", upscale: null, band: "none", hasPhoto: false, warns: false, sentence: "" };
+  }
+  if (u == null || u <= 0) {
+    return { scope: "file", upscale: null, band: "unknown", hasPhoto: m.hasPhoto === true,
+      warns: false, sentence: m.hasPhoto === true ? "Photo resolution has not been measured yet." : "" };
   }
   const band = softnessOf(u);
   /* The exact boundary ad-engine's own warning uses, expressed once. */
   const warns = u > SOFT_UPSCALE;
   const x = timesPhrase(u).text;
+  const source = obj(m.source);
+  const sourceW = num(source.w) || num(m.sourceWidth);
+  const sourceH = num(source.h) || num(m.sourceHeight);
+  const needSource = warns && sourceW > 0 && sourceH > 0
+    ? { w: Math.ceil(sourceW * u), h: Math.ceil(sourceH * u) }
+    : null;
+  const replace = needSource
+    ? `an original of at least ${needSource.w}×${needSource.h} pixels`
+    : "a higher resolution original";
   return {
-    scope: "file", upscale: u, band, hasPhoto: true, warns,
+    scope: "file", upscale: u, band, hasPhoto: true, warns, needSource,
     sentence: warns
-      ? `This file enlarges the photograph ${x}, past the ${SOFT_UPSCALE}× this system calls soft, so it will look soft. Supply a larger original.`
+      ? `Photo detail needs attention at export size (${x} enlargement). Choose a layout with a smaller image area or use ${replace}.`
       : band === "native"
         ? "The photograph was drawn at its own resolution or smaller, so nothing in this file is enlarged."
-        : `This file enlarges the photograph ${x}, inside the ${SOFT_UPSCALE}× this system calls soft.`,
+        : `The photograph uses ${x} enlargement. Check the full size preview before export.`,
   };
 }
 
@@ -1456,9 +1489,13 @@ export function designsOf(row) {
   const r = obj(row);
   const f = obj(r.facts);
   const listed = arr(f.designs).map(str).filter(Boolean);
-  if (listed.length) return uniq(listed);
-  const drawn = uniq(arr(r.perAssetMetrics).map(m => str(obj(m).design)).filter(Boolean));
-  if (drawn.length) return drawn;
+  // An explicitly empty delivered list is a fact, not a missing field.
+  // Clean photos and held outputs must not credit the requested design.
+  if (Array.isArray(f.designs)) return uniq(listed);
+  const drawn = uniq(arr(r.perAssetMetrics).map(obj)
+    .filter(m => !m.blocked && m.variant !== "clean" && m.vId !== "clean" && m.style !== "photo")
+    .map(m => str(m.design)).filter(Boolean));
+  if (Array.isArray(r.perAssetMetrics)) return drawn;
   const asked = str(r.design)
     || (str(r.layout) && (DESIGNS.find(d => d.style === r.layout) || {}).id)
     || "";

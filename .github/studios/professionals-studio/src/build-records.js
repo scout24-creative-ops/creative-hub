@@ -191,9 +191,13 @@ function openDb() {
   if (!recordsAvailable()) return Promise.reject(new Error("this browser offers no IndexedDB, so nothing can be stored"));
   const p = new Promise((resolve, reject) => {
     let req;
+    let settled = false;
+    const finish = (fn, value) => { if (settled) return; settled = true; clearTimeout(timer); fn(value); };
+    const timer = setTimeout(() => finish(reject, new Error("the browser's database did not open in time")), TIMEOUT_MS);
     try { req = indexedDB.open(DB_NAME, DB_VERSION); }
-    catch (e) { reject(new Error(describe(e))); return; }
+    catch (e) { finish(reject, new Error(describe(e))); return; }
     req.onupgradeneeded = () => {
+      if (settled) { try { req.transaction.abort(); } catch (e) {} return; }
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE)) {
         const os = db.createObjectStore(STORE, { keyPath: "buildId" });
@@ -205,14 +209,15 @@ function openDb() {
     };
     req.onsuccess = () => {
       const db = req.result;
+      if (settled) { try { db.close(); } catch (e) {} return; }
       /* Another tab upgrading the schema must not find this connection in
          its way: let go, and let the next call open again. */
       db.onversionchange = () => { try { db.close(); } catch (e) {} dbPromise = null; };
       db.onclose = () => { dbPromise = null; };
-      resolve(db);
+      finish(resolve, db);
     };
-    req.onerror = () => reject(new Error(describe(req.error)));
-    req.onblocked = () => reject(new Error("another tab is holding an older version of the database open"));
+    req.onerror = () => finish(reject, new Error(describe(req.error)));
+    req.onblocked = () => finish(reject, new Error("another tab is holding an older version of the database open"));
   });
   /* A failed open must not be remembered as the answer forever: a private
      window that the user leaves, or a quota that gets cleared, deserves a
@@ -227,8 +232,10 @@ function run(mode, work) {
      giving up on a write is not the same as stopping it, and only one of the
      two is something we can honestly report. */
   let tx = null;
+  let cancelled = false;
   const p = (async () => {
     const db = await openDb();
+    if (cancelled) throw new Error("the database operation expired before it could start");
     return await new Promise((resolve, reject) => {
       let t;
       try { t = db.transaction(STORE, mode); }
@@ -242,7 +249,7 @@ function run(mode, work) {
       catch (e) { try { t.abort(); } catch (_) {} reject(new Error(describe(e))); }
     });
   })();
-  return withDeadline(p, () => tx);
+  return withDeadline(p, () => tx, () => { cancelled = true; });
 }
 
 /* The deadline exists because IndexedDB can hang, and nothing in a build may
@@ -254,13 +261,14 @@ function run(mode, work) {
    So the deadline stops the write rather than merely stopping the wait. Aborting
    is what makes the failure true, and the browser's refusal to abort is what
    tells us it is not. */
-function withDeadline(promise, transaction) {
+function withDeadline(promise, transaction, cancel) {
   return new Promise((resolve, reject) => {
     let settled = false;
     let timer = null;
     const finish = (fn, v) => { if (settled) return; settled = true; clearTimeout(timer); fn(v); };
     const late = () => new Error(`the browser's database did not answer within ${Math.round(TIMEOUT_MS / 1000)} seconds`);
     const expire = () => {
+      cancel();
       const t = transaction();
       /* No transaction yet means the open itself is hanging, which is the
          blocked-by-another-tab case: nothing was written, and saying so is true. */
