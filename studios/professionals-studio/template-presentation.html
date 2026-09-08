@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style data-omelette-injected>html,body{background:transparent}</style><script data-omelette-injected>(()=>{{const W=new URLSearchParams(location.search).get("theme");if(W==="light"||W==="dark"){document.documentElement.dataset.theme=W}}{if(new URLSearchParams(location.search).get("_omthumb")==="1"){const W=(q)=>{const X=q.focus;if(!X)return;q.focus=function(H){X.call(this,{...H,preventScroll:true})}};W(HTMLElement.prototype);W(SVGElement.prototype);if(typeof MathMLElement!=="undefined"){W(MathMLElement.prototype)}const $=(q)=>{q.removeAttribute("autofocus");q.inert=true;if(!(q instanceof HTMLElement))q.removeAttribute("tabindex")};const z=(q)=>{if(q.hasAttribute("autofocus"))$(q);for(const X of q.querySelectorAll("[autofocus]")){$(X)}};z(document.documentElement);new MutationObserver((q)=>{for(const X of q){for(const H of X.addedNodes){if(H.nodeType===1)z(H)}}}).observe(document,{childList:true,subtree:true})}}{const W=()=>{try{if(document.querySelector('meta[name="color-scheme"]'))return;const $=getComputedStyle(document.documentElement).getPropertyValue("color-scheme").trim();if($&&$!=="normal")return;const z=(j)=>{if(!j)return null;const F=getComputedStyle(j).backgroundColor.match(/^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+%?))?\s*\)$/);if(!F)return null;const G=F[4]==null?1:parseFloat(F[4])/(F[4].endsWith("%")?100:1);if(G<0.99)return null;return[+F[1],+F[2],+F[3]]};const q=z(document.body)||z(document.documentElement);if(!q)return;const X=(j)=>{const F=j/255;return F<=0.04045?F/12.92:((F+0.055)/1.055)**2.4};const H=0.2126*X(q[0])+0.7152*X(q[1])+0.0722*X(q[2]);document.documentElement.style.setProperty("color-scheme",H<0.4?"dark":"light")}catch{}};if(document.readyState==="complete")W();else window.addEventListener("load",W)}var b=[];var p=false;var u=30000;var d=3000;document.addEventListener("DOMContentLoaded",()=>{const W=window.Babel;const $="om-src-id";if(W&&W.registerPlugin&&!(W.availablePlugins&&W.availablePlugins[$])){W.registerPlugin($,({types:H})=>({visitor:{JSXOpeningElement(j,F){const G=j.node;if(G.name&&G.name.type==="JSXMemberExpression")return;for(let Q=0;Q<G.attributes.length;Q++){const V=G.attributes[Q];if(V.type==="JSXAttribute"&&V.name&&V.name.name==="data-om-id")return}const P=F.file&&F.file.opts&&F.file.opts.filename||"?";const R=G.loc&&G.loc.start;const J=`jsx:${P}:${G.start??0}:${R?R.line:0}:${R?R.column+1:0}`;G.attributes.push(H.jsxAttribute(H.jsxIdentifier("data-om-id"),H.stringLiteral(J)))}}}))}const z="om-text-extract";let q=false;if(p&&W&&W.registerPlugin&&!(W.availablePlugins&&W.availablePlugins[z])){const H=window.React;if(H&&H.useSyncExternalStore&&H.createElement){q=true;const j={};const F=new Set;let G=0;window.__omTextO=j;window.__omTextSet=(J)=>{for(const Q in J){const V=J[Q];if(V==null)delete j[Q];else j[Q]=V}G++;F.forEach((Q)=>Q())};const P=(J)=>{F.add(J);return()=>F.delete(J)};const R=()=>G;window.__OmT=function J(Q){H.useSyncExternalStore(P,R,R);return H.createElement("span",{"data-om-text":Q.i,className:"__om-t"},Q.i in j?j[Q.i]:Q.children)};W.registerPlugin(z,({types:J})=>{const Q={style:1,script:1,noscript:1,textarea:1,title:1,option:1,text:1,tspan:1,textPath:1};const V={placeholder:1,alt:1,title:1,label:1,"aria-label":1,"aria-description":1,"aria-placeholder":1};const Y=(K,M)=>J.logicalExpression("??",J.memberExpression(J.logicalExpression("||",J.memberExpression(J.identifier("window"),J.identifier("__omTextO")),J.objectExpression([])),J.stringLiteral(K),true),M);const Z=(K)=>K.file&&K.file.opts&&K.file.opts.filename||"?";const B=(K)=>K.file&&K.file.code||"";const U=(K,M)=>{const L=(D)=>D&&D.start!=null&&D.end!=null&&(D.type==="StringLiteral"||D.type==="TemplateLiteral"&&D.expressions.length===0)?[D.start,D.end]:null;const N=L(M);if(N)return N;if(M&&M.type==="Identifier"){const D=K.scope.getBinding(M.name);if(D&&D.constant&&D.path.node.type==="VariableDeclarator"){return L(D.path.node.init)}}return null};const x=(K,M,L)=>{const N=K.node;let D=false;const f=(w,A)=>{D=true;return J.jsxElement(J.jsxOpeningElement(J.jsxIdentifier("__OmT"),[J.jsxAttribute(J.jsxIdentifier("i"),J.stringLiteral(w))],false),J.jsxClosingElement(J.jsxIdentifier("__OmT")),[A],false)};const C=N.children.map((w)=>{if(w.type==="JSXText"){if(w.start==null||w.end==null)return w;const A=L.slice(w.start,w.end);const S=A.length-A.trimStart().length;const O=A.length-A.trimEnd().length;if(S+O>=A.length)return w;return f(`txt:${M}:${w.start+S}:${w.end-O}`,w)}if(w.type==="JSXExpressionContainer"){const A=U(K,w.expression);if(A)return f(`str:${M}:${A[0]}:${A[1]}`,w)}return w});if(D)N.children=C};return{visitor:{JSXOpeningElement(K,M){const L=K.node;const N=Z(M);const D={};for(let f=0;f<L.attributes.length;f++){const C=L.attributes[f];if(C.type!=="JSXAttribute"||!C.name)continue;const w=C.name.name;if(!V[w])continue;if(!C.value||C.value.type!=="StringLiteral")continue;if(C.value.start==null||C.value.end==null)continue;const A=`txt:${N}:${C.value.start}:${C.value.end}`;D[w]=A;C.value=J.jsxExpressionContainer(Y(A,J.stringLiteral(C.value.value)))}if(Object.keys(D).length){L.attributes.push(J.jsxAttribute(J.jsxIdentifier("data-om-text-attrs"),J.stringLiteral(JSON.stringify(D))))}},JSXElement(K,M){const L=K.node.openingElement;const N=L&&L.name&&L.name.name;if(N==="__OmT")return;if(typeof N==="string"&&Q[N])return;x(K,Z(M),B(M))},JSXFragment(K,M){x(K,Z(M),B(M))}}}})}}const X=q?["transform-react-jsx-source",$,z]:["transform-react-jsx-source",$];document.querySelectorAll('script[type="text/babel"],script[type="text/jsx"]').forEach((H,j)=>{const F=H.getAttribute("data-plugins")||"";const G=X.filter((P)=>F.indexOf(P)<0);if(G.length){H.setAttribute("data-plugins",F?`${F},${G.join(",")}`:G.join(","))}if(!H.hasAttribute("data-filename")){H.setAttribute("data-filename",H.getAttribute("src")||`inline-${j}`)}})});var I=window.parent;var g="not editable here, open the project in the Claude Design editor to save";var n=()=>Promise.resolve({persisted:false,noHost:true,reason:g});var k=n;var v="data/storage.json";var l=()=>{try{const W=new URL(document.baseURI);const $=W.pathname.match(/\/projects\/([^/]+)\/serve\//);if($)return $[1];return W.hostname.split(".")[0]||""}catch{return location.hostname.split(".")[0]||""}};var o=()=>{try{const W=new URL(document.baseURI);const $=W.pathname.indexOf("/serve/");if($>=0)return W.origin+W.pathname.slice(0,$+"/serve/".length)+v}catch{}return"./"+v};var E=null;var _=()=>{if(!E){E=fetch(o(),{cache:"no-store"}).then((W)=>{if(W.ok)return W.text();return W.status===404?"":null}).catch(()=>null).then((W)=>{if(W===null){E=null;return null}const $=new Map;if(!W)return $;let z;try{z=JSON.parse(W)}catch{console.warn("[omelette.storage] "+v+" is not valid JSON; treating the store as unreadable so a save cannot overwrite the "+"hand-edited bytes. Fix the JSON (or delete the file) to re-enable persistence.");E=null;return null}if(z===null||typeof z!=="object"||Array.isArray(z)){console.warn("[omelette.storage] "+v+" doesn't hold a JSON object; treating the store as unreadable so a save cannot "+"overwrite the hand-edited bytes. Make the top level a JSON object to re-enable persistence.");E=null;return null}const q=z;if("data"in q){const X=q.data;if(X===null||typeof X!=="object"||Array.isArray(X)){console.warn("[omelette.storage] "+v+' has a "data" field that is not a JSON object; treating the store as unreadable so a '+'save cannot overwrite the hand-edited bytes. Make "data" a JSON object to re-enable persistence.');E=null;return null}const H=q._meta;const j=H!==null&&typeof H==="object"?H.project:undefined;if(typeof j==="string"&&j!==""&&j!==l())return $;for(const F of Object.keys(X))$.set(F,X[F]);return $}for(const X of Object.keys(q)){if(X!=="_meta")$.set(X,q[X])}return $})}return E};var y=(W)=>k(v,JSON.stringify({_meta:{project:l(),version:1},data:Object.fromEntries(W)},null,2));var m=Promise.resolve();var T=(W)=>{const $=m.then(W);m=$.then(()=>{return},()=>{return});return $};var s=/sk-(?:ant-)?[A-Za-z0-9_-]{16,}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|xox[a-z]-[A-Za-z0-9][A-Za-z0-9-]{9,}|AIza[0-9A-Za-z_-]{30,}|-----BEGIN [A-Z ]*PRIVATE KEY-----/;var a=/password|passwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token|credential/i;var r=(W,$,z)=>{if(s.test($)||a.test(W)&&typeof z==="string"&&z.length>=8){console.warn('[omelette.storage] the value for "'+W+'" looks like a credential. The storage file is a plaintext project file, visible to '+"everyone with project access and copied when the project is duplicated. Do not store secrets here.")}};var c={persisted:false,reason:"could not load the existing store, not overwriting it"};var i={persisted:false,reason:"stored value changed since a failed read, re-read this key before saving"};var h=new Set;var t={get:(W)=>{if(typeof W!=="string"){return Promise.reject(new TypeError("storage.get: key must be a string"))}return T(_).then(($)=>{if($===null){h.add(W);return null}h.delete(W);if(!$.has(W))return null;const z=$.get(W);return z==null?null:JSON.parse(JSON.stringify(z))})},set:(W,$)=>{if(typeof W!=="string"){return Promise.reject(new TypeError("storage.set: key must be a string"))}let z;try{z=JSON.stringify($)}catch(X){return Promise.reject(new TypeError("storage.set: value must be JSON-serializable ("+String(X)+")"))}if(z===undefined){return Promise.reject(new TypeError("storage.set: value must be JSON-serializable"))}r(W,z,$);const q=JSON.parse(z);return T(()=>_().then((X)=>{if(X===null)return c;if(h.has(W)){if(X.has(W))return i;h.delete(W)}X.set(W,q);return y(X)}))},delete:(W)=>{if(typeof W!=="string"){return Promise.reject(new TypeError("storage.delete: key must be a string"))}return T(()=>_().then(($)=>{if($===null)return c;if(h.has(W)){if($.has(W))return i;h.delete(W)}$.delete(W);return y($)}))},keys:()=>T(_).then((W)=>W===null?[]:Array.from(W.keys()))};window.omelette={writeFile:(W,$)=>k(W,$).then((z)=>{if(!z.persisted&&!z.noHost){throw new Error(z.reason||"write failed")}}),storage:t};if(I&&I!==window){const W=(J,Q)=>{try{I.postMessage({__omelette_log:true,type:J,data:Q},"*")}catch{}};["log","warn","error"].forEach((J)=>{const Q=console[J];console[J]=(...V)=>{const Y=V.map((Z)=>{try{return typeof Z==="object"?JSON.stringify(Z):String(Z)}catch{try{return String(Z)}catch{return"[unstringifiable]"}}}).join(" ");W(J,Y);Q.apply(console,V)}});window.addEventListener("error",(J)=>{const Q=J.target;if(Q&&Q!==window&&Q.tagName){const V=Q.src||Q.href||"";W("resource_error",`${Q.tagName} failed to load: ${V}`)}else{W("error",`${J.message||"Unknown error"} at ${J.filename||"?"}:${J.lineno||0}:${J.colno||0}`)}},true);window.addEventListener("unhandledrejection",(J)=>{const Q=J.reason;const V=Q instanceof Error?`${Q.message} ${Q.stack}`:String(Q);W("error",`Unhandled rejection: ${V}`)});window.addEventListener("click",(J)=>{if(J.defaultPrevented||J.button!==0)return;if(J.metaKey||J.ctrlKey||J.shiftKey||J.altKey)return;const Q=J.composedPath?J.composedPath():[];const V=["button","input","select","textarea","summary","label"];let Y=null;for(const x of Q){if(!(x instanceof Element))continue;if(x.localName==="a"){if(!(x instanceof HTMLAnchorElement))return;Y=x;break}if(V.indexOf(x.localName)!==-1)return}if(!Y)return;if(Y.isContentEditable)return;const Z=Y.closest("[contenteditable]");if(Z&&Z.getAttribute("contenteditable")!=="false")return;const B=(Y.getAttribute("target")||"_self").toLowerCase();if(B!=="_self"&&B!=="_top"&&B!=="_parent")return;let U;try{U=new URL(Y.href)}catch{return}if(U.protocol!=="http:"&&U.protocol!=="https:")return;if(location.origin==="null")return;if(U.origin===location.origin)return;J.preventDefault();window.open(U.href,"_blank","noopener,noreferrer")});const $=()=>{try{I.postMessage({type:"omelette:height",height:document.documentElement.scrollHeight},"*")}catch{}};if(window.ResizeObserver)new ResizeObserver($).observe(document.documentElement);const z=()=>{$();if(!document.querySelector('script[type="text/babel"],script[type="text/jsx"]'))return;const J=()=>document.getElementById("root")||document.querySelector("body > div[id]");const Q=J()?.firstElementChild??null;let V=0;const Y=()=>{const Z=J();if(Z&&Z.firstElementChild!==Q||++V>30){$();return}setTimeout(Y,100)};setTimeout(Y,100)};if(document.readyState==="complete")z();else window.addEventListener("load",z);const q={};let X=0;const H=(J)=>new Promise((Q,V)=>{if(!b.length){V(new Error("claude.complete: no parent origin"));return}const Y=`c${++X}`;const Z=()=>setTimeout(()=>{delete q[Y];V(new Error(`claude.complete: no data for ${u/1000}s`))},u);const B=Z();q[Y]={resolve:Q,reject:V,text:"",t:B,arm:Z};try{for(const U of b){I.postMessage({__om_api:true,id:Y,body:J},U)}}catch(U){clearTimeout(B);delete q[Y];V(U)}});const j=8;const F=async(J,Q)=>{if(!Array.isArray(J.messages)){throw new Error("claude.complete: tools require a messages array")}const V=J.messages.slice();const Y={...J,tools:J.tools.map((U)=>{if(U===null||typeof U!=="object")return U;const x={};for(const K of Object.keys(U)){if(typeof U[K]!=="function")x[K]=U[K]}return x})};const Z=Y.tool_choice;const B=Z!=null&&(Z.type==="any"||Z.type==="tool")?{...Y,tool_choice:Z.disable_parallel_tool_use!==undefined?{type:"auto",disable_parallel_tool_use:Z.disable_parallel_tool_use}:{type:"auto"}}:Y;for(let U=0;U<j;U++){const x=await H({...U===0?Y:B,messages:V});const K=x.message;const M=K&&Array.isArray(K.content)?K.content:null;const L=M?M.filter((D)=>D?.type==="tool_use"):[];if(K?.stop_reason!=="tool_use"||L.length===0){return x.text}const N=[];for(const D of L){const f=Q.get(D.name);if(!f){N.push({type:"tool_result",tool_use_id:D.id,content:`no handler for tool "${D.name}"`,is_error:true});continue}try{const C=await f(D.input);const w=typeof C==="string"?C:R(C)??"";N.push({type:"tool_result",tool_use_id:D.id,content:w})}catch(C){N.push({type:"tool_result",tool_use_id:D.id,content:String(C?.message??C??"tool handler failed"),is_error:true})}}V.push({role:"assistant",content:M},{role:"user",content:N})}throw new Error(`claude.complete: exceeded ${j} tool turns`)};window.claude={complete(J){const Q=J;if(Q!==null&&typeof Q==="object"&&Array.isArray(Q.tools)&&Q.tools.some((V)=>V!==null&&typeof V==="object"&&typeof V.run==="function")){const V=new Map;for(const Y of Q.tools){if(Y!==null&&typeof Y==="object"&&typeof Y.run==="function"){V.set(String(Y.name),Y.run)}}return F(Q,V)}return H(J).then((V)=>V.text)}};const G={};let P=0;k=(J,Q)=>new Promise((V)=>{if(!b.length){V({persisted:false,noHost:true,reason:g});return}const Y=`f${++P}`;const Z=setTimeout(()=>{delete G[Y];V({persisted:false,noHost:true,reason:g})},d);G[Y]={settle:V,t:Z};try{for(const B of b){I.postMessage({__om_file:true,id:Y,op:"write",path:J,content:Q},B)}}catch{clearTimeout(Z);delete G[Y];V({persisted:false,noHost:true,reason:g})}});const R=(J)=>{try{return JSON.stringify(J)}catch{return JSON.stringify(String(J))}};window.addEventListener("message",(J)=>{if(b.indexOf(J.origin)<0)return;if(J.source!==I)return;const Q=J.data;if(!Q)return;if(Q.type==="omelette-preview-refresh"){if(typeof Q.token!=="string"||!/^[0-9a-f.-]+(\.(rc|pr-[0-9]+))?(\.[0-9]+\.[0-9a-f]{16})?$/.test(Q.token))return;const Z=Math.max(1,Math.floor((Q.expiresAt||0)-Date.now()/1000));document.cookie="__Host-omelette-preview="+Q.token+"; Path=/; Secure; SameSite=None; Partitioned; Max-Age="+Z;return}if(Q.__om_file_r){const Z=G[Q.id];if(!Z)return;clearTimeout(Z.t);delete G[Q.id];Z.settle(Q.ok?{persisted:true}:{persisted:false,reason:Q.error||"write failed"});return}if(Q.__om_api_r){const Z=q[Q.id];if(!Z)return;if(Q.error!=null){clearTimeout(Z.t);delete q[Q.id];Z.reject(new Error(Q.error));return}if(Q.chunk!=null){clearTimeout(Z.t);Z.t=Z.arm();Z.text+=Q.chunk;return}if(Q.done){clearTimeout(Z.t);delete q[Q.id];Z.resolve({text:Q.text!=null?Q.text:Z.text,message:Q.message});return}return}if(!Q.__om_eval)return;const V=Q;const Y=(Z)=>{J.source.postMessage({...Z,__om_eval_r:1,id:V.id},J.origin)};try{const Z=(0,eval)(V.code);if(Z&&typeof Z.then==="function"){Z.then((B)=>Y({ok:1,v:R(B)}),(B)=>Y({ok:0,e:String(B)}))}else{Y({ok:1,v:R(Z)})}}catch(Z){Y({ok:0,e:String(Z)})}})}})();
+</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>Professionals Templates · Presentation</title>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/components/fig-tokens.css">
+  <link rel="stylesheet" href="_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/colors_and_type.css">
+  <script src="_ds/cosma-design-system-immoscout24-8eb67f26-7064-4594-8f25-60ab9a5637e2/_ds_bundle.js"></script>
+  <script src="image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #FBF8F6; font-family: "Make It Better"; color: #333333; }
+    a { color: #333333; text-decoration: underline; text-decoration-color: #3DF5DC; }
+    a:hover { text-decoration-color: #24E3FF; }
+  </style>
+</helmet>
+<div data-screen-label="Presentation Templates" style="font-family:'Make It Better';color:#333333;padding:40px 48px 72px">
+
+  <style>
+    /* Slides are built at their real export size, 1920x1080, and shown at half
+       scale. Every number in the markup is therefore the production number:
+       what you read here is what you set in the deck. */
+    /* Slides are authored at 1920x1080 and shown at a fixed fraction of it, so
+       the gallery needs no script to lay itself out. The scale steps down at
+       narrower windows; the slide contents never reflow, which is the point:
+       what you see is the exported frame, not a responsive approximation. */
+    .deckwrap { display:grid; grid-template-columns:repeat(auto-fit,692px); gap:44px 40px; justify-content:start; }
+    .stage { width:692px; height:389px; position:relative; overflow:hidden;
+             border-radius:10px; box-shadow:0 3px 18px rgba(51,51,51,.13); background:#FBF8F6; }
+    .slide { position:absolute; top:0; left:0; width:1920px; height:1080px;
+             transform:scale(0.3604); transform-origin:top left; overflow:hidden; }
+    @media (max-width:1580px) {
+      .deckwrap { grid-template-columns:repeat(auto-fit,560px); }
+      .stage { width:560px; height:315px; }
+      .slide { transform:scale(0.29167); }
+    }
+    @media (max-width:1240px) {
+      .deckwrap { grid-template-columns:repeat(auto-fit,minmax(0,760px)); }
+      .stage { width:100%; max-width:760px; height:auto; aspect-ratio:16/9; }
+      .slide { transform:scale(0.3958); }
+    }
+    @media (max-width:820px) {
+      .stage { width:100%; max-width:560px; }
+      .slide { transform:scale(0.29167); }
+    }
+    .cap { margin-top:11px; }
+    .cap b { font-size:15px; font-weight:700; display:block; }
+    .cap .use { font-size:13px; color:rgba(51,51,51,.66); line-height:1.5; margin-top:3px; }
+    .cap .spec { font-size:11.5px; color:rgba(51,51,51,.5); margin-top:6px; font-weight:700; letter-spacing:.02em; }
+    .num { position:absolute; right:96px; bottom:64px; font-size:22px; font-weight:700; color:rgba(51,51,51,.82); }
+    .eyebrow { font-size:26px; font-weight:700; letter-spacing:.10em; text-transform:none; }
+    .foot { position:absolute; left:96px; bottom:60px; display:flex; align-items:center; gap:22px; }
+    .foot img { height:40px; display:block; }
+    .chip { display:inline-block; font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px;
+            background:#ffffff; border:1px solid #e0e0e0; }
+    .chip.dark { background:#333333; color:#fff; border-color:#333333; }
+    .rulebox { background:#fff; border:1px solid #e0e0e0; border-left:4px solid #3DF5DC; border-radius:14px;
+               padding:18px 22px; margin:0 0 34px; max-width:900px; font-size:13.5px; line-height:1.6; }
+    .rulebox b { font-weight:700; }
+    .rulebox ul { margin:9px 0 0; padding-left:20px; }
+    .rulebox li { margin-bottom:5px; }
+  </style>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:16px">
+      <a href="index.html" title="Back to the dashboard" style="display:flex"><img src="assets/logo-professionals.svg" alt="Back to the dashboard" style="height:26px"></a>
+      <h1 style="margin:0;font-size:26px;font-weight:700">Presentation templates</h1>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="chip dark">16 layouts</span>
+      <span class="chip">1920 × 1080, export at 2×</span>
+      <span class="chip">Measured: every mark ≥ 5.0:1</span>
+    </div>
+  </div>
+  <p style="margin:0 0 22px;font-size:14px;color:rgba(51,51,51,.65);max-width:900px">Sixteen slide layouts that cover a real deck: opening, structure, argument, evidence, proof and close. Built at full export size and shown at half scale, so every value here is the value you set. Rules: <a href="brand.html">Professionals Brand Guidelines</a>.</p>
+
+  <div class="rulebox">
+    <b>The four rules these layouts encode</b>
+    <ul>
+      <li><b>Nothing coloured sits behind a word.</b> No marker, no highlight, no tinted box under a line of type. Colour is the field the type sits on, or it is a button, and nothing in between.</li>
+      <li><b>Use only the approved colour fields and accessible text pairings.</b> Charcoal or white text is chosen by contrast. Every mark on every slide must clear the documented accessibility threshold.</li>
+      <li><b>A photograph may fill the whole slide</b> as long as the type still clears 4.5:1. That is bought with a gradient that runs off the edge of the frame, not with a panel dropped on top of the picture.</li>
+      <li><b>The Professionals is a shape, never a bullet.</b> Maximum three per slide, rotated no more than 30°, and lists use a rule or a chip instead.</li>
+    </ul>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:none;color:rgba(51,51,51,.5);margin:0 0 14px">Opening and structure</div>
+  <div class="deckwrap">
+
+    <!-- 1. Title, full bleed ------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide>
+        <img src="assets/photo-interior.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(20,16,14,.86) 0%, rgba(20,16,14,.86) 44%, rgba(20,16,14,.40) 66%, rgba(20,16,14,0) 94%)"></div>
+        <div style="position:absolute;left:96px;right:520px;bottom:200px;color:#fff">
+          <div class="eyebrow" style="color:#3DF5DC;margin-bottom:26px">Produktstrategie 2026</div>
+          <div style="font-size:112px;font-weight:700;line-height:1.03;letter-spacing:-.015em">Mehr Anfragen, weniger Aufwand</div>
+        </div>
+        <div class="foot"><img src="assets/logos/immoscout24-horizontal-inverse.svg" alt="ImmoScout24">
+          <span style="color:rgba(255,255,255,.72);font-size:22px;font-weight:700">März 2026</span></div>
+      </div></div>
+      <div class="cap"><b>01 · Title, full bleed</b>
+        <div class="use">The photograph carries the whole slide. The veil is a gradient off the bottom edge, never a box, and it is only as strong as the picture needs.</div>
+        <div class="spec">Weakest mark measured 10.2:1 against the worst 3% of pixels under it · headline 14.3:1</div></div>
+    </div>
+
+    <!-- 2. Title, colour field ------------------------------------------------>
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#333333">
+        <img src="assets/blank.svg" alt="" style="position:absolute;right:-72px;top:150px;width:320px;transform:rotate(14deg)">
+        <img src="assets/blank.svg" alt="" style="position:absolute;right:300px;bottom:-96px;width:230px;transform:rotate(-22deg)">
+        <div style="position:absolute;left:96px;right:640px;top:50%;transform:translateY(-50%);color:#fff">
+          <div class="eyebrow" style="color:#3DF5DC;margin-bottom:26px">Produktstrategie 2026</div>
+          <div style="font-size:112px;font-weight:700;line-height:1.03;letter-spacing:-.015em">Mehr Anfragen, weniger Aufwand</div>
+          <div style="font-size:30px;font-weight:700;line-height:1.45;margin-top:34px;color:rgba(255,255,255,.78);max-width:900px">Wie Professionals die Suche für Mieter und die Arbeit für Vermieter im selben Schritt verbessert.</div>
+        </div>
+        <div class="foot"><img src="assets/logos/immoscout24-horizontal-inverse.svg" alt="ImmoScout24"></div>
+      </div></div>
+      <div class="cap"><b>02 · Title, colour field</b>
+        <div class="use">When there is no photograph worth the room. Two Professionals shapes bleed off the edge and hold the right side, so the type does not float.</div>
+        <div class="spec">Weakest mark 8.4:1 · white on charcoal · two brand elements, 14° and 22°</div></div>
+    </div>
+
+    <!-- 3. Agenda ------------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#FBF8F6">
+        <div style="position:absolute;left:96px;right:96px;top:96px;bottom:96px;display:flex;flex-direction:column;justify-content:center">
+          <div class="eyebrow" style="color:rgba(51,51,51,.72);margin-bottom:22px">Inhalt</div>
+          <div style="font-size:64px;font-weight:700;line-height:1.1;margin-bottom:56px">Worüber wir sprechen</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 96px">
+            <div>
+              <div style="display:flex;gap:28px;padding:30px 0;border-top:2px solid rgba(51,51,51,.14)"><span style="font-size:30px;font-weight:700;color:rgba(51,51,51,.72);min-width:52px">01</span><span style="font-size:36px;font-weight:700">Wo Mieter heute hängen bleiben</span></div>
+              <div style="display:flex;gap:28px;padding:30px 0;border-top:2px solid rgba(51,51,51,.14)"><span style="font-size:30px;font-weight:700;color:rgba(51,51,51,.72);min-width:52px">02</span><span style="font-size:36px;font-weight:700">Was Professionals daran ändert</span></div>
+              <div style="display:flex;gap:28px;padding:30px 0;border-top:2px solid rgba(51,51,51,.14)"><span style="font-size:30px;font-weight:700;color:rgba(51,51,51,.72);min-width:52px">03</span><span style="font-size:36px;font-weight:700">Ergebnisse aus dem Pilot</span></div>
+            </div>
+            <div>
+              <div style="display:flex;gap:28px;padding:30px 0;border-top:2px solid rgba(51,51,51,.14)"><span style="font-size:30px;font-weight:700;color:rgba(51,51,51,.72);min-width:52px">04</span><span style="font-size:36px;font-weight:700">Professionals als Gegenstück</span></div>
+              <div style="display:flex;gap:28px;padding:30px 0;border-top:2px solid rgba(51,51,51,.14)"><span style="font-size:30px;font-weight:700;color:rgba(51,51,51,.72);min-width:52px">05</span><span style="font-size:36px;font-weight:700">Roadmap bis Q4</span></div>
+              <div style="display:flex;gap:28px;padding:30px 0;border-top:2px solid rgba(51,51,51,.14)"><span style="font-size:30px;font-weight:700;color:rgba(51,51,51,.72);min-width:52px">06</span><span style="font-size:36px;font-weight:700">Was wir von euch brauchen</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="num">3</div>
+      </div></div>
+      <div class="cap"><b>03 · Agenda</b>
+        <div class="use">Numbers and hairlines do the structuring. No bullets, no Professionals glyphs standing in for them.</div>
+        <div class="spec">Weakest mark 5.1:1 · charcoal on sand 11.9:1 · numerals and eyebrow 5.1:1</div></div>
+    </div>
+
+    <!-- 4. Section divider ---------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#3DF5DC">
+        <img src="assets/blank.svg" alt="" style="position:absolute;right:-70px;bottom:-80px;width:460px;transform:rotate(18deg)">
+        <div style="position:absolute;left:96px;top:50%;transform:translateY(-50%);right:620px">
+          <div style="font-size:180px;font-weight:700;line-height:.9;letter-spacing:-.02em;color:rgba(51,51,51,.78)">02</div>
+          <div style="font-size:88px;font-weight:700;line-height:1.06;margin-top:18px">Was Professionals daran ändert</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>04 · Section divider</b>
+        <div class="use">A hard colour change is the punctuation of a deck. One accent field, one number, one line. Nothing else on it.</div>
+        <div class="spec">Weakest mark 5.3:1 · charcoal on teal 9.2:1 · the big numeral 5.3:1</div></div>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:none;color:rgba(51,51,51,.5);margin:44px 0 14px">Argument</div>
+  <div class="deckwrap">
+
+    <!-- 5. Statement ---------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#FBF8F6">
+        <img src="assets/blank.svg" alt="" style="position:absolute;right:110px;top:120px;width:190px;transform:rotate(-16deg)">
+        <div style="position:absolute;left:96px;right:300px;top:50%;transform:translateY(-50%)">
+          <div style="font-size:104px;font-weight:700;line-height:1.08;letter-spacing:-.015em">Wer zuerst anfragt, zieht zuerst ein.</div>
+        </div>
+        <div class="num">7</div>
+      </div></div>
+      <div class="cap"><b>05 · Statement</b>
+        <div class="use">One sentence, nothing competing with it. The single most useful slide in any deck and the one people skip.</div>
+        <div class="spec">Weakest mark 6.9:1 · charcoal on sand 11.9:1 · one Professionals at 16°</div></div>
+    </div>
+
+    <!-- 6. Split, photo left --------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#FBF8F6">
+        <img src="assets/photo-interior.jpg" alt="" style="position:absolute;left:0;top:0;width:864px;height:1080px;object-fit:cover">
+        <div style="position:absolute;left:960px;right:96px;top:50%;transform:translateY(-50%)">
+          <div class="eyebrow" style="color:rgba(51,51,51,.72);margin-bottom:22px">Das Problem</div>
+          <div style="font-size:64px;font-weight:700;line-height:1.1">Gute Wohnungen sind vergeben, bevor die Anfrage gelesen wird</div>
+          <div style="font-size:30px;font-weight:700;line-height:1.5;margin-top:30px;color:rgba(51,51,51,.74)">Im Schnitt gehen auf ein Inserat über 80 Anfragen ein. Wer auf Platz 60 landet, wird nicht mehr gelesen.</div>
+        </div>
+        <div class="num">8</div>
+      </div></div>
+      <div class="cap"><b>06 · Split, photo left</b>
+        <div class="use">The workhorse. 45 / 55, hard edge, no rounding and no shadow. The photograph is cropped to the panel, not squeezed into it.</div>
+        <div class="spec">Weakest mark 5.1:1 · charcoal on sand 11.9:1 · photo 864 × 1080</div></div>
+    </div>
+
+    <!-- 7. Split, copy left with lead ------------------------------------------>
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#ffffff">
+        <img src="assets/photo-interior.jpg" alt="" style="position:absolute;right:0;top:0;width:864px;height:1080px;object-fit:cover">
+        <div style="position:absolute;left:96px;right:960px;top:50%;transform:translateY(-50%)">
+          <div class="eyebrow" style="color:rgba(51,51,51,.72);margin-bottom:22px">Die Antwort</div>
+          <div style="font-size:64px;font-weight:700;line-height:1.1">Deine Anfrage landet ganz oben im Postfach</div>
+          <div style="font-size:28px;font-weight:700;line-height:1.55;margin-top:30px;color:rgba(51,51,51,.74)">Professionals zeigt neue Inserate zuerst und schickt die Anfrage in einem Schritt raus. Kein Formular, kein Warten, keine zweite Runde.</div>
+          <div style="margin-top:36px;display:inline-block;background:#333333;color:#fff;font-size:24px;font-weight:700;padding:20px 40px;border-radius:999px">Jetzt freischalten</div>
+        </div>
+        <div class="num">9</div>
+      </div></div>
+      <div class="cap"><b>07 · Split, copy left</b>
+        <div class="use">Mirror of 06 with room for a lead paragraph and one action. The button is the only filled shape a text slide is allowed.</div>
+        <div class="spec">Weakest mark 5.2:1 · charcoal on white 12.6:1 · button white on charcoal 12.6:1</div></div>
+    </div>
+
+    <!-- 8. Three up ------------------------------------------------------------>
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#FBF8F6">
+        <div style="position:absolute;left:96px;right:96px;top:96px;bottom:96px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:64px;font-weight:700;line-height:1.1;margin-bottom:72px">Drei Dinge ändern sich sofort</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:64px">
+            <div><div style="height:6px;background:#3DF5DC;width:88px;margin-bottom:28px"></div>
+              <div style="font-size:34px;font-weight:700;line-height:1.2;margin-bottom:16px">Zuerst sehen</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.55;color:rgba(51,51,51,.74)">Neue Inserate erscheinen für Professionals-Mitglieder vor allen anderen.</div></div>
+            <div><div style="height:6px;background:#24E3FF;width:88px;margin-bottom:28px"></div>
+              <div style="font-size:34px;font-weight:700;line-height:1.2;margin-bottom:16px">Schneller anfragen</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.55;color:rgba(51,51,51,.74)">Ein gespeichertes Profil ersetzt das Formular bei jeder Anfrage.</div></div>
+            <div><div style="height:6px;background:#333333;width:88px;margin-bottom:28px"></div>
+              <div style="font-size:34px;font-weight:700;line-height:1.2;margin-bottom:16px">Oben landen</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.55;color:rgba(51,51,51,.74)">Vollständige Anfragen werden von Vermietern zuerst geöffnet.</div></div>
+          </div>
+        </div>
+        <div class="num">11</div>
+      </div></div>
+      <div class="cap"><b>08 · Three up</b>
+        <div class="use">A short rule above each column instead of an icon. It is the one place accent colour appears as a shape next to text, and it sits above the words, not behind them.</div>
+        <div class="spec">Weakest mark 5.4:1 · rules are 6 px and sit above the words, never under them</div></div>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:none;color:rgba(51,51,51,.5);margin:44px 0 14px">Evidence</div>
+  <div class="deckwrap">
+
+    <!-- 9. Big numbers ---------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#333333">
+        <div style="position:absolute;left:96px;right:96px;top:96px;bottom:96px;display:flex;flex-direction:column;justify-content:center;color:#fff">
+          <div class="eyebrow" style="color:#3DF5DC;margin-bottom:22px">Pilot, 6 Monate</div>
+          <div style="font-size:56px;font-weight:700;line-height:1.12;margin-bottom:76px">Was Professionals-Mitglieder anders erleben</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:56px">
+            <div><div style="font-size:132px;font-weight:700;line-height:.92;letter-spacing:-.02em">3,4×</div>
+              <div style="font-size:28px;font-weight:700;line-height:1.5;margin-top:22px;color:rgba(255,255,255,.78)">mehr Einladungen zur Besichtigung</div></div>
+            <div><div style="font-size:132px;font-weight:700;line-height:.92;letter-spacing:-.02em">11 Tage</div>
+              <div style="font-size:28px;font-weight:700;line-height:1.5;margin-top:22px;color:rgba(255,255,255,.78)">kürzer bis zum Mietvertrag</div></div>
+            <div><div style="font-size:132px;font-weight:700;line-height:.92;letter-spacing:-.02em">86 %</div>
+              <div style="font-size:28px;font-weight:700;line-height:1.5;margin-top:22px;color:rgba(255,255,255,.78)">verlängern nach dem ersten Monat</div></div>
+          </div>
+        </div>
+        <div class="num" style="color:rgba(255,255,255,.8)">13</div>
+      </div></div>
+      <div class="cap"><b>09 · Big numbers</b>
+        <div class="use">Three at most. A fourth stops being a headline and becomes a table, and a table belongs on the next layout.</div>
+        <div class="spec">Weakest mark 8.4:1 · white on charcoal 12.6:1 · support text at 78% measures 8.4:1</div></div>
+    </div>
+
+    <!-- 10. Quote --------------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#24E3FF">
+        <div style="position:absolute;left:96px;right:520px;top:50%;transform:translateY(-50%)">
+          <div style="font-size:64px;font-weight:700;line-height:1.22;letter-spacing:-.01em">„Ich habe drei Monate gesucht. Mit Professionals hatte ich in zwei Wochen den Vertrag.“</div>
+          <div style="display:flex;align-items:center;gap:22px;margin-top:48px">
+            <img src="assets/photo-interior.jpg" alt="" style="width:104px;height:104px;border-radius:999px;object-fit:cover">
+            <div><div style="font-size:28px;font-weight:700">Lena K.</div>
+              <div style="font-size:24px;font-weight:700;color:rgba(51,51,51,.9)">Mieterin, Berlin Neukölln</div></div>
+          </div>
+        </div>
+        <img src="assets/blank.svg" alt="" style="position:absolute;right:-60px;top:150px;width:340px;transform:rotate(-12deg)">
+        <div class="num" style="color:rgba(51,51,51,.9)">15</div>
+      </div></div>
+      <div class="cap"><b>10 · Quote</b>
+        <div class="use">German quotation marks, set into the type rather than blown up as a graphic. The portrait is a circle so it never reads as a second image slot.</div>
+        <div class="spec">Contrast and attribution require a final accessibility check.</div></div>
+    </div>
+
+    <!-- 11. List done right ------------------------------------------------------>
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#ffffff">
+        <div style="position:absolute;left:96px;right:820px;top:96px;bottom:96px;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-size:56px;font-weight:700;line-height:1.12;margin-bottom:48px">Im Professionals enthalten</div>
+          <div style="display:flex;align-items:flex-start;gap:22px;padding:24px 0;border-bottom:1px solid rgba(51,51,51,.12)"><span style="flex:none;width:34px;height:34px;border-radius:999px;background:#3DF5DC;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin-top:3px">✓</span><span style="font-size:30px;font-weight:700;line-height:1.45">Neue Inserate zuerst, mit Push in Echtzeit</span></div>
+          <div style="display:flex;align-items:flex-start;gap:22px;padding:24px 0;border-bottom:1px solid rgba(51,51,51,.12)"><span style="flex:none;width:34px;height:34px;border-radius:999px;background:#3DF5DC;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin-top:3px">✓</span><span style="font-size:30px;font-weight:700;line-height:1.45">Gespeichertes Bewerberprofil für jede Anfrage</span></div>
+          <div style="display:flex;align-items:flex-start;gap:22px;padding:24px 0;border-bottom:1px solid rgba(51,51,51,.12)"><span style="flex:none;width:34px;height:34px;border-radius:999px;background:#3DF5DC;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin-top:3px">✓</span><span style="font-size:30px;font-weight:700;line-height:1.45">SCHUFA-BonitätsCheck ohne Aufpreis</span></div>
+          <div style="display:flex;align-items:flex-start;gap:22px;padding:24px 0;border-bottom:1px solid rgba(51,51,51,.12)"><span style="flex:none;width:34px;height:34px;border-radius:999px;background:#3DF5DC;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin-top:3px">✓</span><span style="font-size:30px;font-weight:700;line-height:1.45">Monatlich kündbar, kein Vertrag im Hintergrund</span></div>
+        </div>
+        <img src="assets/photo-interior.jpg" alt="" style="position:absolute;right:0;top:0;width:720px;height:1080px;object-fit:cover">
+        <div class="num" style="right:auto;left:96px">17</div>
+      </div></div>
+      <div class="cap"><b>11 · List</b>
+        <div class="use">Check chips and hairlines. The Professionals shape is never used as a bullet, which is the rule this layout exists to make easy to follow.</div>
+        <div class="spec">Weakest mark 7.1:1 · charcoal on white 12.6:1 · chip is charcoal on teal 9.2:1</div></div>
+    </div>
+
+    <!-- 12. Process ------------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#FBF8F6">
+        <div style="position:absolute;left:96px;right:96px;top:50%;transform:translateY(-50%)">
+          <div style="font-size:56px;font-weight:700;line-height:1.12;margin-bottom:72px">Vier Schritte bis zur Zusage</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:44px;position:relative">
+            <div style="position:absolute;left:0;right:0;top:27px;height:2px;background:rgba(51,51,51,.16)"></div>
+            <div style="position:relative"><div style="width:56px;height:56px;border-radius:999px;background:#333333;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin-bottom:28px">1</div>
+              <div style="font-size:30px;font-weight:700;margin-bottom:12px">Profil anlegen</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.5;color:rgba(51,51,51,.72)">Einmal ausfüllen, danach nie wieder.</div></div>
+            <div style="position:relative"><div style="width:56px;height:56px;border-radius:999px;background:#333333;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin-bottom:28px">2</div>
+              <div style="font-size:30px;font-weight:700;margin-bottom:12px">Zuerst sehen</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.5;color:rgba(51,51,51,.72)">Push, sobald ein passendes Inserat online geht.</div></div>
+            <div style="position:relative"><div style="width:56px;height:56px;border-radius:999px;background:#333333;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin-bottom:28px">3</div>
+              <div style="font-size:30px;font-weight:700;margin-bottom:12px">In einem Schritt anfragen</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.5;color:rgba(51,51,51,.72)">Profil und Bonität hängen schon dran.</div></div>
+            <div style="position:relative"><div style="width:56px;height:56px;border-radius:999px;background:#3DF5DC;color:#333;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin-bottom:28px">4</div>
+              <div style="font-size:30px;font-weight:700;margin-bottom:12px">Eingeladen werden</div>
+              <div style="font-size:27px;font-weight:700;line-height:1.5;color:rgba(51,51,51,.72)">Vollständige Anfragen werden zuerst geöffnet.</div></div>
+          </div>
+        </div>
+        <div class="num">19</div>
+      </div></div>
+      <div class="cap"><b>12 · Process</b>
+        <div class="use">Four steps is the ceiling. The last marker turns teal so the eye knows where the story ends.</div>
+        <div class="spec">Weakest mark 5.1:1 · markers are white on charcoal and charcoal on teal</div></div>
+    </div>
+
+    <!-- 13. Comparison ----------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#FBF8F6">
+        <div style="position:absolute;left:0;top:0;width:960px;height:1080px;background:#ffffff;padding:96px 72px 96px 96px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center">
+          <div class="eyebrow" style="color:rgba(51,51,51,.72);margin-bottom:26px">Ohne Professionals</div>
+          <div style="font-size:44px;font-weight:700;line-height:1.16;margin-bottom:38px">Anfrage 61 von 84</div>
+          <div style="font-size:28px;font-weight:700;line-height:1.6;color:rgba(51,51,51,.74)">Formular jedes Mal neu. Bonität nachreichen. Antwort kommt, wenn die Wohnung weg ist.</div>
+        </div>
+        <div style="position:absolute;right:0;top:0;width:960px;height:1080px;background:#333333;color:#fff;padding:96px 96px 96px 72px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;overflow:hidden">
+          <div class="eyebrow" style="color:#3DF5DC;margin-bottom:26px">Mit Professionals</div>
+          <div style="font-size:44px;font-weight:700;line-height:1.16;margin-bottom:38px">Anfrage 3 von 84</div>
+          <div style="font-size:28px;font-weight:700;line-height:1.6;color:rgba(255,255,255,.78)">Profil liegt bereit. Bonität hängt dran. Die Anfrage ist raus, bevor das Inserat Reichweite hat.</div>
+          <img src="assets/blank.svg" alt="" style="position:absolute;right:-50px;bottom:-60px;width:260px;transform:rotate(20deg)">
+          <div class="num" style="color:rgba(255,255,255,.8)">21</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>13 · Comparison</b>
+        <div class="use">A straight 50 / 50 with the colour doing the arguing. No arrows between the halves and no red and green.</div>
+        <div class="spec">Weakest mark 5.2:1 · charcoal on white and white on charcoal, both 12.6:1</div></div>
+    </div>
+
+    <!-- 14. Product UI ------------------------------------------------------------>
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#3DF5DC">
+        <div style="position:absolute;left:96px;top:50%;transform:translateY(-50%);right:1000px">
+          <div class="eyebrow" style="color:rgba(51,51,51,.78);margin-bottom:22px">Im Produkt</div>
+          <div style="font-size:56px;font-weight:700;line-height:1.12">Der Professionals-Filter sitzt da, wo gesucht wird</div>
+          <div style="font-size:28px;font-weight:700;line-height:1.55;margin-top:28px;color:rgba(51,51,51,.76)">Kein zweiter Ort, keine neue Oberfläche. Dieselbe Suche, eine Stufe früher.</div>
+        </div>
+        <div style="position:absolute;right:96px;top:96px;bottom:96px;width:800px;background:#fff;border-radius:28px;box-shadow:0 24px 60px rgba(51,51,51,.22);overflow:hidden">
+          <div style="height:80px;border-bottom:1px solid #eee;display:flex;align-items:center;padding:0 32px;gap:14px">
+            <img src="assets/logo-professionals.svg" alt="" style="height:24px">
+            <div style="flex:1"></div>
+            <div style="width:120px;height:34px;border-radius:999px;background:#333"></div>
+          </div>
+          <div style="padding:32px;height:calc(100% - 80px);box-sizing:border-box;display:flex;flex-direction:column;gap:22px">
+            <div style="height:52px;border-radius:12px;background:#f2efed;flex:none"></div>
+            <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:22px">
+              <div style="border-radius:14px;background:#f2efed"></div>
+              <div style="border-radius:14px;background:#f2efed"></div>
+              <div style="border-radius:14px;background:#f2efed"></div>
+              <div style="border-radius:14px;background:#f2efed"></div>
+            </div>
+          </div>
+        </div>
+        <div class="num">23</div>
+      </div></div>
+      <div class="cap"><b>14 · Product UI</b>
+        <div class="use">The screen sits in a white card on an accent field, so the interface reads as itself and not as part of the slide.</div>
+        <div class="spec">Weakest mark 5.0:1 · charcoal on teal 9.2:1 · the card is neutral, never tinted</div></div>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:none;color:rgba(51,51,51,.5);margin:44px 0 14px">Image and close</div>
+  <div class="deckwrap">
+
+    <!-- 15. Full bleed with caption ------------------------------------------------>
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide>
+        <img src="assets/photo-interior.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(20,16,14,.86) 0%, rgba(20,16,14,.86) 48%, rgba(20,16,14,.38) 68%, rgba(20,16,14,0) 86%)"></div>
+        <div style="position:absolute;left:96px;top:50%;transform:translateY(-50%);right:1060px;color:#fff">
+          <div class="eyebrow" style="color:#3DF5DC;margin-bottom:22px">Zielgruppe</div>
+          <div style="font-size:56px;font-weight:700;line-height:1.14">Paare zwischen 25 und 35, erste gemeinsame Wohnung</div>
+          <div style="font-size:28px;font-weight:700;line-height:1.55;margin-top:28px;color:rgba(255,255,255,.8)">Zwei Einkommen, wenig Zeit, hohe Erwartung an das Tempo einer Antwort.</div>
+        </div>
+        <div class="num" style="color:rgba(255,255,255,.86)">25</div>
+      </div></div>
+      <div class="cap"><b>15 · Full bleed with copy</b>
+        <div class="use">A photograph may fill the slide as long as the words still clear 4.5:1. The gradient runs off the left edge and dies before the middle, so the picture is still a picture.</div>
+        <div class="spec">Weakest mark measured 7.7:1 · headline 14.4:1 · the veil is flat across the words and gone by 86% of the width</div></div>
+    </div>
+
+    <!-- 16. Closing ------------------------------------------------------------->
+    <div class="slidebox">
+      <div class="stage"><div class="slide" data-slide style="background:#333333">
+        <img src="assets/blank.svg" alt="" style="position:absolute;left:-70px;bottom:-90px;width:380px;transform:rotate(-18deg)">
+        <img src="assets/blank.svg" alt="" style="position:absolute;right:120px;top:-60px;width:250px;transform:rotate(24deg)">
+        <div style="position:absolute;left:96px;right:520px;top:50%;transform:translateY(-50%);color:#fff">
+          <div style="font-size:88px;font-weight:700;line-height:1.08;letter-spacing:-.015em">Wir starten mit Berlin und Hamburg im Mai.</div>
+          <div style="font-size:28px;font-weight:700;line-height:1.5;margin-top:32px;color:rgba(255,255,255,.78)">Was wir brauchen: Freigabe für das Budget und zwei Wochen Entwicklungszeit im April.</div>
+          <div style="margin-top:44px;display:inline-block;background:#3DF5DC;color:#333;font-size:26px;font-weight:700;padding:22px 44px;border-radius:999px">peter.sijtsma@scout24.com</div>
+        </div>
+        <div class="foot"><img src="assets/logos/immoscout24-horizontal-inverse.svg" alt="ImmoScout24"></div>
+      </div></div>
+      <div class="cap"><b>16 · Closing</b>
+        <div class="use">The ask, in one line, with the next step attached to it. Never a thank-you slide with nothing on it.</div>
+        <div class="spec">Weakest mark 8.4:1 · white on charcoal 12.6:1 · button charcoal on teal 9.2:1</div></div>
+    </div>
+  </div>
+
+  <p style="margin:42px 0 0;font-size:13px;color:rgba(51,51,51,.6);max-width:900px;line-height:1.6">
+    Slides are laid out at 1920 × 1080 and scaled to fit this page, so the pixel values in the markup are production values. Export at 2× for a projector. The Professionals shapes are decoration and never carry meaning: a slide still has to read with all of them removed.
+  </p>
+
+
+</div>
+
+</x-dc>
+<script src="language.js"></script>
+</body>
+</html>

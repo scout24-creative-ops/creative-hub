@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Professionals design fidelity checks</title>
+<style>
+@font-face{font-family:"Make It Better";font-weight:400;src:url("../assets/fonts/MakeItBetter-Regular.woff2")}
+@font-face{font-family:"Make It Better";font-weight:700;src:url("../assets/fonts/MakeItBetter-Bold.woff2")}
+body{font-family:"Make It Better";background:#fbf8f6;color:#333;margin:0;padding:32px;line-height:1.5}
+h1{font-size:32px;font-weight:700;margin:0 0 16px}h2{font-size:20px;font-weight:700;margin:0 0 8px}
+p{max-width:78ch}button,select{font:inherit;padding:12px 16px;border:1px solid #333;background:#fff;color:#333;border-radius:6px}
+button{cursor:pointer}button:disabled{opacity:.55;cursor:default}.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:24px 0}
+#status{padding:16px 0}#gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(440px,100%),1fr));gap:32px}
+.design{padding:16px;background:#fff}.examples{display:grid;grid-template-columns:1fr 1fr;gap:12px}figure{margin:0;min-width:0}
+canvas{display:block;width:100%;height:auto;background:#fbf8f6}figcaption{font-size:13px;margin-top:10px;overflow-wrap:anywhere}
+.held{outline:2px dotted #333;outline-offset:2px}pre{font:inherit;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+details{margin:32px 0}a{color:inherit}@media(max-width:520px){body{padding:16px}.examples{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-fidelity-tests>
+<h1>Professionals design fidelity checks</h1>
+<p>Checks that the selected design stays the selected design. A held file is not a successful export. Synthetic source fixtures test geometry only and are never campaign assets.</p>
+<div class="controls">
+<button id="run">Run fidelity matrix</button>
+<button id="healthy">Run healthy designs</button>
+<button id="emphasis">Run emphasis checks</button>
+<button id="visual">Show provided photography</button>
+<label for="placement">Contact sheet format</label>
+<select id="placement"><option value="0">Square</option><option value="1">Portrait</option><option value="2">Story</option></select>
+<button id="download" disabled>Download results</button>
+</div>
+<p id="status" role="status">Ready</p>
+<div id="gallery"></div>
+<details><summary>Detailed results</summary><pre id="results"></pre></details>
+<script type="module" src="design-fidelity.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Professionals rendering checks</title>
+<style>
+@font-face{font-family:"Make It Better";font-weight:400;src:url("../assets/fonts/MakeItBetter-Regular.woff2")}
+@font-face{font-family:"Make It Better";font-weight:700;src:url("../assets/fonts/MakeItBetter-Bold.woff2")}
+@font-face{font-family:"Make It Better";font-weight:800;src:url("../assets/fonts/MakeItBetter-XBold.woff2")}
+body{font-family:"Make It Better";background:#FBF8F6;color:#333333;padding:2rem;line-height:1.5}
+button{font:inherit;padding:1rem;border:1px solid #333333;background:#FFFFFF;color:#333333;cursor:pointer}
+pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}
+#gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:1rem}
+figure{margin:0}img{width:100%;height:auto}figcaption{font-size:.8rem}
+</style>
+</head>
+<body>
+<h1>Professionals rendering checks</h1>
+<p>Runs the production renderer with normal, small, panoramic and portrait sources. All assertions use the actual export dimensions.</p>
+<button id="smoke">Run visual samples</button>
+<button id="stress">Run stress matrix</button>
+<button id="download" disabled>Download results</button>
+<p id="status" role="status">Ready</p>
+<div id="gallery"></div>
+<details><summary>Detailed results</summary><pre id="results"></pre></details>
+<script type="module" src="render-stress.js"></script>
+</body>
+</html>
