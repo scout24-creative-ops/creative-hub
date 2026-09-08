@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professionals Deck Studio</title>
+<style>
+  @font-face { font-family:"Make It Better"; font-weight:400; src:url("assets/fonts/MakeItBetter-Regular.woff2") format("woff2"); }
+  @font-face { font-family:"Make It Better"; font-weight:700; src:url("assets/fonts/MakeItBetter-Bold.woff2") format("woff2"); }
+  @font-face { font-family:"Make It Better"; font-weight:800; src:url("assets/fonts/MakeItBetter-XBold.woff2") format("woff2"); }
+
+  /* The interface's own palette, copied from concept-studio.html so the two
+     products read as one system. These are chrome, not deck colour: every
+     colour a slide is ever painted in comes from fieldFor() in
+     deck-layouts.js and is never written here. */
+  :root {
+    --blue:#24E3FF; --teal:#3DF5DC; --charcoal:#333333; --white:#FFFFFF; --sand:#FBF8F6;
+    --hairline:#e0e0e0; --muted:rgba(51,51,51,.55); --muted2:rgba(51,51,51,.72);
+    --shadow:0 2px 12px rgba(51,51,51,.10); --shadow-float:0 4px 16px rgba(51,51,51,.14);
+    --font:"Make It Better";
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:var(--font); background:var(--sand); color:var(--charcoal); font-size:16px; line-height:1.55; }
+  button { font-family:var(--font); cursor:pointer; }
+
+  /* ---------- Header + stepper ---------- */
+  header.app {
+    position:sticky; top:0; z-index:50; background:var(--white); border-bottom:1px solid var(--hairline);
+    padding:0 28px;
+  }
+  .headrow { display:flex; align-items:center; gap:16px; padding:13px 0; }
+  .headrow img.logo { height:24px; display:block; }
+  .headrow .title { font-weight:700; font-size:16px; line-height:1.2; }
+  .headrow .subtitle { font-size:12.5px; color:var(--muted); font-weight:700; }
+  .headrow .spacer { flex:1; }
+  .pill-btn {
+    border:1px solid var(--hairline); background:var(--white); color:var(--charcoal);
+    border-radius:999px; padding:8px 18px; font-size:13px; font-weight:700; transition:all .2s ease-in-out;
+  }
+  .pill-btn:hover:not(:disabled) { border-color:var(--charcoal); }
+  .pill-btn.primary { background:var(--charcoal); color:var(--white); border-color:var(--charcoal); }
+  .pill-btn.primary:hover:not(:disabled) { background:#000; }
+  .pill-btn:disabled { opacity:.35; cursor:default; }
+  .pill-btn.big { font-size:15px; padding:13px 28px; }
+  .pill-btn.tiny { font-size:12px; padding:5px 12px; }
+
+  .stepper { display:flex; align-items:stretch; gap:0; border-top:1px solid var(--hairline);
+             background:var(--white); padding:4px 0; }
+  .stepbtn { flex:1; position:relative; display:flex; align-items:center; gap:11px;
+             padding:14px 8px 14px 18px; background:none; border:none; text-align:left;
+             color:var(--muted); font-family:var(--font); }
+  .stepbtn + .stepbtn::before { content:""; position:absolute; left:0; top:50%;
+             width:18px; height:2px; background:var(--hairline); transform:translateY(-50%); }
+  .stepbtn.done + .stepbtn::before, .stepbtn.active::before { background:var(--teal); }
+  .stepbtn .num { flex:none; width:30px; height:30px; border-radius:50%; display:flex;
+             align-items:center; justify-content:center; font-size:13.5px; font-weight:700;
+             background:var(--sand); border:1.5px solid var(--hairline); color:var(--muted); }
+  .stepbtn .lbl { font-size:14px; font-weight:700; display:block; }
+  .stepbtn .sub { font-size:11.5px; font-weight:600; color:var(--muted); display:block; margin-top:1px; }
+  .stepbtn.done { color:var(--charcoal); cursor:pointer; }
+  .stepbtn.done .num { background:var(--teal); border-color:var(--teal); color:var(--charcoal); }
+  .stepbtn.active { color:var(--charcoal); }
+  .stepbtn.active .num { background:var(--charcoal); border-color:var(--charcoal); color:var(--white);
+             box-shadow:0 0 0 4px rgba(51,51,51,.10); }
+  .stepbtn.active .sub { color:var(--charcoal); opacity:.62; }
+  .stepbtn:disabled { cursor:default; opacity:.45; }
+
+  main { max-width:1180px; margin:0 auto; padding:30px 24px calc(var(--composerH, 96px) + 110px); }
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  .stepintro { margin-bottom:22px; }
+  .stepintro h1 { font-size:32px; font-weight:700; line-height:1.12; margin-bottom:6px; }
+  .stepintro p { color:var(--muted2); max-width:680px; font-size:15.5px; }
+
+  .card { background:var(--white); border:1px solid var(--hairline); border-radius:16px; box-shadow:var(--shadow); padding:24px 26px; margin-bottom:16px; }
+  .card h3 { font-size:20px; font-weight:700; margin-bottom:4px; line-height:1.2; }
+  .chip { display:inline-block; background:var(--teal); color:var(--charcoal); font-size:12px; font-weight:700; border-radius:999px; padding:3px 12px; margin-right:6px; }
+  .chip.outline { background:var(--white); border:1px solid var(--hairline); color:var(--muted2); }
+  .notice { background:var(--white); border:1px solid var(--hairline); border-left:4px solid var(--blue); border-radius:12px; padding:14px 18px; font-size:14px; margin-bottom:22px; }
+  .notice.error { border-left-color:#c0392b; }
+  .notice code { background:var(--sand); padding:1px 6px; border-radius:6px; font-size:13px; }
+
+  /* ---------- Step 1, the two doors ---------- */
+  .doors { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+  .door { background:var(--white); border:1px solid var(--hairline); border-radius:16px;
+          box-shadow:var(--shadow); padding:22px 24px; text-align:left; font-family:var(--font);
+          color:var(--charcoal); transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
+  .door:hover:not(:disabled) { transform:translateY(-2px); border-color:var(--charcoal); box-shadow:0 8px 22px rgba(51,51,51,.10); }
+  .door:disabled { opacity:.5; cursor:default; }
+  .door b { display:block; font-size:19px; font-weight:700; margin-bottom:5px; }
+  .door span { display:block; font-size:13.5px; color:var(--muted2); line-height:1.5; }
+  .door em { display:inline-block; font-style:normal; margin-top:10px; font-size:11.5px; font-weight:700;
+             color:var(--muted); background:var(--sand); border:1px solid var(--hairline);
+             border-radius:999px; padding:3px 11px; }
+
+  /* ---------- Step 2, the narratives ---------- */
+  .narrgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+  .narrcard { background:var(--white); border:1px solid var(--hairline); border-radius:16px;
+              box-shadow:var(--shadow); padding:20px 22px; text-align:left; font-family:var(--font);
+              color:var(--charcoal); transition:border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
+  .narrcard:hover { transform:translateY(-2px); border-color:var(--charcoal); box-shadow:0 8px 22px rgba(51,51,51,.10); }
+  .narrcard.on { border-color:var(--charcoal); box-shadow:0 0 0 2px var(--charcoal); }
+  .narrcard b { display:block; font-size:19px; font-weight:700; }
+  .narrcard .note { display:block; font-size:13.5px; color:var(--muted2); margin:4px 0 12px; }
+  .narrcard .flow { display:block; font-size:11.5px; color:var(--muted); line-height:1.5; }
+
+  .briefpeek { font-size:13px; color:var(--muted2); background:var(--white); border:1px solid var(--hairline);
+               border-radius:12px; padding:12px 15px; margin-bottom:18px; }
+  .briefpeek b { font-weight:700; color:var(--charcoal); }
+
+  /* ---------- Step 3, the deck ---------- */
+  .slidecard { background:var(--white); border:1px solid var(--hairline); border-radius:16px;
+               box-shadow:var(--shadow); padding:14px 16px 16px; margin-bottom:16px; }
+  .sc-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .sc-head b { font-size:14px; font-weight:700; }
+  .sc-head .n { font-size:11.5px; font-weight:700; color:var(--muted); background:var(--sand);
+                border:1px solid var(--hairline); border-radius:999px; padding:3px 10px; }
+  .sc-head .spacer { flex:1; }
+  .sc-body { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
+  /* The slide is 1920x1080 and stays 1920x1080. Fitting it to this column
+     is a transform, and `--k` is a bare number the script sets from the
+     frame's measured width — CSS cannot divide a length by a length, so a
+     hard-coded scale and a fluid box drift apart the moment the window is
+     narrow. The declared value fits the 560px column this layout asks for,
+     and is what a scriptless page keeps. */
+  .sc-stage { flex:none; width:560px; max-width:100%; }
+  .sc-frame { width:100%; aspect-ratio:16/9; border:1px solid var(--hairline);
+              border-radius:10px; overflow:hidden; background:var(--sand); }
+  .sc-frame iframe { width:1920px; height:1080px; border:0; display:block;
+                     transform:scale(var(--k,.29166667)); transform-origin:top left; }
+  .sc-fields { flex:1; min-width:260px; display:flex; flex-direction:column; gap:10px; }
+  .fld label { display:block; font-size:11px; font-weight:700; color:var(--muted);
+               letter-spacing:.03em; margin-bottom:3px; }
+  .fld input, .fld textarea {
+    width:100%; border:1px solid var(--hairline); border-radius:10px; padding:9px 11px;
+    font-family:var(--font); font-size:13.5px; color:var(--charcoal); background:var(--white);
+    line-height:1.45; resize:vertical;
+  }
+  .fld input:focus, .fld textarea:focus { outline:none; border-color:var(--charcoal); }
+  .fld .cnt { font-size:10.5px; color:var(--muted); text-align:right; margin-top:2px; }
+  .fld .cnt.full { color:#a35b00; font-weight:700; }
+  .sc-note { font-size:11.5px; color:var(--muted); line-height:1.45; }
+  .addrow { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:6px 0 22px; }
+  .addrow select { font-family:var(--font); font-size:13px; border:1px solid var(--hairline);
+                   border-radius:999px; padding:8px 14px; background:var(--white); color:var(--charcoal); }
+
+  .actionbar { position:sticky; bottom:14px; z-index:45; display:flex; align-items:center; gap:18px;
+               flex-wrap:wrap; background:var(--white); border:1px solid var(--charcoal);
+               border-radius:18px; box-shadow:var(--shadow-float); padding:14px 18px; margin-top:22px; }
+  .ab-txt { flex:1; min-width:200px; font-size:13px; color:var(--muted2); line-height:1.5; }
+  .ab-txt b { color:var(--charcoal); font-weight:700; }
+  .ab-act { display:flex; gap:10px; flex:none; flex-wrap:wrap; }
+
+  .gapwarn { background:#fff7e6; border:1px solid #f0d9a8; border-radius:12px; padding:12px 16px;
+             font-size:13.5px; margin-bottom:16px; }
+  .gapwarn b { font-weight:700; }
+
+  /* ---------- Composer ---------- */
+  .composer { position:fixed; left:0; right:0; bottom:0; z-index:60; pointer-events:none; background:linear-gradient(to top, var(--sand) 78%, rgba(242,245,250,0)); padding:16px 24px 22px; }
+  .composer[hidden] { display:none; }
+  .composer .inner { pointer-events:auto; max-width:1000px; margin:0 auto; background:var(--white); border:1px solid var(--hairline); border-radius:18px; box-shadow:var(--shadow-float); padding:13px 15px; display:flex; gap:12px; align-items:flex-end; }
+  .composer textarea { flex:1; border:none; outline:none; resize:none; font-family:var(--font); font-size:15px; line-height:1.5; max-height:170px; min-height:24px; background:transparent; color:var(--charcoal); }
+  .composer .send { background:var(--charcoal); color:var(--white); border:none; border-radius:999px; font-weight:700; font-size:14px; padding:10px 22px; }
+  .composer .send:disabled { opacity:.4; cursor:default; }
+  .composer .hint { pointer-events:auto; max-width:1000px; margin:7px auto 0; font-size:12px; color:var(--muted); padding:0 8px; }
+  .composer .biglabel { pointer-events:auto; max-width:1000px; margin:0 auto 8px; font-size:13px; font-weight:700; color:var(--charcoal); padding:0 8px; }
+
+  /* ---------- Empty state ---------- */
+  .empty { text-align:center; padding:40px 20px 26px; position:relative; }
+  .empty img.pl { position:absolute; width:70px; transform:rotate(14deg); right:6%; top:0; opacity:.9; }
+  .empty img.pl2 { position:absolute; width:42px; transform:rotate(-18deg); left:8%; top:110px; }
+  .empty h1 { font-size:40px; font-weight:700; line-height:1.1; margin-bottom:12px; }
+  .empty p { color:var(--muted2); max-width:600px; margin:0 auto 22px; }
+  .starters { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:26px; }
+  .starter { border:1px solid var(--hairline); background:var(--white); border-radius:999px; padding:10px 20px; font-size:13.5px; font-weight:700; }
+  .starter:hover { border-color:var(--charcoal); }
+
+  /* ---------- Modal ---------- */
+  .modal-bg { position:fixed; inset:0; background:rgba(51,51,51,.45); z-index:100; display:none; align-items:center; justify-content:center; padding:20px; }
+  .modal-bg.open { display:flex; }
+  .modal { background:var(--white); border-radius:16px; max-width:640px; width:100%; padding:28px 30px; box-shadow:var(--shadow-float); max-height:90vh; overflow-y:auto; }
+  .modal h2 { font-size:22px; font-weight:700; margin-bottom:6px; }
+  .modal p.sub { font-size:13.5px; color:var(--muted2); margin-bottom:18px; }
+  .modal .row { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; }
+  .histlist { display:flex; flex-direction:column; gap:10px; max-height:56vh; overflow-y:auto; padding-right:4px; }
+  .histempty { font-size:13.5px; color:var(--muted); padding:22px 0; }
+  .histrow { display:flex; gap:14px; align-items:center; border:1px solid var(--hairline); border-radius:14px; padding:11px 13px; }
+  .hr-body { flex:1; min-width:0; }
+  .hr-body b { font-size:14px; font-weight:700; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hr-body span { font-size:11.5px; color:var(--muted); }
+  .hr-act { display:flex; gap:7px; flex:none; }
+  .hr-thumbs { display:flex; gap:4px; flex:none; width:96px; }
+  .hr-thumbs img { width:30px; height:30px; object-fit:cover; border-radius:6px; border:1px solid var(--hairline); }
+  .hr-none { font-size:10.5px; color:var(--muted); }
+  .hr-head { font-size:12.5px; color:var(--muted2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .modal.wide { max-width:760px; }
+
+  @media (max-width:900px) {
+    .sc-stage { width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="headrow">
+    <a href="index.html" title="Back to the dashboard" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit">
+      <img class="logo" src="assets/logo-professionals.svg" alt="Back to the dashboard">
+      <div>
+        <div class="title">Deck Studio</div>
+        <div class="subtitle">Source → Shape → Deck</div>
+      </div>
+    </a>
+    <div class="spacer"></div>
+    <button class="pill-btn" id="btnHistory">History</button>
+    <button class="pill-btn primary" id="btnNew">New deck</button>
+  </div>
+  <div class="stepper" id="stepper"></div>
+</header>
+
+<main>
+  <section class="panel active" id="panel1">
+    <div class="empty">
+      <h1>What are we presenting?</h1>
+      <p><b>Write or paste your brief in the box at the bottom.</b> Plain text is fine. The first line becomes the title, a short line with nothing after it becomes a section heading, the sentences under it become the argument and the lines that are not sentences become the list. Nothing is invented: a field the brief cannot feed stays a visible bracketed gap.</p>
+      <div class="starters">
+        <button class="starter" data-starter="Professionals, Q3 pitch
+
+Lokale Expertise, klar sichtbar
+Eigentümer:innen suchen einen verlässlichen Partner für Verkauf oder Vermietung. Die Kampagne macht Kompetenz konkret und führt zu einem eindeutigen nächsten Schritt.
+Regionale Marktkenntnis
+Professionelle Objektpräsentation
+Persönliche Beratung
+
+Was die Kampagne leistet
+Ein konsistenter Auftritt über Paid Social, LinkedIn, Landing Page und E-Mail.
+Klare Hierarchie
+Eine Aussage pro Motiv
+Menschliche Freigabe vor Veröffentlichung
+
+Was wir jetzt brauchen
+Freigabe für Konzept, Bildwelt und Produktionsplan.">A worked example brief</button>
+      </div>
+    </div>
+
+    <div class="doors">
+      <button class="door" id="doorBrief">
+        <b>Write a brief</b>
+        <span>Type it into the box at the bottom of this page and press Send. The brief is read as it stands — no keys, no model, no network.</span>
+        <em>Ready</em>
+      </button>
+      <button class="door" id="doorCampaign" disabled>
+        <b>Start from a campaign</b>
+        <span>Take a concept, its imagery and its export plan straight out of Concept Studio and tell it as a deck.</span>
+        <em>No campaigns built yet</em>
+      </button>
+    </div>
+  </section>
+
+  <section class="panel" id="panel2">
+    <div class="stepintro">
+      <h1>Shape</h1>
+      <p><b>The order is the opinion.</b> The same brief told as a pitch and told as a readout is not the same deck: the pitch puts the problem before the number, the readout puts the number first because the number already happened.</p>
+    </div>
+    <div id="briefPeek"></div>
+    <div class="narrgrid" id="narrGrid"></div>
+  </section>
+
+  <section class="panel" id="panel3">
+    <div class="stepintro">
+      <h1>Deck</h1>
+      <p><b>Every slide, at its own size, with its own fields beside it.</b> Type and the slide re-renders. Anything still in square brackets is a gap the brief did not fill — it is marked on the slide, and it stays marked until you write it.</p>
+    </div>
+    <div id="deckBody"></div>
+  </section>
+</main>
+
+<div class="composer" id="composer">
+  <div class="biglabel">Write your brief, then press Send</div>
+  <div class="inner">
+    <textarea id="input" rows="1" placeholder="Your brief: what it is called, what it has to say…"></textarea>
+    <button class="send" id="btnSend">Send</button>
+  </div>
+  <div class="hint">Enter to send · Shift+Enter for a new line · layouts from <code>deck-layouts.js</code></div>
+</div>
+
+<div class="modal-bg" id="campBg">
+  <div class="modal wide">
+    <h2>Start from a campaign</h2>
+    <p class="sub">Every set built in Concept Studio in this browser, newest first. Deck Studio only reads this list — nothing here is changed, removed or written back. Picking one tells it as a campaign deck: the concept up front, the work, where it runs, and the concept's own stated risk on a slide of its own.</p>
+    <div class="histlist" id="campList"></div>
+    <div class="row">
+      <button class="pill-btn" id="campClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="histBg">
+  <div class="modal">
+    <h2>Deck history</h2>
+    <p class="sub">Everything saved in this browser. The deck model is kept, never the built file: a rendered deck with its fonts and pictures inlined would not fit in localStorage, and the model rebuilds it byte for byte.</p>
+    <div class="histlist" id="histList"></div>
+    <div class="row">
+      <button class="pill-btn" id="histClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { NARRATIVES, narrativeById, mapBrief, deckFrom, deckFromBuild, buildDeck, placeholder, recordFacts, DECK_VERSION } from "./deck-builder.js";
+import { LAYOUTS, layoutById, fieldFor } from "./deck-layouts.js";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* =====================================================================
+   ASSETS
+
+   Everything a slide or a downloaded deck needs is carried in the page as
+   a data URI, read from the repo once. A deck that resolves a relative
+   path is a deck that breaks the moment it leaves this folder, and a
+   preview written into an iframe with srcdoc has no URL of its own to
+   resolve one against. This is the same loader deck-lab.html uses.
+   ===================================================================== */
+
+const FONT_DIR = "assets/fonts/";
+const WANT_ASSETS = [
+  ["plusTeal", "assets/blank.svg", "image/svg+xml"],
+  ["plusBlue", "assets/blank.svg", "image/svg+xml"],
+  ["logo", "assets/logo-professionals.svg", "image/svg+xml"],
+];
+const WANT_FACES = [[400, "MakeItBetter-Regular.woff2"], [700, "MakeItBetter-Bold.woff2"],
+  [800, "MakeItBetter-XBold.woff2"]];
+
+const A = { fontCss: "", assets: {}, fonts: {}, missing: [] };
+
+function b64(buf) {
+  const bytes = new Uint8Array(buf);
+  let s = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+/* The MIME is stated rather than taken from the response: a static server
+   that answers woff2 as application/octet-stream would produce a data URI
+   some browsers refuse to load as a font. */
+async function dataUri(path, mime) {
+  const r = await fetch(new URL(path, location.href));
+  if (!r.ok) throw new Error(`${path}: ${r.status}`);
+  return `data:${mime};base64,${b64(await r.arrayBuffer())}`;
+}
+
+/* A missing asset is reported, not swallowed. Without the fonts the
+   previews are laid out in a fallback face — different metrics entirely —
+   and the person judging the line breaks is judging a deck nobody will
+   see. Only what is still missing is fetched, so a retry after a server
+   hiccup repairs the page. */
+async function loadAssets() {
+  A.missing = [];
+  for (const [k, p, mime] of WANT_ASSETS) {
+    if (A.assets[k]) continue;
+    try { A.assets[k] = await dataUri(p, mime); } catch (e) { A.missing.push(p); }
+  }
+  for (const [weight, file] of WANT_FACES) {
+    if (A.fonts[weight]) continue;
+    try { A.fonts[weight] = await dataUri(FONT_DIR + file, "font/woff2"); }
+    catch (e) { A.missing.push(FONT_DIR + file); }
+  }
+  A.fontCss = WANT_FACES.filter(([w]) => A.fonts[w])
+    .map(([w]) => `@font-face{font-family:"Make It Better";font-weight:${w};font-style:normal;` +
+      `font-display:block;src:url("${A.fonts[w]}") format("woff2")}`).join("\n");
+}
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+
+const state = { step: 1, brief: "", map: null, narrative: null, deck: null, saved: false, build: null };
+
+/* =====================================================================
+   THE PLACEHOLDER MARK
+
+   deckFrom writes "[Headline]" where the brief fed nothing, and a person
+   must never send a deck out with [Contact] on the closing slide without
+   having seen it. The preview marks them, and the mark cannot be done by
+   wrapping the escaper: the layouts pass image sources through the same
+   esc(), so a span injected there would land inside an attribute.
+
+   Instead the placeholder value is fenced with an invisible separator
+   before rendering — a character no escaper touches and no layout
+   measures — and the fence is turned into a span once the HTML exists.
+
+   That rewrite is over the whole rendered string, so it is only safe
+   while no layout puts a *field* value inside an attribute. Today only
+   `art.src` is interpolated into one, and that is not a field. This is
+   not left to a comment: qa/deck-layouts.test.mjs renders every layout
+   with a fenced sentinel in every field and fails if one of them reaches
+   an attribute value, so the day a layout writes title="${e(f.headline)}"
+   the suite says so instead of a slide quietly breaking.
+
+   The mark is an outline in the slide's own ink, never a colour of its
+   own: nothing here may invent a brand colour. */
+const FENCE = "⁣";
+const isPlaceholder = v => /^\[[^\[\]]+\]$/.test(String(v ?? "").trim());
+/* The bracketed gap comes from deck-builder, never from a second copy of
+   its one line here: an editor that put back a different gap than
+   deckFrom wrote would drift from it silently. */
+const placeholderFor = placeholder;
+
+const PH_CSS = `.ph{outline:2px dashed currentColor;outline-offset:.12em;opacity:.45;
+  border-radius:.08em;padding:0 .06em}`;
+
+function fenceFields(slide) {
+  const out = {};
+  for (const [k, v] of Object.entries(slide.fields || {})) {
+    out[k] = isPlaceholder(v) ? `${FENCE}${v}${FENCE}` : v;
+  }
+  return { ...slide, fields: out };
+}
+
+const unfence = html => html.split(FENCE).map((part, i) =>
+  (i % 2 ? `<span class="ph">${part}</span>` : part)).join("");
+
+/* =====================================================================
+   PREVIEW
+
+   One slide, at 1920x1080, in its own iframe. The only scaling is a CSS
+   transform on the frame element in this page; the geometry inside the
+   frame never sees it, so what is measured is what would be presented.
+   ===================================================================== */
+
+function slideDoc(slide) {
+  const layout = layoutById(slide.layout);
+  const colours = fieldFor(slide.bg || layout.bg);
+  const inner = unfence(layout.render(fenceFields(slide), {
+    esc, field: colours, assets: A.assets,
+  }));
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><style>
+${A.fontCss}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:1920px;height:1080px;overflow:hidden}
+body{font-family:"Make It Better";-webkit-font-smoothing:antialiased}
+.slide{width:1920px;height:1080px;position:relative;overflow:hidden}
+${PH_CSS}
+</style></head><body><section class="slide" style="background:${colours.bg};color:${colours.fg}">${inner}</section></body></html>`;
+}
+
+/* Re-renders one slide and nothing else: a deck of sixteen frames that all
+   reload on every keystroke is a deck nobody can type into. */
+function paintSlide(i) {
+  const frame = document.querySelector(`iframe[data-i="${i}"]`);
+  if (!frame || !state.deck) return;
+  try {
+    frame.srcdoc = slideDoc(state.deck.slides[i]);
+  } catch (e) {
+    frame.srcdoc = `<!doctype html><body style="font:16px system-ui;padding:40px">${esc(e.message)}</body>`;
+  }
+}
+
+function paintAll() {
+  if (!state.deck) return;
+  state.deck.slides.forEach((s, i) => paintSlide(i));
+  fitFrames();
+}
+
+/* The scale, measured rather than assumed. One number for every frame,
+   because every frame is the same width. */
+function fitFrames() {
+  const box = document.querySelector(".sc-frame");
+  if (!box || !box.clientWidth) return;
+  document.documentElement.style.setProperty("--k", String(box.clientWidth / 1920));
+}
+window.addEventListener("resize", fitFrames);
+
+/* =====================================================================
+   STEPPER AND PANELS
+   ===================================================================== */
+
+const STEPS = [
+  { n: 1, lbl: "Source", sub: "A brief, or a campaign" },
+  { n: 2, lbl: "Shape", sub: "Which story it tells" },
+  { n: 3, lbl: "Deck", sub: "Edit and download" },
+];
+
+function reachable(n) {
+  if (n === 1) return true;
+  if (n === 2) return !!state.map;
+  return !!state.deck;
+}
+
+function drawStepper() {
+  $("stepper").innerHTML = STEPS.map(s => {
+    const cls = state.step === s.n ? "active" : (reachable(s.n) && s.n < state.step ? "done" : "");
+    const on = reachable(s.n);
+    return `<button class="stepbtn ${cls}" data-step="${s.n}"${on ? "" : " disabled"}>
+      <span class="num">${s.n}</span>
+      <span><span class="lbl">${esc(s.lbl)}</span><span class="sub">${esc(s.sub)}</span></span>
+    </button>`;
+  }).join("");
+}
+
+function go(n) {
+  if (!reachable(n)) return;
+  state.step = n;
+  for (const p of [1, 2, 3]) $(`panel${p}`).classList.toggle("active", p === n);
+  $("composer").hidden = n !== 1;
+  document.documentElement.style.setProperty("--composerH", n === 1 ? "96px" : "0px");
+  drawStepper();
+  if (n === 3) paintAll();
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+$("stepper").addEventListener("click", ev => {
+  const b = ev.target.closest(".stepbtn");
+  if (b) go(Number(b.dataset.step));
+});
+
+/* =====================================================================
+   STEP 1, SOURCE
+   ===================================================================== */
+
+const input = $("input");
+function autosize() { input.style.height = "auto"; input.style.height = `${input.scrollHeight}px`; }
+input.addEventListener("input", () => { autosize(); $("btnSend").disabled = !input.value.trim(); });
+input.addEventListener("keydown", ev => {
+  if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); send(); }
+});
+$("btnSend").addEventListener("click", send);
+$("btnSend").disabled = true;
+
+$("doorBrief").addEventListener("click", () => { input.focus(); input.scrollIntoView({ block: "center" }); });
+
+for (const b of document.querySelectorAll(".starter")) {
+  b.addEventListener("click", () => {
+    input.value = b.dataset.starter;
+    autosize();
+    $("btnSend").disabled = false;
+    input.focus();
+  });
+}
+
+function send() {
+  const text = input.value.trim();
+  if (!text) return;
+  state.brief = text;
+  state.map = mapBrief(text);
+  state.narrative = null;
+  state.deck = null;
+  state.build = null;
+  drawNarratives();
+  go(2);
+}
+
+/* =====================================================================
+   THE CAMPAIGN DOOR
+
+   Concept Studio's own history, read and never written. The key belongs
+   to that product: Deck Studio has no business trimming it, reordering
+   it or repairing it, so every access here is a get, and a list that
+   cannot be parsed is treated as an empty one rather than replaced.
+   ===================================================================== */
+
+const CAMPAIGN_KEY = "professionals_studio_history";
+
+function loadBuilds() {
+  try {
+    const list = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || "[]");
+    return Array.isArray(list) ? list.filter(b => b && typeof b === "object") : [];
+  } catch (e) { return []; }
+}
+
+/* The same coercion the model uses, for the same reason: a record from
+   another browser or an older Concept Studio is not a promise about
+   types, and `b.thumbs || []` hands a *string* straight to .filter. One
+   such row used to throw inside the list builder and leave the modal
+   empty with the door still cheerfully reporting five campaigns. */
+const arr = v => (Array.isArray(v) ? v : []);
+const obj = v => (v && typeof v === "object" && !Array.isArray(v) ? v : {});
+const conceptOf = b => obj(b.concept || arr(b.concepts).find(c => c && typeof c === "object"));
+const stamp = iso => String(iso || "").slice(0, 16).replace("T", " ");
+
+/* The door is only a door when there is something behind it. */
+function drawCampaignDoor() {
+  const list = loadBuilds();
+  const door = $("doorCampaign");
+  door.disabled = !list.length;
+  door.querySelector("em").textContent = list.length
+    ? `${list.length} campaign${list.length === 1 ? "" : "s"} built`
+    : "No campaigns built yet";
+}
+
+function drawCampaigns() {
+  const list = loadBuilds();
+  $("campList").innerHTML = list.length
+    /* One unreadable row must never blank the list. It says so in its own
+       place and the other campaigns stay usable. */
+    ? list.map(b => { try { return campaignRow(b); }
+        catch (err) {
+          console.error("deck-studio: campaign row could not be read", err);
+          return `<div class="histrow"><div class="hr-body"><b>${
+            esc(String(b.id || "This record"))}</b><span>could not be read</span></div></div>`;
+        } }).join("")
+    : `<div class="histempty">Nothing built yet. Build a set in Concept Studio and it appears here.</div>`;
+}
+
+function campaignRow(b) {
+        const c = conceptOf(b);
+        const cf = recordFacts(b, obj(b.exportPlan || b.plan));
+        const thumbs = arr(b.thumbs).filter(t => typeof t === "string" && t).slice(0, 3);
+        return `<div class="histrow">
+          <div class="hr-thumbs">${thumbs.length
+            ? thumbs.map(t => `<img src="${esc(t)}" alt="">`).join("")
+            : `<span class="hr-none">no preview</span>`}</div>
+          <div class="hr-body">
+            <b>${esc(b.product || "[Product]")}</b>
+            <div class="hr-head">${esc(c.headline_de || "")}</div>
+            <span>${esc(b.objective || "no objective stated")} · ${esc(stamp(b.at))}${
+              /* THE COUNTS THE RECORD ITSELF HOLDS, read through the one
+                 derivation both products share. This row printed
+                 `b.placements` unqualified — the PLANNED figure — while the
+                 same record carried `placementsBuilt` and Concept Studio's
+                 history row for that build read "8 of 9 placements". */
+              cf.filesPhrase ? ` · ${esc(cf.filesPhrase)}` : ""}${
+              cf.placementsPhrase ? ` · ${esc(cf.placementsPhrase)}` : ""}</span>
+          </div>
+          <div class="hr-act">
+            <button class="pill-btn tiny" data-build="${esc(b.id || "")}">Use this</button>
+          </div>
+        </div>`;
+}
+
+/* The step-2 material for a campaign, so re-shaping it as a pitch or a
+   readout has something real to read. Every line below is a string the
+   entry already held — the headline, the subline, the concept's name and
+   argument, the product, the placements. No heading is invented: the
+   concept's own name and the product name are the two headings, and the
+   placement lines carry no full stop, so mapBrief reads them as the list
+   they are. */
+function briefTextFromBuild(b) {
+  const c = conceptOf(b);
+  const plan = obj(b.exportPlan || b.plan);
+  const places = arr(plan.families).flatMap(f => arr(obj(f).placements))
+    .concat(arr(plan.placements))
+    .map(p => [obj(p).platform, obj(p).placement].filter(Boolean).join(" · "))
+    .filter(Boolean);
+  const blocks = [];
+  if (c.headline_de) blocks.push(c.headline_de);
+  if (c.subline_de) blocks.push("", c.subline_de);
+  if (c.name && (c.why_it_works || c.risk)) {
+    blocks.push("", c.name, ...[c.why_it_works, c.risk].filter(Boolean));
+  }
+  if (b.product && places.length) blocks.push("", b.product, ...places.slice(0, 6));
+  return blocks.join("\n");
+}
+
+function useBuild(b) {
+  state.build = b;
+  state.brief = briefTextFromBuild(b);
+  state.map = mapBrief(state.brief);
+  state.narrative = "campaign";
+  state.deck = deckFromBuild(b, {});
+  state.saved = false;
+  /* Draw first, close second. Closing the modal up front meant that when
+     drawNarratives or drawDeck threw, the caller's report landed on a
+     button inside a modal the user could no longer see — a click that
+     appeared to do nothing at all. With the close last, anything that
+     throws leaves the modal open and the message in front of the user. */
+  drawNarratives();
+  drawDeck();
+  $("campBg").classList.remove("open");
+  go(3);
+}
+
+$("doorCampaign").addEventListener("click", () => {
+  if ($("doorCampaign").disabled) return;
+  drawCampaigns();
+  $("campBg").classList.add("open");
+});
+$("campList").addEventListener("click", ev => {
+  const btn = ev.target.closest("[data-build]");
+  if (!btn) return;
+  const b = loadBuilds().find(x => String(x.id || "") === btn.dataset.build);
+  if (!b) return;
+  /* A record written by another browser or an older Concept Studio is not
+     a promise about types. deckFromBuild tolerates every shape the model
+     can be handed, but a click handler that throws leaves a modal that
+     simply stops responding and never says why, so the failure is caught
+     and reported here rather than lost to the console. */
+  try { useBuild(b); }
+  catch (err) {
+    btn.textContent = "This build could not be read";
+    btn.disabled = true;
+    console.error("deck-studio: campaign build could not be read", err);
+  }
+});
+$("campClose").addEventListener("click", () => $("campBg").classList.remove("open"));
+$("campBg").addEventListener("click", ev => { if (ev.target === $("campBg")) $("campBg").classList.remove("open"); });
+
+/* =====================================================================
+   STEP 2, SHAPE
+   ===================================================================== */
+
+function drawNarratives() {
+  const m = state.map || { title: "", sections: [] };
+  const src = state.build
+    ? `Read from the campaign <b>${esc(state.build.product || "")}</b>: `
+    : "Read from your brief: ";
+  $("briefPeek").innerHTML = (state.build
+    ? `<div class="briefpeek">Told as a <b>Campaign</b>, this deck is built from the build record itself — the export plan, the file count and the concept's stated risk. Any other shape is built from the concept's own words only, and the export plan does not travel with it.</div>`
+    : "") + `<div class="briefpeek">${src}title <b>${
+    esc(m.title || "[Title]")}</b> · <b>${m.sections.length}</b> section${
+    m.sections.length === 1 ? "" : "s"} · <b>${
+    m.sections.reduce((n, s) => n + s.items.length, 0)}</b> list line${
+    m.sections.reduce((n, s) => n + s.items.length, 0) === 1 ? "" : "s"} · <b>${
+    m.sections.reduce((n, s) => n + s.numbers.length, 0)}</b> numeral${
+    m.sections.reduce((n, s) => n + s.numbers.length, 0) === 1 ? "" : "s"} with a unit</div>`;
+
+  $("narrGrid").innerHTML = NARRATIVES.map(n => `<button class="narrcard${
+    state.narrative === n.id ? " on" : ""}" data-narr="${esc(n.id)}">
+      <b>${esc(n.label)}</b>
+      <span class="note">${esc(n.note)}</span>
+      <span class="flow">${n.roles.length} slides · ${esc(n.roles.map(r => layoutById(r.layout).label).join(" → "))}</span>
+    </button>`).join("");
+}
+
+$("narrGrid").addEventListener("click", ev => {
+  const b = ev.target.closest(".narrcard");
+  if (!b) return;
+  state.narrative = b.dataset.narr;
+  /* A campaign told as a campaign is the entry itself, not the text this
+     page derived from it: deckFromBuild reads the export plan, the file
+     count and the risk, and none of those survive a round trip through
+     mapBrief. Any other shape falls back to the derived text, which is
+     the concept's own words and nothing more. */
+  state.deck = (state.build && state.narrative === "campaign")
+    ? deckFromBuild(state.build, {})
+    : deckFrom({
+        brief: state.brief, narrative: state.narrative,
+        source: state.build && state.build.id ? `build:${state.build.id}` : "brief",
+      });
+  state.saved = false;
+  drawNarratives();
+  drawDeck();
+  go(3);
+});
+
+/* =====================================================================
+   STEP 3, DECK
+   ===================================================================== */
+
+function gapCount() {
+  if (!state.deck) return 0;
+  return state.deck.slides.reduce((n, s) =>
+    n + Object.values(s.fields).filter(isPlaceholder).length, 0);
+}
+
+function fieldRow(i, f, value) {
+  const ph = placeholderFor(f);
+  const empty = isPlaceholder(value);
+  const shown = empty ? "" : String(value ?? "");
+  const tag = f.multiline
+    ? `<textarea rows="3" maxlength="${f.max}" data-i="${i}" data-k="${esc(f.k)}" placeholder="${esc(ph)}">${esc(shown)}</textarea>`
+    : `<input type="text" maxlength="${f.max}" data-i="${i}" data-k="${esc(f.k)}" placeholder="${esc(ph)}" value="${esc(shown)}">`;
+  return `<div class="fld">
+    <label>${esc(f.label)}</label>
+    ${tag}
+    <div class="cnt${shown.length >= f.max ? " full" : ""}" data-cnt="${i}-${esc(f.k)}">${shown.length} / ${f.max}</div>
+  </div>`;
+}
+
+function drawDeck() {
+  if (!state.deck) return;
+  const deck = state.deck;
+  const gaps = gapCount();
+  const body = deck.slides.map((s, i) => {
+    const layout = layoutById(s.layout);
+    return `<div class="slidecard" data-card="${i}">
+      <div class="sc-head">
+        <span class="n">${i + 1} / ${deck.slides.length}</span>
+        <b>${esc(layout.label)}</b>
+        <span class="spacer"></span>
+        <button class="pill-btn tiny" data-act="up" data-i="${i}"${i === 0 ? " disabled" : ""}>Up</button>
+        <button class="pill-btn tiny" data-act="down" data-i="${i}"${i === deck.slides.length - 1 ? " disabled" : ""}>Down</button>
+        <button class="pill-btn tiny" data-act="remove" data-i="${i}"${deck.slides.length < 2 ? " disabled" : ""}>Remove</button>
+      </div>
+      <div class="sc-body">
+        <div class="sc-stage"><div class="sc-frame"><iframe data-i="${i}" title="Slide ${i + 1}"></iframe></div></div>
+        <div class="sc-fields">
+          ${layout.fields.map(f => fieldRow(i, f, s.fields[f.k])).join("")}
+          <div class="sc-note">${esc(layout.note)}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  /* A deck restored from history has its photographs stripped — the model
+     is kept, the image data is not, because one campaign deck's pictures
+     would evict the whole history. That is stated here rather than left to
+     be discovered in a downloaded file: these slides will render without a
+     photograph, and rebuilding from the campaign in step 1 brings them
+     back. */
+  const stripped = deck.slides.filter(s => s.art && !s.art.src).length;
+
+  $("deckBody").innerHTML =
+    (gaps ? `<div class="gapwarn"><b>${gaps} field${gaps === 1 ? " is" : "s are"} still a gap.</b>
+       They are marked on the slides and they print exactly as you see them — write them, or remove the slide.</div>` : "") +
+    (stripped ? `<div class="gapwarn"><b>${stripped} slide${stripped === 1 ? "" : "s"} ${
+       stripped === 1 ? "has" : "have"} no photograph.</b> History keeps the deck's words, never its
+       pictures — a campaign deck's photographs alone would fill the whole browser store. ${
+       stripped === 1 ? "This slide renders" : "These slides render"} without one, here and in the
+       downloaded file. Start from the campaign again in step 1 to bring the pictures back.</div>` : "") +
+    (A.missing.length ? `<div class="notice error">${A.missing.length} asset${
+      A.missing.length === 1 ? "" : "s"} did not load, so these previews are not the deck you would download:
+      <code>${esc(A.missing.join(", "))}</code>. Serve this folder over HTTP and reload.</div>` : "") +
+    body +
+    `<div class="addrow">
+      <select id="addLayout">${LAYOUTS.map(l =>
+        `<option value="${esc(l.id)}">${esc(l.n)} ${esc(l.label)}</option>`).join("")}</select>
+      <button class="pill-btn" id="btnAdd">Add this slide</button>
+      <span class="sc-note">Sixteen layouts, all of them measured against worst-case content.</span>
+    </div>
+    <div class="actionbar">
+      <div class="ab-txt"><b>${esc(narrativeLabel(deck.meta.narrative))}</b> · ${deck.slides.length} slides · deck ${esc(DECK_VERSION)}<br>
+        One file, everything inside it: fonts, shapes and pictures are carried as data, so it opens from a desktop with no server.</div>
+      <div class="ab-act">
+        <button class="pill-btn" id="btnJson">Copy deck as JSON</button>
+        <button class="pill-btn" id="btnSave">Save to history</button>
+        <button class="pill-btn primary big" id="btnDownload">Download the deck</button>
+      </div>
+    </div>`;
+
+  paintAll();
+}
+
+/* Editing. The model is the truth and the frame follows it: one field, one
+   slide, one re-render. An emptied field does not become an empty string —
+   it goes back to being the bracketed gap it started as, because a slide
+   that silently drops its headline is worse than one that shows it is
+   missing. */
+$("deckBody").addEventListener("input", ev => {
+  const el = ev.target;
+  const i = Number(el.dataset.i);
+  const k = el.dataset.k;
+  if (!k || !Number.isInteger(i) || !state.deck || !state.deck.slides[i]) return;
+  const layout = layoutById(state.deck.slides[i].layout);
+  const f = layout.fields.find(x => x.k === k);
+  if (!f) return;
+  /* The fence character is the preview's own punctuation, so a pasted one
+     would shift the fence parity and mark the rest of the slide. It is
+     invisible, it carries no meaning in a deck, and it is dropped. */
+  const raw = el.value.split(FENCE).join("");
+  state.deck.slides[i].fields[k] = raw.trim() ? raw.slice(0, f.max) : placeholderFor(f);
+  state.saved = false;
+  const cnt = $("deckBody").querySelector(`[data-cnt="${i}-${k}"]`);
+  if (cnt) {
+    cnt.textContent = `${raw.length} / ${f.max}`;
+    cnt.classList.toggle("full", raw.length >= f.max);
+  }
+  paintSlide(i);
+});
+
+$("deckBody").addEventListener("click", ev => {
+  const b = ev.target.closest("button[data-act]");
+  if (b) {
+    const i = Number(b.dataset.i);
+    const s = state.deck.slides;
+    if (b.dataset.act === "up" && i > 0) { [s[i - 1], s[i]] = [s[i], s[i - 1]]; }
+    else if (b.dataset.act === "down" && i < s.length - 1) { [s[i + 1], s[i]] = [s[i], s[i + 1]]; }
+    else if (b.dataset.act === "remove" && s.length > 1) { s.splice(i, 1); }
+    else return;
+    state.saved = false;
+    drawDeck();
+    return;
+  }
+  /* closest(), like the branch above: a click landing on a node *inside*
+     the button never matches ev.target.id, and the action silently does
+     nothing. */
+  const act = ev.target.closest("button[id]");
+  if (!act) return;
+  if (act.id === "btnAdd") addSlide();
+  else if (act.id === "btnDownload") download(act);
+  else if (act.id === "btnJson") copyJson(act);
+  else if (act.id === "btnSave") saveDeck(act);
+});
+
+/* A new slide is every field's own gap, never invented prose. */
+function addSlide() {
+  const layout = layoutById($("addLayout").value);
+  const fields = {};
+  for (const f of layout.fields) fields[f.k] = placeholderFor(f);
+  state.deck.slides.push({ layout: layout.id, fields, art: null });
+  state.saved = false;
+  drawDeck();
+  const last = $("deckBody").querySelector(`[data-card="${state.deck.slides.length - 1}"]`);
+  if (last) last.scrollIntoView({ block: "center", behavior: "smooth" });
+}
+
+/* =====================================================================
+   THE THREE ACTIONS
+   ===================================================================== */
+
+const slug = s => String(s || "deck").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "deck";
+const today = () => new Date().toISOString().slice(0, 10);
+
+/* THE PHOTOGRAPHS HAVE TO TRAVEL.
+
+   A campaign's picture is usually a *path*, not data. Concept Studio's
+   conceptImage returns `c.__upload || c.__photo`, and only an uploaded or
+   generated photo is a data URI — a preset is a repo path like
+   "assets/photo-interior.jpg". In the preview that path resolves
+   against this document and everything looks right, which is exactly how
+   this hid: an srcdoc iframe inherits the page's base URL. Downloaded and
+   opened from a Downloads folder there is no base and no server, so the
+   title, split and product slides lose their photograph and the deck's one
+   promise — a single file that opens anywhere — is broken.
+
+   So every non-data art source is fetched and inlined before the file is
+   built. Each distinct source is fetched once, however many slides share
+   it. buildDeck's own localOnly() drops a slide art source that points
+   over the network (as it does the shared assets), so the two halves are
+   covered: buildDeck refuses the remote URL, and this refuses to let a
+   local path travel unresolved. */
+async function inlineArt(slides) {
+  const need = [...new Set(slides
+    .map(s => (s.art && s.art.src) || "")
+    .filter(src => src && !/^data:/i.test(src)))];
+  if (!need.length) return { slides, failed: [] };
+
+  const map = new Map();
+  const failed = [];
+  for (const src of need) {
+    try {
+      const r = await fetch(new URL(src, location.href));
+      if (!r.ok) throw new Error(String(r.status));
+      const blob = await r.blob();
+      map.set(src, `data:${blob.type || "image/jpeg"};base64,${b64(await blob.arrayBuffer())}`);
+    } catch (e) { failed.push(src); }
+  }
+  return {
+    slides: slides.map(s => (s.art && map.has(s.art.src)
+      ? { ...s, art: { ...s.art, src: map.get(s.art.src) } } : s)),
+    failed,
+  };
+}
+
+async function download(btn) {
+  const was = btn && btn.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = "Packing the pictures…"; }
+  let slides = state.deck.slides;
+  let failed = [];
+  try { ({ slides, failed } = await inlineArt(slides)); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = was; } }
+
+  /* A picture that could not be read is named, not dropped in silence: the
+     deck still builds — the layouts all render without one — but the person
+     downloading it is told which slides will open without their photograph
+     rather than finding out in the room. */
+  if (failed.length && !confirm(
+      `${failed.length} picture${failed.length === 1 ? "" : "s"} could not be read, so ` +
+      `${failed.length === 1 ? "that slide" : "those slides"} will open without ` +
+      `${failed.length === 1 ? "it" : "them"}:\n\n${failed.join("\n")}\n\n` +
+      `Download the deck anyway?`)) return;
+
+  const deck = { ...state.deck, slides, assets: { ...A.assets, fonts: A.fonts } };
+  let html;
+  try { html = buildDeck(deck); }
+  catch (e) { alert(`The deck could not be built: ${e.message}`); return; }
+  const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `professionals-deck-${slug(state.deck.meta.narrative)}-${today()}.html`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* The model, not the file: JSON that carries the pictures would be a
+   megabyte of base64 nobody can read in a text editor. */
+async function copyJson(btn) {
+  const text = JSON.stringify({ meta: state.deck.meta, slides: state.deck.slides }, null, 2);
+  const was = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
+  catch (e) { btn.textContent = "Clipboard refused"; }
+  setTimeout(() => { btn.textContent = was; }, 1600);
+}
+
+/* =====================================================================
+   HISTORY
+
+   The deck model and its meta, never the rendered HTML: a built deck with
+   its fonts and photographs inlined is several megabytes and localStorage
+   holds about five, so keeping files would evict the whole history on the
+   first save. The model rebuilds the same file byte for byte.
+   ===================================================================== */
+
+const HISTORY_KEY = "professionals_studio_decks";
+const HISTORY_MAX = 24;
+
+function loadDecks() {
+  try {
+    const list = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    return Array.isArray(list) ? list : [];
+  } catch (e) { return []; }
+}
+
+/* Trim from the back until it fits rather than failing the whole save —
+   but never past the point of destroying what was already there. The
+   earlier version fell through to removeItem, so one oversized save wiped
+   an entire history and still reported "Saved". Deleting is a deliberate
+   act and gets its own branch; anything else that will not fit leaves the
+   stored list exactly as it found it and says it failed. */
+function writeDecks(list) {
+  if (!list.length) {
+    try { localStorage.removeItem(HISTORY_KEY); } catch (e) {}
+    return 0;
+  }
+  const before = localStorage.getItem(HISTORY_KEY);
+  for (let n = list.length; n > 0; n--) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, n))); return n; }
+    catch (e) { /* quota, drop the oldest and try again */ }
+  }
+  try {
+    if (before === null) localStorage.removeItem(HISTORY_KEY);
+    else localStorage.setItem(HISTORY_KEY, before);
+  } catch (e) { /* the restore is best effort; the report below is not */ }
+  return 0;
+}
+
+/* A deck record is words, not pictures. A brief-built deck carried no art
+   at all and a record was about a kilobyte; a campaign deck carries the
+   concept's photograph and its thumbnails as `art.src` data URIs, and one
+   record of those can be larger than the whole five-megabyte budget. So
+   the source is kept and the bytes are not: the slide keeps its layout,
+   its veil and every word, and loses the image data. The layouts all
+   render without a photograph — the split slide drops its panel, the
+   product slide draws its own wireframe — so a restored record is a
+   readable deck with the pictures missing rather than a broken one, and
+   rebuilding it from the campaign in step 1 brings them straight back. */
+function withoutArtData(slides) {
+  return slides.map(s => (s.art && s.art.src ? { ...s, art: { ...s.art, src: "" } } : s));
+}
+
+function saveDeck(btn) {
+  const entry = {
+    id: `d${Date.now().toString(36)}`,
+    at: new Date().toISOString(),
+    meta: { ...state.deck.meta, at: new Date().toISOString() },
+    gaps: gapCount(),
+    slides: withoutArtData(state.deck.slides),
+  };
+  const list = [entry, ...loadDecks()].slice(0, HISTORY_MAX);
+  const kept = writeDecks(list);
+  state.saved = kept > 0;
+  const was = btn.textContent;
+  btn.textContent = kept === 0 ? "Could not save"
+    : kept < list.length ? `Saved, dropped ${list.length - kept} older`
+    : "Saved";
+  setTimeout(() => { btn.textContent = was; }, 2400);
+}
+
+function drawHistory() {
+  const list = loadDecks();
+  $("histList").innerHTML = list.length
+    ? list.map(d => `<div class="histrow" data-id="${esc(d.id)}">
+        <div class="hr-body">
+          <b>${esc((d.meta && d.meta.title) || "[Title]")}</b>
+          <span>${esc(narrativeLabel(d.meta && d.meta.narrative))} · ${
+            (d.slides || []).length} slides · ${esc(String(d.at || "").slice(0, 16).replace("T", " "))}${
+            d.gaps ? ` · ${d.gaps} gap${d.gaps === 1 ? "" : "s"}` : ""}</span>
+        </div>
+        <div class="hr-act">
+          <button class="pill-btn tiny" data-open="${esc(d.id)}">Open</button>
+          <button class="pill-btn tiny" data-del="${esc(d.id)}">Delete</button>
+        </div>
+      </div>`).join("")
+    : `<div class="histempty">Nothing saved yet. Build a deck and press Save to history.</div>`;
+}
+
+function narrativeLabel(id) {
+  try { return narrativeById(id).label; } catch (e) { return "Unknown narrative"; }
+}
+
+$("histList").addEventListener("click", ev => {
+  const open = ev.target.closest("[data-open]");
+  const del = ev.target.closest("[data-del]");
+  if (open) {
+    const d = loadDecks().find(x => x.id === open.dataset.open);
+    if (!d) return;
+    state.deck = { meta: d.meta, slides: d.slides };
+    state.narrative = d.meta.narrative;
+    /* The record is the deck, not the campaign it came from. Leaving the
+       previous build in state would let a re-pick in step 2 rebuild
+       somebody else's campaign over the one just opened. */
+    state.build = null;
+    state.map = state.map || mapBrief(d.meta.title || "");
+    state.saved = true;
+    $("histBg").classList.remove("open");
+    drawDeck();
+    go(3);
+  } else if (del) {
+    writeDecks(loadDecks().filter(x => x.id !== del.dataset.del));
+    drawHistory();
+  }
+});
+
+$("btnHistory").addEventListener("click", () => { drawHistory(); $("histBg").classList.add("open"); });
+$("histClose").addEventListener("click", () => $("histBg").classList.remove("open"));
+$("histBg").addEventListener("click", ev => { if (ev.target === $("histBg")) $("histBg").classList.remove("open"); });
+
+$("btnNew").addEventListener("click", () => {
+  if (state.deck && !state.saved && !confirm("Start a new deck? The one on screen is not saved to history.")) return;
+  state.brief = ""; state.map = null; state.narrative = null; state.deck = null; state.saved = false;
+  state.build = null;
+  drawCampaignDoor();
+  input.value = "";
+  autosize();
+  $("btnSend").disabled = true;
+  $("deckBody").innerHTML = "";
+  go(1);
+});
+
+/* =====================================================================
+   START
+   ===================================================================== */
+
+drawStepper();
+drawCampaignDoor();
+go(1);
+await loadAssets();
+if (state.deck) drawDeck();
+</script>
+<script src="language.js"></script>
+</body>
+</html>

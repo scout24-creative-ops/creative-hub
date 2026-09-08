@@ -1,0 +1,147 @@
+{
+  "$schema_note": "Export preset matrix for the Image Size Adapter agent (agents/size-adapter-agent.md). Replaces the agent's 'marketing-export-presets.md'. Organised by canonical aspect ratio first, because the agent's core strategy is to map placements to the nearest canonical ratio and minimise unique recompositions.",
+  "version": "1.0",
+  "researched": "2026-08-06",
+  "verification_legend": {
+    "verified": "Confirmed on the platform's own documentation.",
+    "secondary": "Consistent across multiple independent third-party sources; the platform's own page was unreachable or 404s. Confirm before a large spend.",
+    "consensus": "No authoritative publisher exists. Industry practice."
+  },
+
+  "strategy": {
+    "principle": "Map every requested placement to a canonical ratio family first. Produce one master per family, then export the pixel sizes within it. Never treat each pixel size as a separate generation.",
+    "highest_yield_masters": ["1:1", "16:9", "9:16", "4:5"],
+    "coverage_note": "1:1 + 16:9 + 9:16 cover roughly 14 of ~20 placements. Adding 4:5 brings in all of Meta Feed, Meta's highest-volume placement.",
+    "build_order": ["1:1", "16:9", "4:5", "9:16", "3:2", "3:1"]
+  },
+
+  "ratio_families": {
+    "1:1": {
+      "master": { "w": 1200, "h": 1200, "note": "Export larger if the source allows; 1200 is the floor for the biggest placements." },
+      "difficulty": "easy",
+      "why": "No safe zones, text permitted almost everywhere, largest family by placement count.",
+      "placements": [
+        { "platform": "Meta", "placement": "Carousel", "w": 1080, "h": 1080, "min_w": 600, "min_h": 600, "max_file_mb": 30, "formats": ["JPG", "PNG"], "text_in_image": "allowed", "safe_zone": null, "verification": "secondary", "note": "All cards in a carousel must share one ratio." },
+        { "platform": "Google Display", "placement": "Responsive Display, square", "w": 1200, "h": 1200, "min_w": 300, "min_h": 300, "max_file_kb": 5120, "formats": ["JPG", "PNG", "GIF"], "text_in_image": "discouraged", "safe_zone": null, "verification": "verified", "note": "Google auto-crops RDA assets; keep logos out of the image asset, they go in the logo asset." },
+        { "platform": "Outbrain", "placement": "Carousel / App Install", "w": 1200, "h": 1200, "max_file_mb": 2.5, "formats": ["JPG", "PNG"], "text_in_image": "discouraged", "safe_zone": null, "verification": "verified" },
+        { "platform": "Taboola", "placement": "Native (1:1 accepted ratio)", "w": 1200, "h": 1200, "min_w": 400, "min_h": 350, "max_file_mb": 2.5, "formats": ["JPG", "PNG", "WEBP"], "text_in_image": "forbidden_in_practice", "safe_zone": null, "verification": "verified" },
+        { "platform": "Moloco", "placement": "Square banner", "w": 300, "h": 250, "text_in_image": "allowed", "safe_zone": null, "verification": "secondary", "note": "300x250 is the classic MREC; text is expected in Moloco banners." }
+      ]
+    },
+
+    "16:9": {
+      "master": { "w": 2560, "h": 1440, "note": "A 16:9 master centre-crops cleanly to 1.91:1, only 4% height difference. Treat them as one family." },
+      "also_covers": ["1.91:1"],
+      "difficulty": "easy",
+      "why": "Second-largest family. Wide crops are forgiving as long as the subject is centred.",
+      "placements": [
+        { "platform": "Taboola", "placement": "Native thumbnail (primary)", "w": 1200, "h": 674, "min_w": 400, "min_h": 350, "max_file_mb": 2.5, "formats": ["JPG", "PNG", "WEBP", "GIF"], "text_in_image": "forbidden_in_practice", "safe_zone": { "type": "centre_bias", "note": "No formal safe zone. Taboola auto-crops the SAME file into 16:9, 4:3, 1:1, 6:5, 2:1 and 1.91:1, the focal point must survive all of them. Keep ~300px clear each side on a 1200-wide image." }, "verification": "verified", "conflicts": "Taboola's own pages give 1200x674 and 1000x600; max file size 5MB and 2.5MB. Using the conservative values.", "note": "Headline is rendered by Taboola in HTML, the image must carry no text." },
+        { "platform": "Google Display", "placement": "Responsive Display, landscape", "w": 1200, "h": 628, "min_w": 600, "min_h": 314, "max_file_kb": 5120, "formats": ["JPG", "PNG", "GIF"], "text_in_image": "discouraged", "ratio": "1.91:1", "verification": "verified" },
+        { "platform": "Moloco", "placement": "Native main image", "w": 1200, "h": 628, "ratio": "1.91:1", "text_in_image": "no_baked_text", "verification": "secondary", "note": "Headline/description rendered by the exchange. 1200x600 (2:1) required for Kakao/Native List inventory in KR." },
+        { "platform": "Web", "placement": "Landing page hero, desktop", "w": 1920, "h": 1080, "retina_w": 2560, "retina_h": 1440, "min_w": 1280, "target_file_kb": 400, "formats": ["WebP", "JPG"], "text_in_image": "forbidden", "verification": "consensus", "note": "Never bake the H1 into the image, live HTML text for SEO, accessibility, localisation. Ship a srcset ladder 640/1024/1536/1920/2560. Keep the focal subject inside the central 60% and reserve one side for the headline overlay." }
+      ]
+    },
+
+    "4:5": {
+      "master": { "w": 1440, "h": 1800 },
+      "difficulty": "moderate",
+      "why": "Small family but it covers Meta Feed, the highest-volume paid placement.",
+      "placements": [
+        { "platform": "Meta", "placement": "Facebook Feed", "w": 1440, "h": 1800, "min_w": 600, "min_h": 750, "max_file_mb": 30, "formats": ["JPG", "PNG"], "text_in_image": "allowed", "safe_zone": null, "verification": "verified", "note": "Meta raised the recommendation from 1080x1350 to 1440x1800, export at the higher res. Ratio tolerance ±3%." },
+        { "platform": "Meta", "placement": "Instagram Feed", "w": 1440, "h": 1800, "min_w": 500, "max_file_mb": 30, "formats": ["JPG", "PNG"], "text_in_image": "allowed", "safe_zone": null, "verification": "verified", "note": "Ratio tolerance ±1%, tighter than Facebook." },
+        { "platform": "Google Display", "placement": "Responsive Display, portrait", "w": 1200, "h": 1500, "max_file_kb": 5120, "formats": ["JPG", "PNG"], "text_in_image": "discouraged", "verification": "verified", "note": "Optional asset; minimum dimensions unverified." },
+        { "platform": "Web", "placement": "Landing page hero, mobile", "w": 828, "h": 1035, "text_in_image": "forbidden", "target_file_kb": 100, "formats": ["WebP", "JPG"], "verification": "consensus" }
+      ]
+    },
+
+    "9:16": {
+      "master": { "w": 1080, "h": 1920 },
+      "difficulty": "hard",
+      "why": "Tightest family. Large parts of the frame are covered by platform UI, and the usable box is far smaller than the canvas.",
+      "universal_safe_zone": {
+        "note": "Design to this one box and a single asset clears Meta Stories, Meta Reels and TikTok. It is the union of the strictest margin on each side.",
+        "canvas": { "w": 1080, "h": 1920 },
+        "top_px": 269,
+        "bottom_px": 707,
+        "left_px": 122,
+        "right_px": 242,
+        "usable_box": { "w": 716, "h": 944 },
+        "derivation": "Top 269 = Meta 14%, published. Bottom 707, left 122 and right 242 are the strictest of the widely cited TikTok figures, because TikTok publishes none of its own."
+      },
+      "placements": [
+        { "platform": "Meta", "placement": "Stories", "w": 1080, "h": 1920, "max_file_mb": 30, "formats": ["JPG", "PNG"], "text_in_image": "allowed_inside_safe_zone", "safe_zone": { "top_pct": 14, "bottom_pct": 35, "sides_pct": 6, "top_px": 269, "bottom_px": 672, "sides_px": 65 }, "verification": "verified", "note": "Meta publishes ONE 9:16 rule, 14/35/6, covering Stories, Reels, Facebook Stories, Facebook Reels and 9:16 Instagram Feed. The 20% bottom figure repeated across the web is out of date by 456px. Ads carrying a disclaimer want 40% (768px)." },
+        { "platform": "Meta", "placement": "Reels", "w": 1080, "h": 1920, "max_file_mb": 30, "formats": ["JPG", "PNG"], "text_in_image": "allowed_inside_safe_zone", "safe_zone": { "top_pct": 14, "bottom_pct": 35, "sides_pct": 6, "top_px": 269, "bottom_px": 672, "sides_px": 65 }, "verification": "verified", "note": "35% of the frame is unusable at the bottom. Design for Reels and Stories comes free." },
+        { "platform": "TikTok", "placement": "In-Feed (Auction)", "w": 1080, "h": 1920, "min_w": 540, "min_h": 960, "max_file_mb": 500, "formats": ["mp4", "mov", "mpeg", "3gp", "avi"], "text_in_image": "allowed_inside_safe_zone", "safe_zone": { "top_px": 254, "bottom_px": 707, "left_px": 122, "right_px": 242, "note": "TikTok publishes NO pixel values anywhere. The geometry ships only as downloadable template overlays, and TikTok states the zone varies with aspect ratio, caption length and interactive add-ons. Cited third-party figures disagree by about 2.4x on every edge; these are the strictest of them." }, "verification": "consensus", "note": "Asymmetric right margin (242px vs 122px left), so never centre the subject on the geometric centre. This is a VIDEO placement: a static image needs motion added, not just a crop. Pull TikTok's official PSD/AE templates from Ads Manager to confirm before locking." },
+        { "platform": "Web", "placement": "Mobile full-screen hero", "w": 1080, "h": 1920, "text_in_image": "forbidden", "verification": "consensus" }
+      ]
+    },
+
+    "3:2": {
+      "master": { "w": 1200, "h": 800 },
+      "difficulty": "moderate",
+      "why": "Orphan ratio. Outbrain only. Always costs a unique recomposition. From 16:9 you lose 15% of width; from 1:1 you lose 33% of height.",
+      "placements": [
+        { "platform": "Outbrain", "placement": "Standard Native / In the Feed", "w": 1200, "h": 800, "max_file_mb": 2.5, "formats": ["JPG", "PNG"], "text_in_image": "discouraged", "safe_zone": { "type": "centre_bias", "note": "Outbrain auto-adjusts to publisher widget ratios via automatic / blur-padding / colour-padding. Keep the subject centred." }, "verification": "verified", "note": "Lifestyle photography over stock or illustration. Minimum dimensions not published." }
+      ]
+    },
+
+    "4:3": {
+      "master": { "w": 1600, "h": 1200 },
+      "difficulty": "moderate",
+      "why": "The Plus project's own display ladder. Derivable from a 16:9 master by cropping the sides, or from 1:1 by cropping top and bottom.",
+      "warning": "840x630, 640x480, 420x315, 320x240 and 100x75 are NOT standard Google Display sizes, none appears in Google's supported size table or the RDA asset spec. They are a custom 4:3 ladder inherited from the approved Plus display assets. If these are meant to run on GDN they will get near-zero inventory; use them as an internal/CMS ladder and add the real GDN sizes (300x250, 336x280, 728x90, 300x600, 320x50) for programmatic buys.",
+      "placements": [
+        { "platform": "Plus (internal)", "placement": "Display 840x630", "w": 840, "h": 630, "text_in_image": "allowed", "verification": "project", "note": "Master of the Plus display ladder." },
+        { "platform": "Plus (internal)", "placement": "Display 640x480", "w": 640, "h": 480, "text_in_image": "allowed", "verification": "project" },
+        { "platform": "Plus (internal)", "placement": "Display 420x315", "w": 420, "h": 315, "text_in_image": "allowed", "verification": "project" },
+        { "platform": "Plus (internal)", "placement": "Display 320x240", "w": 320, "h": 240, "text_in_image": "allowed", "verification": "project" },
+        { "platform": "Plus (internal)", "placement": "Display 100x75, logo + plus only", "w": 100, "h": 75, "text_in_image": "logo_only", "verification": "project", "note": "7,500 pixels total. No crop of a photographic hero survives this legibly, it needs separate art direction, not a resize. Per the brand rules: logo and one plus only. Below every platform minimum here; internal thumbnail use only." }
+      ]
+    },
+
+    "3:1": {
+      "master": { "w": 1200, "h": 400 },
+      "difficulty": "hard",
+      "why": "Orphan ratio and an extreme letterbox. From a 4:5 or 9:16 source this discards 60-85% of the frame.",
+      "placements": [
+        { "platform": "Email", "placement": "Header image", "w": 1200, "h": 400, "rendered_w": 600, "rendered_h": 200, "target_file_kb": 200, "formats": ["JPG", "PNG", "GIF"], "avoid_formats": ["WebP"], "text_in_image": "discouraged", "verification": "consensus", "note": "Email body is 600px; design at 1200 and hard-set width=600 for retina. Assume images-off: never put essential information only in the image, always set alt text and a background colour. WebP does not render in Outlook desktop. Test dark mode, white logos on transparent PNG disappear. Keep total HTML under 102KB or Gmail clips it." }
+      ]
+    },
+
+    "misc_banners": {
+      "master": null,
+      "difficulty": "hard",
+      "why": "Fixed-size IAB banners with baked-in text. These are layout jobs, not image crops, build them from the display templates rather than adapting a photograph.",
+      "placements": [
+        { "platform": "Google Display", "placement": "Medium rectangle", "w": 300, "h": 250, "max_file_kb": 150, "formats": ["JPG", "PNG", "GIF"], "text_in_image": "allowed", "verification": "verified" },
+        { "platform": "Google Display", "placement": "Large rectangle", "w": 336, "h": 280, "max_file_kb": 150, "text_in_image": "allowed", "verification": "verified" },
+        { "platform": "Google Display", "placement": "Leaderboard", "w": 728, "h": 90, "max_file_kb": 150, "text_in_image": "allowed", "verification": "verified" },
+        { "platform": "Google Display", "placement": "Half page", "w": 300, "h": 600, "max_file_kb": 150, "text_in_image": "allowed", "verification": "verified" },
+        { "platform": "Google Display", "placement": "Mobile banner", "w": 320, "h": 50, "max_file_kb": 150, "text_in_image": "allowed", "verification": "verified" },
+        { "platform": "Google Display", "placement": "Billboard", "w": 970, "h": 250, "max_file_kb": 150, "text_in_image": "allowed", "verification": "verified" },
+        { "platform": "Moloco", "placement": "Interstitial portrait", "w": 320, "h": 480, "text_in_image": "allowed", "verification": "secondary" },
+        { "platform": "Moloco", "placement": "Interstitial landscape", "w": 480, "h": 320, "text_in_image": "allowed", "verification": "secondary" },
+        { "platform": "Moloco", "placement": "Tablet portrait", "w": 768, "h": 1024, "text_in_image": "allowed", "verification": "secondary" },
+        { "platform": "Moloco", "placement": "Tablet landscape", "w": 1024, "h": 768, "text_in_image": "allowed", "verification": "secondary" }
+      ]
+    }
+  },
+
+  "hardest_adaptations": [
+    { "placement": "TikTok In-Feed", "why": "Asymmetric safe zone (right 242px vs left 122px) breaks any centred composition; the safe zone changes size at runtime with caption length; and it is fundamentally a video placement, so a static source needs motion added rather than a crop." },
+    { "placement": "Meta Reels", "why": "35% of the frame is unusable at the bottom. The composable area is roughly a 1:1 crop floating in the upper-middle of a 9:16 frame. Any 16:9 or 4:3 source needs heavy vertical extension with the subject pushed above centre." },
+    { "placement": "Plus 100x75", "why": "7,500 pixels total. Needs separate tight-crop art direction, not a resize." },
+    { "placement": "Outbrain 3:2", "why": "The only 3:2 in the matrix, so it always costs a unique recomposition." },
+    { "placement": "Taboola", "why": "Deceptively hard. The same uploaded file is auto-cropped into six ratios, so the focal point must survive all of them, subject centred, generous margins, plain background, zero text or logo. The strictest compositional constraint in the set despite a loose numeric spec." },
+    { "placement": "Email header 3:1 and desktop hero 16:9", "why": "Extreme-wide letterbox crops. From a 4:5 or 9:16 source these discard 60-85% of the frame." }
+  ],
+
+  "unverified": [
+    "Moloco: max file size, accepted formats, minimum dimensions, and the full supported-size list (help centre blocks automated fetch, needs a manual browser check).",
+    "Meta Stories/Reels/Carousel minimum dimensions, and the reported March-2026 unification of vertical safe zones.",
+    "TikTok safe-zone pixel figures, consistent across many third-party sources but TikTok's own article 404s. Pull the official PSD/AE templates from TikTok Ads Manager to confirm.",
+    "Outbrain minimum image dimensions.",
+    "Taboola: recommended size (1200x674 vs 1000x600) and max file size (5MB vs 2.5MB) conflict across Taboola's own pages.",
+    "Landing page hero and email header specs have no authoritative publisher, consensus practice only."
+  ]
+}

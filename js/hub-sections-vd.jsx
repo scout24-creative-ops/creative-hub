@@ -515,10 +515,13 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
                   {groups.map((group) => <section className="dv-nav__drawer-links" aria-labelledby={`${menuId}-${group.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`} key={group.label}>
                     <span className="dv-nav__group" id={`${menuId}-${group.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`}>{group.label}</span>
                     {group.items.map((item) => {
-                      if (item.url) return <a href={item.url} target="_blank" rel="noreferrer" key={item.key} onClick={() => {
+                      if (item.url) {
+                        const isExternal = /^https?:\/\//i.test(item.url);
+                        return <a href={item.url} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined} key={item.key} onClick={() => {
                         setOpen(null);
                         setMobileNavOpen(false);
-                      }}>{item.label}<DI name="arrow-right" size={13}/></a>;
+                        }}>{item.label}<DI name="arrow-right" size={13}/></a>;
+                      }
                       const isActive = item.key === activePageKey || (item.key === "create::agents" && activeSection === "create");
                       const openAvailablePage = () => {
                         setOpen(null);

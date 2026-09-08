@@ -51,9 +51,9 @@ function buildHubNavigation() {
       { label: "All agents", key: "create::agents", source: "local" },
       {
         label: "Professionals Studio",
-        key: "github::professionals-studio",
-        source: "github",
-        url: "https://github.com/scout24-creative-ops/creative-hub/tree/main/.github/studios/professionals-studio",
+        key: "studio::professionals-studio",
+        source: "local",
+        url: "./studios/professionals-studio/",
       },
     ],
     brand: [
