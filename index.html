@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Creative Hub has moved</title>
+    <meta
+      http-equiv="refresh"
+      content="0; url=https://scout24.github.io/creative-hub/"
+    />
+    <link rel="canonical" href="https://scout24.github.io/creative-hub/" />
+    <script>
+      (() => {
+        const previousBase = "/creative-hub";
+        const remainingPath = window.location.pathname.startsWith(previousBase)
+          ? window.location.pathname.slice(previousBase.length)
+          : "/";
+        const destination = new URL("https://scout24.github.io/creative-hub/");
+
+        destination.pathname = `/creative-hub/${remainingPath.replace(/^\/+/, "")}`;
+        destination.search = window.location.search;
+        destination.hash = window.location.hash;
+        window.location.replace(destination.toString());
+      })();
+    </script>
+  </head>
+  <body>
+    <main>
+      <h1>Creative Hub has moved</h1>
+      <p>
+        Continue to
+        <a href="https://scout24.github.io/creative-hub/">the new Creative Hub</a>.
+      </p>
+    </main>
+  </body>
+</html>
