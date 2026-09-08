@@ -75,7 +75,12 @@ export const ASSET_TYPE_ROLES = Object.freeze({
   }),
 });
 
-export const ENGINE_VERSION = "2.5.0";
+export const ENGINE_VERSION = "2.6.0";
+
+export const BRAND_CLAIM = "Mehr Möglichkeiten. Mehr Erfolg. Mehr für Sie.";
+export function isBrandClaim(value) {
+  return String(value || "").replace(/\s+/g, " ").trim() === BRAND_CLAIM;
+}
 
 /* WCAG 2.2 AA for normal text. Large bold display type is allowed 3:1 by the
    standard, but the whole set is held to 4.5:1 so the promise is one number
@@ -594,6 +599,84 @@ function buildStack(s) {
   };
 }
 
+/* The Professionals claim is artwork-like typography, not a sentence for the
+   normal line wrapper. Its three lines, highlighted word, punctuation and
+   underline/bold relationship are protected as one lockup. */
+function fitClaimStack(ctx, colW, maxH, tk, treatment) {
+  const lines = ["Mehr Möglichkeiten.", "Mehr Erfolg.", "Mehr für Sie."];
+  const phrase = "Möglichkeiten.";
+  const outline = treatment === "outline";
+  const start = Math.round(tk.ideal * 1.22);
+  const floor = ASSET_TYPE_ROLES.headline.minPx;
+  for (let px = start; px >= floor; px--) {
+    const lh = px * 1.08;
+    const measured = lines.map((text, index) => {
+      const weight = outline && index === 2 ? 700 : 400;
+      setFont(ctx, weight, px, ASSET_TYPE_ROLES.headline.family);
+      return { t: text, weight, ...measureLine(ctx, text) };
+    });
+    const widest = Math.max(...measured.map(line => line.w));
+    const underlineSpace = outline ? 0 : px * 0.18;
+    const h = measured[0].asc + lh * 2 + measured[2].desc + underlineSpace;
+    if (widest > colW || h > maxH) continue;
+    const firstAsc = measured[0].asc;
+    return {
+      h, headlinePx: px, colW: widest, align: "left", lineCount: 3,
+      measureChars: Math.round(lines.reduce((sum, text) => sum + text.length, 0) / 3),
+      droppedSub: false, droppedCta: false, fitMode: "brand-claim-lockup",
+      isClaimLockup: true, claimTreatment: treatment,
+      parts: { hl: { lines: measured, lh, h: h - underlineSpace, firstAsc, weight: 400, px }, sub: null, cta: null, kicker: null },
+      gaps: { sub: 0, cta: 0, kicker: 0 },
+      draw(drawCtx, x, y, C, ink) {
+        const accent = C.bandId === "teal" ? COLORS.white : COLORS.teal;
+        const foreground = C.fg;
+        let baseline = y + firstAsc;
+        measured.forEach((line, index) => {
+          setFont(drawCtx, line.weight, px, ASSET_TYPE_ROLES.headline.family);
+          if (index === 0) {
+            const prefix = "Mehr ";
+            const prefixMetrics = measureLine(drawCtx, prefix);
+            const phraseMetrics = measureLine(drawCtx, phrase);
+            const pillX = x + prefixMetrics.w - px * 0.08;
+            const pillY = baseline - line.asc - px * 0.08;
+            const pillW = phraseMetrics.w + px * 0.20;
+            const pillH = line.asc + line.desc + px * 0.16;
+            pill(drawCtx, pillX, pillY, pillW, pillH);
+            if (outline) {
+              drawCtx.strokeStyle = accent;
+              drawCtx.lineWidth = Math.max(1, tk.hairline);
+              drawCtx.stroke();
+            } else {
+              drawCtx.fillStyle = accent;
+              drawCtx.fill();
+            }
+            drawCtx.fillStyle = foreground;
+            drawCtx.fillText(prefix, x, baseline);
+            ink(x, baseline - line.asc, prefixMetrics.w, line.asc + line.desc, foreground);
+            drawCtx.fillStyle = outline ? foreground : COLORS.charcoal;
+            const phraseX = x + prefixMetrics.w + px * 0.02;
+            drawCtx.fillText(phrase, phraseX, baseline);
+            ink(phraseX, baseline - line.asc, phraseMetrics.w, line.asc + line.desc,
+              outline ? foreground : COLORS.charcoal);
+          } else {
+            drawCtx.fillStyle = foreground;
+            drawCtx.fillText(line.t, x, baseline);
+            ink(x, baseline - line.asc, line.w, line.asc + line.desc, foreground);
+          }
+          baseline += lh;
+        });
+        if (!outline) {
+          const underlineY = y + measured[0].asc + lh * 2 + measured[2].desc + px * 0.08;
+          drawCtx.fillStyle = accent;
+          drawCtx.fillRect(x, underlineY, measured[2].w, Math.max(tk.hairline, px * 0.055));
+          ink(x, underlineY, measured[2].w, Math.max(tk.hairline, px * 0.055), null);
+        }
+      },
+    };
+  }
+  return null;
+}
+
 /* =====================================================================
    3. CONTENT AWARE CROPPING
    Cover-cropping is a one-dimensional problem: the scale is forced, so
@@ -639,13 +722,31 @@ export function analyzeImage(img) {
    with a card. The skin channel does tell you. */
 function personCentre(skinMap, W, H) {
   let sx = 0, sy = 0, tot = 0;
+  const cols = new Float32Array(W), rows = new Float32Array(H);
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const v = skinMap[y * W + x];
     if (!v) continue;
     sx += v * (x + 0.5); sy += v * (y + 0.5); tot += v;
+    cols[x] += v; rows[y] += v;
   }
   const frac = tot / (W * H);
-  return tot > 0 ? { x: sx / tot / W, y: sy / tot / H, strength: frac } : null;
+  if (!(tot > 0) || frac < 0.0003) return null;
+  const quantile = (values, q) => {
+    const target = tot * q;
+    let sum = 0;
+    for (let i = 0; i < values.length; i++) {
+      sum += values[i];
+      if (sum >= target) return i;
+    }
+    return values.length - 1;
+  };
+  return {
+    x: sx / tot / W, y: sy / tot / H, strength: frac,
+    x0: quantile(cols, 0.06) / W,
+    x1: (quantile(cols, 0.94) + 1) / W,
+    y0: quantile(rows, 0.04) / H,
+    y1: (quantile(rows, 0.96) + 1) / H,
+  };
 }
 
 function saliency(d, W, H) {
@@ -791,7 +892,7 @@ function interp(cum, p) {
 }
 
 /* Cover-draw the photo into a box around a focal point. */
-export function drawPhoto(ctx, img, box, focal) {
+function photoTransform(img, box, focal) {
   const fx = Number.isFinite(focal && focal.x) ? Math.max(0, Math.min(1, focal.x)) : 0.5;
   const fy = Number.isFinite(focal && focal.y) ? Math.max(0, Math.min(1, focal.y)) : 0.42;
   const s = Math.max(box.w / img.width, box.h / img.height);
@@ -800,12 +901,34 @@ export function drawPhoto(ctx, img, box, focal) {
   let y = box.y + box.h / 2 - dh * fy;
   x = Math.min(box.x, Math.max(box.x + box.w - dw, x));
   y = Math.min(box.y, Math.max(box.y + box.h - dh, y));
+  return { x, y, dw, dh, s };
+}
+
+export function drawPhoto(ctx, img, box, focal) {
+  const { x, y, dw, dh, s } = photoTransform(img, box, focal);
   ctx.save();
   ctx.beginPath(); ctx.rect(box.x, box.y, box.w, box.h); ctx.clip();
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, x, y, dw, dh);
   ctx.restore();
   return s;
+}
+
+function subjectRectOnCanvas(img, box, focal, padding) {
+  const person = analyzeImage(img).person;
+  if (!person) return null;
+  const t = photoTransform(img, box, focal);
+  const raw = {
+    x: t.x + person.x0 * t.dw,
+    y: t.y + person.y0 * t.dh,
+    w: (person.x1 - person.x0) * t.dw,
+    h: (person.y1 - person.y0) * t.dh,
+  };
+  const p = Math.max(0, padding || 0);
+  const left = Math.max(box.x, raw.x - p), top = Math.max(box.y, raw.y - p);
+  const right = Math.min(box.x + box.w, raw.x + raw.w + p);
+  const bottom = Math.min(box.y + box.h, raw.y + raw.h + p);
+  return right > left && bottom > top ? { x: left, y: top, w: right - left, h: bottom - top } : null;
 }
 
 /* Quality is derived from the actual decoded source and destination, even
@@ -989,68 +1112,6 @@ function hexL(hex) {
   return luminance((n >> 16) & 255, (n >> 8) & 255, n & 255);
 }
 
-/* Solve the scrim rather than guess it. Compositing is source-over in sRGB,
-   so for a scrim colour s at alpha a the result is (1-a)*c + a*s per channel.
-   Binary search the smallest alpha that clears the contrast target, then stop:
-   an over-strong scrim flattens the photograph for no benefit. */
-function solveScrimAlpha(bgRgb, scrimDark, textL, target) {
-  const s = scrimDark ? 0 : 255;
-  let lo = 0, hi = 0.82;
-  const ok = a => {
-    const c = bgRgb.map(v => (1 - a) * v + a * s);
-    return contrastRatio(textL, luminance(c[0], c[1], c[2])) >= target;
-  };
-  if (ok(0)) return 0;
-  if (!ok(hi)) return hi;
-  for (let i = 0; i < 14; i++) {
-    const mid = (lo + hi) / 2;
-    if (ok(mid)) hi = mid; else lo = mid;
-  }
-  return Math.min(0.82, hi + 0.04);
-}
-
-/* A VEIL, NOT A PANEL.
-
-   The brand does not put coloured blocks behind words. So when type sits on a
-   photograph, the picture is darkened or lightened by a gradient that runs off
-   the edge of the frame and fades to nothing. It spans the full canvas on its
-   axis, so there is never a visible rectangle: it reads as the light in the
-   photograph falling away, which is what a retoucher would do by hand. */
-function drawVeil(ctx, rect, dark, alpha, w, h) {
-  const c = dark ? "0,0,0" : "255,255,255";
-  const cx = rect.x + rect.w / 2, cy = rect.y + rect.h / 2;
-  /* Fade from whichever edge the words are nearest, so the picture keeps as
-     much of itself as possible. */
-  const offX = Math.abs(cx / w - 0.5), offY = Math.abs(cy / h - 0.5);
-  const horizontal = offX > 0.16 && offX > offY;
-
-  const axis = horizontal
-    ? { size: w, near: cx > w / 2 ? w : 0, a: rect.x, b: rect.x + rect.w, ext: rect.w }
-    : { size: h, near: cy > h / 2 ? h : 0, a: rect.y, b: rect.y + rect.h, ext: rect.h };
-  const fromEnd = axis.near > 0;
-  /* Distance from the anchored edge to the far side of the words. The veil is
-     held at full strength across all of that, then falls to nothing beyond it.
-     Tapering across the words themselves is what left the last line short of
-     the target no matter how much alpha was thrown at it. */
-  const covered = fromEnd ? axis.size - axis.a : axis.b;
-  const falloff = Math.max(axis.ext * 0.9, axis.size * 0.16);
-  const total = covered + falloff;
-  const far = fromEnd ? axis.near - total : axis.near + total;
-  const g = horizontal
-    ? ctx.createLinearGradient(axis.near, 0, far, 0)
-    : ctx.createLinearGradient(0, axis.near, 0, far);
-
-  const plateau = Math.min(0.94, covered / total);
-  g.addColorStop(0, `rgba(${c},${alpha.toFixed(3)})`);
-  g.addColorStop(plateau, `rgba(${c},${alpha.toFixed(3)})`);
-  g.addColorStop(Math.min(1, plateau + (1 - plateau) * 0.45), `rgba(${c},${(alpha * 0.55).toFixed(3)})`);
-  g.addColorStop(1, `rgba(${c},0)`);
-  ctx.save();
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, w, h);
-  ctx.restore();
-}
-
 /* The worst background a piece of type actually sits on, measured off a copy
    of the canvas taken before any glyph was drawn. A percentile rather than the
    single worst pixel, so one specular highlight does not force a black frame,
@@ -1099,27 +1160,14 @@ function worstBanded(backdrop, rect, lightText) {
   return worst;
 }
 
-/* Darken or lighten until the words genuinely clear the target, checking the
-   canvas again after each pass instead of trusting the first estimate. */
-function ensureContrast(ctx, backdrop, rect, textHex, target, w, h) {
+/* Photography is never recoloured, veiled or faded to rescue contrast. The
+   renderer measures the untouched photograph and chooses another approved
+   layout or surface when it cannot carry the mark safely. */
+function ensureContrast(ctx, backdrop, rect, textHex) {
   const textL = hexL(textHex);
   const dark = textL > 0.4;
-  const bctx = backdrop.getContext("2d");
-  /* Judge the veil against the very worst patch under the block, not a
-     comfortable percentile. One blown-out window behind one line is what used
-     to leave a handful of files at 4.2:1 after the block as a whole passed. */
-  let worst = worstBanded(backdrop, rect, dark);
-  let ratio = contrastRatio(textL, worst.l), alpha = 0;
-  for (let pass = 0; pass < 6 && ratio < target - 0.02; pass++) {
-    const need = solveScrimAlpha(worst.rgb, dark, textL, target * 1.06);
-    alpha = Math.min(0.92, Math.max(alpha + 0.10, need));
-    drawVeil(ctx, rect, dark, alpha, w, h);
-    bctx.clearRect(0, 0, w, h);
-    bctx.drawImage(ctx.canvas, 0, 0);
-    worst = worstBanded(backdrop, rect, dark);
-    ratio = contrastRatio(textL, worst.l);
-  }
-  return { ratio, alpha };
+  const worst = worstBanded(backdrop, rect, dark);
+  return { ratio: contrastRatio(textL, worst.l), alpha: 0 };
 }
 
 /* =====================================================================
@@ -1133,7 +1181,7 @@ function ensureContrast(ctx, backdrop, rect, textHex, target, w, h) {
    ===================================================================== */
 export const LAYOUTS = [
   { id: "editorial", label: "Editorial split", blurb: "Photograph and colour field meet on one hard edge, with a kicker above the headline. Magazine structure." },
-  { id: "fullbleed", label: "Full bleed",     blurb: "Nothing but the photograph, with the words set straight onto it. The picture is darkened or lightened until every line clears 4.5:1, and never with a block behind the text." },
+  { id: "fullbleed", label: "Full bleed",     blurb: "The photograph remains untouched. Copy uses detected negative space and is held when the original cannot carry it at 4.5:1." },
   { id: "poster",    label: "Poster",         blurb: "Headline on top, a full-width band of photograph under it, button and mark on a footer line. Three tiers, read top to bottom." },
   { id: "statement", label: "Typography only",blurb: "No photograph. The headline carries the composition with a clear hierarchy and generous space." },
 ];
@@ -1190,10 +1238,11 @@ export const DESIGNS = [
   { id: "poster-angle-type-first", style: "poster", params: { angled: true }, label: "Angled message cap", note: "A large message field cuts diagonally into the photograph below." },
   { id: "poster-angle-photo-first", style: "poster", params: { order: "photo-first", angled: true }, label: "Angled image cap", note: "The photograph opens the composition with an angled edge into the message." },
   { id: "statement-impact",  style: "statement", params: { impact: true, highlight: "straight", highlightColour: "blue" }, label: "Type statement", note: "A bold type led frame with one highlighted line and generous open space." },
-  { id: "editorial-horizontal", style: "editorial", params: { axis: "horizontal" }, label: "Hard horizontal split", note: "The photograph fills the upper section; a solid message field closes the composition." },
   { id: "fullbleed-lower-caption", style: "fullbleed", params: { copy: "bottom", caption: true }, label: "Quiet photo caption", note: "A restrained caption at the lower left gives the photograph room to lead." },
   { id: "statement-centred", style: "statement", params: { align: "middle", textAlign: "center", restrained: true }, label: "Centred statement", note: "A centred benefit, supporting sentence and logo with generous surrounding space." },
   { id: "statement-underline", style: "statement", params: { align: "bottom", highlight: "underline", highlightColour: "teal" }, label: "Underlined statement", note: "A statement anchored low in the frame with one supplied underline." },
+  { id: "claim-lockup-filled", style: "statement", params: { claim: true, claimTreatment: "filled" }, label: "Brand claim lockup", note: "The approved claim with its filled Möglichkeiten pill and underline." },
+  { id: "claim-lockup-outline", style: "statement", params: { claim: true, claimTreatment: "outline" }, label: "Brand claim lockup outline", note: "The approved claim with its outlined Möglichkeiten pill and bold closing line." },
 ];
 
 export function designById(id) {
@@ -1636,37 +1685,43 @@ const STYLE_PLANNERS = {
     const C = contentRect(w, h, safe, tk);
     const dp = G.dp || {};
     const impact = !!dp.impact;
+    const person = G.photoImg ? analyzeImage(G.photoImg).person : null;
+    const copyRight = !!(person && person.x < 0.5);
+    const copyHigh = !(person && person.y < 0.5);
     if (cls === "wide" || cls === "banner") {
       /* Words in one half, picture readable in the other. */
-      const colW = Math.round(C.w * (dp.caption ? 0.60 : impact ? 0.47 : 0.52));
+      const colW = Math.round(C.w * (dp.caption ? 0.50 : impact ? 0.46 : 0.48));
       return blockPlan(G, fit, {
         photo: { x: 0, y: 0, w, h },
-        inner: { x: C.x, y: C.y, w: colW, h: C.h },
-        vAlign: dp.caption ? "bottom" : "center", autoPolarity: true,
+        inner: { x: copyRight ? C.x + C.w - colW : C.x, y: C.y, w: colW, h: C.h },
+        vAlign: dp.caption ? (copyHigh ? "top" : "bottom") : "center", autoPolarity: true,
         copyOverPhoto: true, logoOnPhoto: true, logoPhotoCorner: "bottom-right",
+        avoidSubject: true,
         bigType: impact, startScale: dp.caption ? 0.82 : impact ? 1.50 : undefined,
         tightLines: impact ? 3 : undefined, maxCPL: impact ? 18 : 28,
         highlight: dp.highlight ? { kind: dp.highlight, colour: dp.highlightColour || "teal", line: "shortest" } : null,
-        focalTargetX: Math.min(0.82, (C.x + colW + (w - C.x - colW) / 2) / w),
+        focalTargetX: copyRight ? 0.24 : 0.76,
       });
     }
     /* Portrait, square and story: the lockup sits low by default, the way a
        poster does, and the subject is framed into the clear part away from it. */
-    const colW = dp.caption ? Math.round(C.w * 0.76) : impact
-      ? Math.round(C.w * 0.78)
-      : dp.negativeSpace ? Math.round(C.w * 0.57)
+    const colW = dp.caption ? Math.round(C.w * 0.48) : impact
+      ? Math.round(C.w * 0.49)
+      : dp.negativeSpace ? Math.round(C.w * 0.48)
       : Math.round(Math.min(C.w, tk.ideal * 11));
-    const at = impact || dp.copy === "top" ? "top" : dp.copy === "middle" ? "center" : "bottom";
+    const requestedAt = impact || dp.copy === "top" ? "top" : dp.copy === "middle" ? "center" : "bottom";
+    const at = person ? (copyHigh ? "top" : "bottom") : requestedAt;
     return blockPlan(G, fit, {
       photo: { x: 0, y: 0, w, h },
-      inner: { x: C.x, y: C.y, w: colW, h: C.h },
+      inner: { x: copyRight ? C.x + C.w - colW : C.x, y: C.y, w: colW, h: C.h },
       vAlign: at, autoPolarity: true,
       copyOverPhoto: true, logoOnPhoto: true, logoPhotoCorner: "bottom-right",
+      avoidSubject: true,
       bigType: impact, startScale: dp.caption ? 0.82 : impact ? 1.50 : undefined,
       tightLines: impact ? 3 : undefined,
       maxCPL: impact ? 18 : dp.negativeSpace ? 24 : undefined,
       highlight: dp.highlight ? { kind: dp.highlight, colour: dp.highlightColour || "teal", line: impact ? "shortest" : "last" } : null,
-      focalTargetX: dp.negativeSpace || impact ? 0.76 : undefined,
+      focalTargetX: person ? (copyRight ? 0.24 : 0.76) : (dp.negativeSpace || impact ? 0.76 : undefined),
       focalTargetY: at === "top" ? (cls === "story" ? 0.70 : 0.66)
                   : at === "center" ? 0.5
                   : (cls === "story" ? 0.30 : 0.34),
@@ -1821,6 +1876,7 @@ const STYLE_PLANNERS = {
       maxCPL: dp.impact ? 18 : 28,
       tightLines: dp.impact ? 4 : undefined,
       highlight: dp.highlight ? { kind: dp.highlight, colour: dp.highlightColour || "teal", line: "shortest" } : null,
+      claimLockup: dp.claim ? { treatment: dp.claimTreatment || "filled" } : null,
       plusses: [],
     });
   },
@@ -1923,10 +1979,12 @@ function blockPlan(G, fit, p) {
       subline: p.subline,
       cta: p.cta,
     };
-    stack = p.stack && p.stack.h <= avail ? p.stack : fit(inner.w, avail, opts);
+    stack = p.claimLockup
+      ? fitClaimStack(G.ctx, inner.w, avail, tk, p.claimLockup.treatment)
+      : (p.stack && p.stack.h <= avail ? p.stack : fit(inner.w, avail, opts));
     /* An extra line of type at full size beats the same words shrunk to fit
        three. Legibility first, tidy line count second. */
-    if ((!stack || stack.headlinePx < tk.ideal * 0.86) && baseLines < 4) {
+    if (!p.claimLockup && (!stack || stack.headlinePx < tk.ideal * 0.86) && baseLines < 4) {
       const longer = fit(inner.w, avail, { ...opts, maxLines: baseLines + 1 });
       if (longer && (!stack || longer.headlinePx > stack.headlinePx)) stack = longer;
     }
@@ -2130,6 +2188,7 @@ async function composeAssetOnce(spec) {
     ctaBg: resolvedCtaBg,
     ctaFg: resolvedCtaBg === COLORS.charcoal ? COLORS.white : COLORS.charcoal,
     headlineLineColours: {},
+    bandId: band.id,
   };
 
   const INK = [];
@@ -2145,7 +2204,7 @@ async function composeAssetOnce(spec) {
   // Plan one full composition. Logo/copy variants hide their content only
   // at paint time, so their photo area, seam and alignment cannot jump.
   const planningVariant = strictDesign && variant !== "clean" ? VARIANTS[3] : v;
-  const G = { w, h, safe, tk, cls, strictDesign, v: planningVariant, band, logoImg, compactLogoImg, photoImg: img, photoHasProfessionals, seed, dp: designParams };
+  const G = { w, h, safe, tk, cls, strictDesign, v: planningVariant, band, logoImg, compactLogoImg, photoImg: img, photoHasProfessionals, seed, dp: designParams, ctx };
   const rawFit = makeFitter(ctx, C, tk);
   const fit = (width, height, options = {}) => rawFit(width, height, {
     ...options, sublineRequired: strictDesign || options.sublineRequired,
@@ -2155,6 +2214,7 @@ async function composeAssetOnce(spec) {
      same way for every variant. */
   let cropCoverage = 1, upscale = 1, cropZoom = 1, plan = null, photoDrawn = false;
   let photoRect = null, photoSourceSize = null, photoAdaptation = null, logoDrawn = false;
+  let photoFocalUsed = null, photoImageUsed = null;
   let headlineDrawn = false, sublineDrawn = false, ctaDrawn = false;
   let emphasisDrawn = false;
   let emphasisKind = null, emphasisColour = null;
@@ -2191,6 +2251,8 @@ async function composeAssetOnce(spec) {
     cropCoverage = f.coverage != null ? f.coverage : 1;
     cropZoom = photoFitMetrics(pi, box).retained;
     upscale = drawPhoto(ctx, pi, box, f);
+    photoFocalUsed = f;
+    photoImageUsed = pi;
     photoRect = { ...box };
     photoSourceSize = { w: pi.naturalWidth || pi.width, h: pi.naturalHeight || pi.height };
     drewFrom = pi === master ? "master" : "source";
@@ -2334,6 +2396,8 @@ async function composeAssetOnce(spec) {
       if (plan.photoRound) { roundRect(ctx, box.x, box.y, box.w, box.h, box.r || tk.radius); ctx.clip(); }
     }
     upscale = drawPhoto(ctx, pi, box, f);
+    photoFocalUsed = f;
+    photoImageUsed = pi;
     photoRect = { x: box.x, y: box.y, w: box.w, h: box.h };
     photoSourceSize = { w: pi.naturalWidth || pi.width, h: pi.naturalHeight || pi.height };
     drewFrom = pi === master ? "master" : "source";
@@ -2548,18 +2612,16 @@ async function composeAssetOnce(spec) {
 
   let logoUsesInverse = band.logo === "-inverse";
 
-  /* Which way round reads better on THIS photograph. A bright interior wants
-     charcoal type and a light touch; a dark room wants white. Choosing by
-     measurement beats defaulting, and it means far less veiling either way. */
+  /* Which approved foreground reads better on the untouched photograph. */
   if (plan.autoPolarity && overPhoto && plan.stack) {
     const t = plan.stack ? stackTop : logoY;
     const b = stackTop + (plan.stack ? plan.stack.h : 0);
     const probe = { x: inner.x, y: t, w: inner.w, h: Math.max(1, b - t) };
     const forWhite = worstBackdrop(backdrop, probe, true);
     const forDark = worstBackdrop(backdrop, probe, false);
-    const aWhite = solveScrimAlpha(forWhite.rgb, true, hexL(COLORS.white), WCAG_AA * 1.06);
-    const aDark = solveScrimAlpha(forDark.rgb, false, hexL(COLORS.charcoal), WCAG_AA * 1.06);
-    const wantWhite = aWhite <= aDark;
+    const whiteRatio = contrastRatio(hexL(COLORS.white), forWhite.l);
+    const darkRatio = contrastRatio(hexL(COLORS.charcoal), forDark.l);
+    const wantWhite = whiteRatio >= darkRatio;
     C.fg = wantWhite ? COLORS.white : COLORS.charcoal;
     C.accentInk = C.fg;
     if (logoImg && logoAltImg) {
@@ -2575,9 +2637,9 @@ async function composeAssetOnce(spec) {
     const probe = { x: logoX, y: logoY, w: logo.w, h: logo.h };
     const forWhite = worstBackdrop(backdrop, probe, true);
     const forDark = worstBackdrop(backdrop, probe, false);
-    const aWhite = solveScrimAlpha(forWhite.rgb, true, hexL(COLORS.white), WCAG_AA * 1.06);
-    const aDark = solveScrimAlpha(forDark.rgb, false, hexL(COLORS.charcoal), WCAG_AA * 1.06);
-    const wantInverse = aWhite <= aDark;
+    const whiteRatio = contrastRatio(hexL(COLORS.white), forWhite.l);
+    const darkRatio = contrastRatio(hexL(COLORS.charcoal), forDark.l);
+    const wantInverse = whiteRatio >= darkRatio;
     if (wantInverse !== logoUsesInverse) {
       const swap = logoImg; logoImg = logoAltImg; logoAltImg = swap;
       const swapC = compactLogoImg; compactLogoImg = compactAltImg; compactAltImg = swapC;
@@ -2590,20 +2652,14 @@ async function composeAssetOnce(spec) {
      headline in the modular grid. Measuring costs one read of the canvas and
      never lies. */
   if (plan.stack || inlineLogo) {
-    /* One veil for the copy lockup. A mark in the photograph is checked
-       separately because it may be on the opposite side of the composition. */
+    /* Measure the copy lockup without changing the photograph. */
     const top = plan.stack ? stackTop : logoY;
     const bot = inlineLogo ? logoY + logo.h : stackTop + contentH;
-    const veilRect = {
+    const contrastRect = {
       x: inner.x - tk.pad * 0.6, y: top - tk.pad * 0.6,
       w: inner.w + tk.pad * 1.2, h: (bot - top) + tk.pad * 1.2,
     };
-    /* Aim above the line, not at it. The veil is solved against a sampled
-       estimate of the picture and verified afterwards against every individual
-       mark, and those two measurements never agree to the last decimal. A 20%
-       margin is what makes the verified number land above 4.5 rather than a
-       whisker under it. */
-    const res = ensureContrast(ctx, backdrop, veilRect, C.fg, WCAG_AA * 1.2, w, h);
+    const res = ensureContrast(ctx, backdrop, contrastRect, C.fg);
     veilAlpha = res.alpha;
     if (res.ratio < WCAG_AA) {
       notes.push({ level: "warn", text: `The photograph is too busy under the words here: ${res.ratio.toFixed(1)}:1 against the 4.5:1 the guidelines ask for. Move the copy or pick a calmer picture.` });
@@ -2812,13 +2868,20 @@ async function composeAssetOnce(spec) {
       k.x < safe.left - tol || k.y < safe.top - tol ||
       k.x + k.w > w - safe.right + tol || k.y + k.h > h - safe.bottom + tol);
     const missingLogo = v.logo && !logoDrawn;
+    const subject = plan && plan.avoidSubject && photoImageUsed && photoRect
+      ? subjectRectOnCanvas(photoImageUsed, photoRect, photoFocalUsed, tk.pad * 0.35) : null;
+    const overlaps = subject ? textBounds.filter(mark =>
+      mark.x < subject.x + subject.w && mark.x + mark.w > subject.x
+      && mark.y < subject.y + subject.h && mark.y + mark.h > subject.y) : [];
     const failedPhoto = photoDrawn && drewFrom !== "master"
       && (upscale > SOFT_UPSCALE + 1e-6 || cropZoom < MIN_PHOTO_RETAINED - 1e-6);
     const emptyComposition = !photoDrawn && !logoDrawn && !headlineDrawn && !sublineDrawn && !ctaDrawn;
-    const requiredCopyMissing = strictDesign && v.copy && (!headlineDrawn || (!!subline && !sublineDrawn) || (!!cta && !ctaDrawn));
+    const protectedClaim = !!(plan && plan.stack && plan.stack.isClaimLockup);
+    const requiredCopyMissing = strictDesign && v.copy && (!headlineDrawn
+      || (!protectedClaim && ((!!subline && !sublineDrawn) || (!!cta && !ctaDrawn))));
     const wc = verifyContrast();
     const failedContrast = !(wc.min >= WCAG_AA - 0.05);
-    const blocked = !!compatibilityReason || outside.length > 0 || missingLogo || failedPhoto || emptyComposition || requiredCopyMissing || failedContrast;
+    const blocked = !!compatibilityReason || outside.length > 0 || overlaps.length > 0 || missingLogo || failedPhoto || emptyComposition || requiredCopyMissing || failedContrast;
     /* THE SOFTNESS SENTENCE IS NOT WRITTEN HERE ANY MORE.
        This engine measured the upscale while drawing and then drew its own
        conclusion in its own words, while `fileEnlargement` stated the same
@@ -2841,8 +2904,8 @@ async function composeAssetOnce(spec) {
     const st = plan && plan.stack;
     const copyDropped = {
       headline: !!(v.copy && headline && !headlineDrawn),
-      subline: !!(v.copy && subline && !sublineDrawn),
-      cta: !!(v.copy && cta && !ctaDrawn),
+      subline: !!(!protectedClaim && v.copy && subline && !sublineDrawn),
+      cta: !!(!protectedClaim && v.copy && cta && !ctaDrawn),
     };
     const omitted = Object.entries(copyDropped).filter(([, dropped]) => dropped).map(([name]) => name === "cta" ? "button" : name);
     if (omitted.length) notes.push({ level: "info", text: `This layout omits the ${omitted.join(" and ")}. Check that the remaining message is complete for this placement.` });
@@ -2860,6 +2923,7 @@ async function composeAssetOnce(spec) {
       blocked,
       blockedReason: blocked
         ? compatibilityReason || (outside.length ? `${outside.length} element${outside.length > 1 ? "s" : ""} could not be kept inside the safe area at ${w}x${h}. Not exported.`
+          : overlaps.length ? "The message or logo would cover the detected person in this photograph. Another approved layout is required. Not exported."
           : missingLogo ? "The required logo could not fit on an approved background inside the safe area. Choose another layout or colour field. Not exported."
           : requiredCopyMissing ? "The complete message does not fit this design at the approved minimum sizes. Shorten the copy or choose another format. Not exported."
           : emptyComposition ? "This variant contains no photograph, logo or message. Choose a variant with visible content. Not exported."
@@ -2872,6 +2936,8 @@ async function composeAssetOnce(spec) {
         emphasisPhrase: C.emphasis, emphasisDrawn, textBounds,
         emphasisKind, emphasisColour,
         emphasisSupported: !!(v.copy && plan && plan.highlight),
+        claimLockup: !!(st && st.isClaimLockup),
+        claimTreatment: st && st.isClaimLockup ? st.claimTreatment : null,
         headlineWeight: st ? st.parts.hl.weight : null,
         sublineWeight: st && st.parts.sub ? st.parts.sub.weight : null,
         headlinePx: st ? st.headlinePx : 0,
@@ -2899,6 +2965,8 @@ async function composeAssetOnce(spec) {
         photoRect,
         photoAdaptation,
         safeViolations: outside.length,
+        subjectOverlap: overlaps.length,
+        subjectGuard: subject ? { x: Math.round(subject.x), y: Math.round(subject.y), w: Math.round(subject.w), h: Math.round(subject.h) } : null,
         logoDrawn,
         emptyComposition,
         copyDropped,
@@ -2918,9 +2986,14 @@ async function composeAssetOnce(spec) {
    approved logo colourway, the renderer tries the neutral fields itself and
    returns the first complete, safe result. */
 export async function composeAsset(spec) {
+  const claim = isBrandClaim(spec.headline);
+  const selectedClaimDesign = spec.design === "claim-lockup-filled" || spec.design === "claim-lockup-outline";
+  const resolvedDesign = claim
+    ? (selectedClaimDesign ? spec.design : "claim-lockup-filled")
+    : (selectedClaimDesign ? "statement-impact" : spec.design);
   const requestedBand = spec.band || BAND_CHOICES[0];
   const palette = resolveAssetPalette(requestedBand, spec.ctaBg);
-  const prepared = { ...spec, band: palette.band, ctaBg: palette.ctaBg, ctaFg: palette.ctaFg };
+  const prepared = { ...spec, design: resolvedDesign, band: palette.band, ctaBg: palette.ctaBg, ctaFg: palette.ctaFg };
   let result = await composeAssetOnce(prepared);
   let resolvedBand = requestedBand;
   let resolvedPalette = palette;
@@ -2932,7 +3005,7 @@ export async function composeAsset(spec) {
       .map(id => BAND_CHOICES.find(candidate => candidate.id === id)).filter(Boolean);
     for (const candidate of candidates) {
       const nextPalette = resolveAssetPalette(candidate, spec.ctaBg);
-      const next = await composeAssetOnce({ ...spec, band: candidate,
+      const next = await composeAssetOnce({ ...spec, design: resolvedDesign, band: candidate,
         ctaBg: nextPalette.ctaBg, ctaFg: nextPalette.ctaFg });
       if (!next.blocked) {
         result.canvas.width = result.canvas.height = 1;

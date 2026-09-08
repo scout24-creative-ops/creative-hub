@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFile } from 'node:fs/promises';
 import { fidelityReasons, emphasisReasons, geometrySignature, countOutcome, healthyCoverageReasons, META_PLACEMENTS } from './design-fidelity.js';
-import { ASSET_TYPE_ROLES, COLORS, DESIGNS, LAYOUTS } from '../ad-engine.js';
+import { ASSET_TYPE_ROLES, BRAND_CLAIM, COLORS, DESIGNS, LAYOUTS, isBrandClaim } from '../ad-engine.js';
 
 const placement = META_PLACEMENTS[0];
 function result(overrides = {}) {
@@ -40,6 +41,16 @@ test('the public library contains only typography, split screens and full bleed 
   assert.deepEqual([...new Set(LAYOUTS.map(layout => layout.id))].sort(), ['editorial', 'fullbleed', 'poster', 'statement']);
   assert.ok(DESIGNS.every(design => ['editorial', 'fullbleed', 'poster', 'statement'].includes(design.style)));
   assert.ok(DESIGNS.every(design => !design.params.circle && !design.params.gallery && !design.params.density));
+});
+test('the exact Professionals claim is recognised as a protected lockup', () => {
+  assert.equal(isBrandClaim(BRAND_CLAIM), true);
+  assert.equal(isBrandClaim('  Mehr Möglichkeiten.  Mehr Erfolg. Mehr für Sie. '), true);
+  assert.equal(isBrandClaim('Mehr Möglichkeiten für Sie.'), false);
+  assert.equal(DESIGNS.filter(design => design.params.claim).length, 2);
+});
+test('the asset renderer never alters photography with a gradient veil', async () => {
+  const source = await readFile(new URL('../ad-engine.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /createLinearGradient|drawVeil|solveScrimAlpha/);
 });
 test('message over image requires photography to fill the bottom edge', () => {
   const r = result({ design: 'poster-angle-type-first', layout: 'poster', requestedLayout: 'poster',

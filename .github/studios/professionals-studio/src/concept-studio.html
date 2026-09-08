@@ -782,8 +782,8 @@ import {
   composeAsset, LAYOUTS, BAND_CHOICES, VARIANTS, LOGO_FILES, COLORS as ENGINE_COLORS,
   allowedVariants, withheldVariants, policyNote, ADVISORY, preloadFonts, loadImg, normaliseLayout,
   resolveSafeBox, ENGINE_VERSION, seedOf, FOCAL_DEFAULT,
-  DESIGNS, designById, rotationSet, ROTATION_POOL,
-} from "./ad-engine.js?v=20260907-quality";
+  DESIGNS, designById, rotationSet, ROTATION_POOL, isBrandClaim,
+} from "./ad-engine.js?v=20260908-claim-lockup";
 import { buildMasters, hardCasesFrom, ADAPTER_VERSION, ASPECT_TOLERANCE } from "./size-adapter.js";
 import { PLATFORM_CHOICES, readPlacements } from "./placement-parser.js";
 import { slug, assetFileName } from "./asset-naming.js";
@@ -3282,12 +3282,6 @@ const PROFESSIONALS_TEMPLATES = [
     sources: "Rebuilt from A4 2",
   },
   {
-    id: "editorial-horizontal", group: "Split screen", label: "Horizontal split",
-    design: "editorial-horizontal", band: "teal", ctaColour: "charcoal",
-    note: "A straight horizontal division separates the photograph and brand message.",
-    sources: "Adapted from Frame 1000004797",
-  },
-  {
     id: "fullbleed-lower-caption", group: "Full bleed image", label: "Photo with lower caption",
     design: "fullbleed-lower-caption", band: "sand", ctaColour: "charcoal",
     note: "A restrained lower caption leaves the image and its professional context visible.",
@@ -3304,6 +3298,18 @@ const PROFESSIONALS_TEMPLATES = [
     design: "statement-underline", band: "charcoal", ctaColour: "white",
     note: "An approved underline gives one phrase emphasis in a calm typographic composition.",
     sources: "Adapted from A4 2 and Frame 15144 1",
+  },
+  {
+    id: "claim-lockup-filled", group: "Typography", label: "Brand claim lockup",
+    design: "claim-lockup-filled", band: "charcoal", ctaColour: "white", claimOnly: true,
+    note: "The exact Professionals claim with its approved filled pill and underline.",
+    sources: "Rebuilt from the approved Professionals claim lockup",
+  },
+  {
+    id: "claim-lockup-outline", group: "Typography", label: "Brand claim outline",
+    design: "claim-lockup-outline", band: "sand", ctaColour: "charcoal", claimOnly: true,
+    note: "The exact Professionals claim with its approved outlined pill and bold closing line.",
+    sources: "Rebuilt from the approved Professionals claim lockup",
   },
 ];
 
@@ -3667,8 +3673,10 @@ async function renderAssetStudio() {
   if (!BAND_CHOICES.some(b => b.id === cfg.band)) cfg.band = "sand";
   let activeTemplate = PROFESSIONALS_TEMPLATES.find(t => t.id === state.designReference)
     || PROFESSIONALS_TEMPLATES.find(t => t.design === state.design);
+  const usesClaim = isBrandClaim(copyFor(concepts[0], cfg).headline);
+  if (usesClaim !== !!activeTemplate?.claimOnly) activeTemplate = null;
   if (!activeTemplate) {
-    activeTemplate = PROFESSIONALS_TEMPLATES[0];
+    activeTemplate = PROFESSIONALS_TEMPLATES.find(template => usesClaim ? template.claimOnly : !template.claimOnly);
     cfg.band = activeTemplate.band;
     cfg.ctaColour = activeTemplate.ctaColour;
   }
@@ -3902,10 +3910,12 @@ async function renderAssetStudio() {
      the large preview and the final export. */
   const referenceGrid = picker.querySelector(".referencegrid");
   for (const group of ["Typography", "Split screen", "Full bleed image"]) {
+    const groupTemplates = PROFESSIONALS_TEMPLATES.filter(item => item.group === group && (usesClaim ? item.claimOnly : !item.claimOnly));
+    if (!groupTemplates.length) continue;
     const family = el(`<section class="referencefamily"><h3 class="referencefamily-title">${esc(group)}</h3><div class="referencefamily-grid"></div></section>`);
     const familyGrid = family.querySelector(".referencefamily-grid");
     referenceGrid.appendChild(family);
-    for (const template of PROFESSIONALS_TEMPLATES.filter(item => item.group === group)) {
+    for (const template of groupTemplates) {
     const t = el(`<button class="referencetile${template.id === state.designReference ? " on" : ""}"
         data-template="${esc(template.id)}" data-design="${esc(template.design)}"
         title="${esc(template.note)}">
@@ -4300,6 +4310,9 @@ async function renderAssetStudio() {
      two helpers with the same seed, so what the preview shows is what the
      file will be. */
   function designForPlacement(concept, i) {
+    if (isBrandClaim(copyFor(concept, cfg).headline)) {
+      return state.design === "claim-lockup-outline" ? state.design : "claim-lockup-filled";
+    }
     if (!cfg.rotate) return state.design;
     const rot = rotationForBuild(state.design, concept.id, places.length);
     return designForStructure(rot[i] || designById(state.design).style, state.design);

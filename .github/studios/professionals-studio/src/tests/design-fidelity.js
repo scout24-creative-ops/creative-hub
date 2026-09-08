@@ -1,10 +1,10 @@
-import { composeAsset, DESIGNS, COLORS, BAND_CHOICES, SOFT_UPSCALE, MIN_PHOTO_RETAINED, ASSET_TYPE_ROLES, preloadFonts } from '../ad-engine.js';
+import { composeAsset, DESIGNS, BRAND_CLAIM, COLORS, BAND_CHOICES, SOFT_UPSCALE, MIN_PHOTO_RETAINED, ASSET_TYPE_ROLES, preloadFonts } from '../ad-engine.js';
 
 export const EXPOSED_DESIGN_IDS = Object.freeze([
   'fullbleed-negative-space', 'fullbleed-impact', 'editorial-vertical',
   'editorial-angle-left', 'editorial-angle-right', 'poster-angle-photo-first',
-  'poster-angle-type-first', 'statement-impact', 'editorial-horizontal', 'fullbleed-lower-caption',
-  'statement-centred', 'statement-underline',
+  'poster-angle-type-first', 'statement-impact', 'fullbleed-lower-caption',
+  'statement-centred', 'statement-underline', 'claim-lockup-filled', 'claim-lockup-outline',
 ]);
 export const META_PLACEMENTS = Object.freeze([
   { platform: 'Meta', placement: 'Carousel', w: 1080, h: 1080 },
@@ -18,7 +18,7 @@ const EXTRA_PLACEMENTS = [
 ];
 const DESIGNS_BY_ID = new Map(DESIGNS.map(design => [design.id, design]));
 export const SHORT_COPY = Object.freeze({ headline: 'Mehr Erfolg für Sie.', subline: 'Ihre Immobilien im Blick.', cta: 'Beratung anfragen' });
-const LONG_COPY = { headline: 'Mehr Möglichkeiten. Mehr Erfolg. Mehr für Sie.', subline: 'Präsentieren Sie Ihre Immobilien professionell und behalten Sie Ihre Anfragen im Blick.', cta: 'Beratung anfragen' };
+const LONG_COPY = { headline: 'Mehr Sichtbarkeit für Ihre Immobilien.', subline: 'Präsentieren Sie Ihre Immobilien professionell und behalten Sie Ihre Anfragen im Blick.', cta: 'Beratung anfragen' };
 const EPSILON = 0.02;
 
 function stable(value) {
@@ -94,7 +94,7 @@ export function fidelityReasons(result, { design, placement, variant = 'full', r
       if (requiredCopy[field] && metrics.copyDropped?.[field]) reasons.push(`required ${field} was omitted`);
     }
     if (!Array.isArray(metrics.textBounds)) reasons.push('text separation was not measurable');
-    if (requiredCopy.headline && metrics.headlineWeight !== ASSET_TYPE_ROLES.headline.weight) reasons.push('headline uses the wrong approved weight');
+    if (requiredCopy.headline && !metrics.claimLockup && metrics.headlineWeight !== ASSET_TYPE_ROLES.headline.weight) reasons.push('headline uses the wrong approved weight');
     if (requiredCopy.subline && !metrics.copyDropped?.subline && metrics.sublineWeight !== ASSET_TYPE_ROLES.subline.weight) reasons.push('subline uses the wrong approved weight');
     if (metrics.emphasisSupported && metrics.emphasisPhrase && !metrics.emphasisDrawn) reasons.push('chosen emphasis phrase was not drawn');
   }
@@ -165,7 +165,9 @@ export function sourceFixture(name, width, height) {
 }
 
 function baseSpec(design, placement, source, variant, copy = SHORT_COPY) {
-  return { ...copy, ...placement, placement, design, variant, photo: source.src,
+  const resolvedCopy = design.startsWith('claim-lockup-')
+    ? { headline: BRAND_CLAIM, subline: '', cta: '' } : copy;
+  return { ...resolvedCopy, ...placement, placement, design, variant, photo: source.src,
     band: BAND_CHOICES.find(band => band.id === 'sand'), logoKey: 'logo-professionals',
     ctaBg: COLORS.charcoal, ctaFg: COLORS.white, rotationSeed: 'design-fidelity', showSafe: false };
 }

@@ -1,7 +1,7 @@
-import { composeAsset, DESIGNS, COLORS, BAND_CHOICES, SOFT_UPSCALE, preloadFonts } from '../ad-engine.js';
+import { composeAsset, DESIGNS, BRAND_CLAIM, COLORS, BAND_CHOICES, SOFT_UPSCALE, preloadFonts } from '../ad-engine.js';
 import { fidelityReasons, countOutcome, healthyCoverageReasons, SHORT_COPY } from './design-fidelity.js';
 
-const ids = ['fullbleed-negative-space','fullbleed-impact','editorial-vertical','editorial-angle-left','editorial-angle-right','poster-angle-photo-first','poster-angle-type-first','statement-impact','editorial-horizontal','fullbleed-lower-caption','statement-centred','statement-underline'];
+const ids = ['fullbleed-negative-space','fullbleed-impact','editorial-vertical','editorial-angle-left','editorial-angle-right','poster-angle-photo-first','poster-angle-type-first','statement-impact','fullbleed-lower-caption','statement-centred','statement-underline','claim-lockup-filled','claim-lockup-outline'];
 const placements = [
   {platform:'Meta',placement:'Carousel',w:1080,h:1080},
   {platform:'Meta',placement:'Facebook Feed',w:1440,h:1800},
@@ -54,7 +54,8 @@ async function run(stress){
           const label=`${id} · ${pl.platform} ${pl.placement} · ${source.name}`;
           const start=performance.now();
           try{
-            const copy=source.name==='healthy'?SHORT_COPY:{headline:'Mehr Möglichkeiten. Mehr Erfolg. Mehr für Sie.',subline:'Präsentieren Sie Ihre Immobilien professionell.',cta:'Beratung anfragen'};
+            const copy=id.startsWith('claim-lockup-')?{headline:BRAND_CLAIM,subline:'',cta:''}
+              :source.name==='healthy'?SHORT_COPY:{headline:'Mehr Sichtbarkeit für Ihre Immobilien.',subline:'Präsentieren Sie Ihre Immobilien professionell.',cta:'Beratung anfragen'};
             const r=await composeAsset({...pl,placement:pl,variant,design:id,band,photo:source.src,logoKey:'logo-professionals',...copy,ctaBg:COLORS.charcoal,ctaFg:COLORS.white});
             report.times.push(performance.now()-start);
             const reasons=fidelityReasons(r,{design:id,placement:pl,variant,requiredCopy:copy});
@@ -83,7 +84,8 @@ async function run(stress){
     if(stress)for(const id of ids)for(const variant of ['full','copy','logo','clean']){
       const pl=placements[2];const label=`${id} · adversarial · ${variant}`;
       try{
-        const copy={headline:'Immobilienfinanzierungsmöglichkeiten für Ihre Geschäftsentwicklung',subline:'Ein sehr langer Text '.repeat(24),cta:'Jetzt Beratung anfragen'};
+        const copy=id.startsWith('claim-lockup-')?{headline:BRAND_CLAIM,subline:'',cta:''}
+          :{headline:'Immobilienfinanzierungsmöglichkeiten für Ihre Geschäftsentwicklung',subline:'Ein sehr langer Text '.repeat(24),cta:'Jetzt Beratung anfragen'};
         const r=await composeAsset({...pl,placement:pl,design:id,variant,band:BAND_CHOICES[2],photo:null,...copy,logoKey:'logo-professionals',focal:{x:Infinity,y:NaN},ctaBg:COLORS.blue});
         countOutcome(report,r,label,fidelityReasons(r,{design:id,placement:pl,variant,requiredCopy:copy}));
         r.canvas.width=1;r.canvas.height=1;

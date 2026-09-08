@@ -72,7 +72,7 @@ function renderAssets() {
   $("#assetCount").textContent = total;
   const grid = $("#assetGrid"); if (!grid) return;
   if (!total) { grid.innerHTML = `<p class="notice">Select a concept and at least one format to preview the campaign.</p>`; return; }
-  grid.innerHTML = selectedConcepts.flatMap(concept => selectedFormats.map(format => `<article class="asset-card"><div class="asset-preview ${layout.cls}" ${state.image ? `style="background-image:linear-gradient(to bottom,rgba(51,51,51,.05),rgba(51,51,51,.88)),url('${state.image}');background-size:cover;background-position:center"` : ""}><div class="asset-logo">ImmoScout24<br>Professionals</div><div class="asset-copy">${escapeHtml(headlineFor(concept)).replace(/(sichtbar|Sichtbarkeit|Auftritt|Auftrag)/gi,"<em>$1</em>")}</div></div><div class="asset-meta"><span>${format.platform}<br>${format.label}</span><span>${format.size}<br>${layout.label}</span></div></article>`)).join("");
+  grid.innerHTML = selectedConcepts.flatMap(concept => selectedFormats.map(format => `<article class="asset-card"><div class="asset-preview ${layout.cls}" ${state.image ? `style="background-image:url('${state.image}');background-size:cover;background-position:center"` : ""}><div class="asset-logo">ImmoScout24<br>Professionals</div><div class="asset-copy">${escapeHtml(headlineFor(concept)).replace(/(sichtbar|Sichtbarkeit|Auftritt|Auftrag)/gi,"<em>$1</em>")}</div></div><div class="asset-meta"><span>${format.platform}<br>${format.label}</span><span>${format.size}<br>${layout.label}</span></div></article>`)).join("");
 }
 function buildCampaign() {
   state.built = true; renderAssets();
