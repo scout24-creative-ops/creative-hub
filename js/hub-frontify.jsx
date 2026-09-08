@@ -49,12 +49,6 @@ function buildHubNavigation() {
     create: [
       fGroup("Create / AI Studio"),
       { label: "All agents", key: "create::agents", source: "local" },
-      {
-        label: "Professionals Studio",
-        key: "studio::professionals-studio",
-        source: "local",
-        url: "./studios/professionals-studio/",
-      },
     ],
     brand: [
       fGroup("Brand"),
