@@ -50,12 +50,12 @@
 .dv-nav__drawer-scroll { min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 18px 14px 32px; scrollbar-width: thin; scrollbar-color: var(--is24-grey-4) transparent; }
 .dv-nav__drawer-links + .dv-nav__drawer-links { margin-top: 20px; }
 .dv-nav__group { display: block; padding: 0 8px 7px; color: var(--is24-grey-6); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.dv-nav__drawer-links button { width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 8px; border: 0; border-radius: var(--is24-radius-4); background: transparent; color: var(--gray-1000); text-align: left; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-.dv-nav__drawer-close:hover, .dv-nav__drawer-links button:hover { background: var(--gray-200); }
+.dv-nav__drawer-links :is(button, a) { width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 8px; border: 0; border-radius: var(--is24-radius-4); background: transparent; color: var(--gray-1000); text-align: left; text-decoration: none; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.dv-nav__drawer-close:hover, .dv-nav__drawer-links :is(button, a):hover { background: var(--gray-200); }
 .dv-nav__drawer-links button.is-active { background: var(--is24-sand); box-shadow: inset 3px 0 0 var(--is24-teal); }
 .dv-nav__drawer-links button.is-disabled { color: var(--is24-grey-5); cursor: not-allowed; }
 .dv-nav__drawer-links button.is-disabled:hover { background: transparent; }
-.dv-nav__drawer-close:focus-visible, .dv-nav__drawer-links button:focus-visible { outline: 2px solid var(--gray-1000); outline-offset: -2px; }
+.dv-nav__drawer-close:focus-visible, .dv-nav__drawer-links :is(button, a):focus-visible { outline: 2px solid var(--gray-1000); outline-offset: -2px; }
 @media (min-width: 981px) {
   .hub-app[data-concept="d"] { --dv-nav-rail-width: 320px; }
 }

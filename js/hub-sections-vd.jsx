@@ -479,7 +479,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
             const isOpen = drawerSection === id;
             const groups = dMenuGroups(nav[id]);
             const isDisabled = disabledSections.has(id);
-            const opensDirectly = id === "create" || id === "knowledge";
+            const opensDirectly = id === "knowledge";
             return <div className="dv-nav__item" key={id}>
               <button
                 ref={(node) => { triggerRefs.current[id] = node; }}
@@ -503,7 +503,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
                   if (event.key !== "ArrowDown") return;
                   event.preventDefault();
                   openMenu(id);
-                  window.requestAnimationFrame(() => document.querySelector(`#${menuId} .dv-nav__drawer-links button:not(:disabled)`)?.focus());
+                  window.requestAnimationFrame(() => document.querySelector(`#${menuId} .dv-nav__drawer-links button:not(:disabled), #${menuId} .dv-nav__drawer-links a`)?.focus());
                 }}
               >{label}</button>
               {isOpen && !opensDirectly && !isDisabled && <aside className="dv-nav__submenu" id={menuId} aria-label={`${label} navigation`}>
@@ -515,12 +515,17 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
                   {groups.map((group) => <section className="dv-nav__drawer-links" aria-labelledby={`${menuId}-${group.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`} key={group.label}>
                     <span className="dv-nav__group" id={`${menuId}-${group.label.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`}>{group.label}</span>
                     {group.items.map((item) => {
+                      if (item.url) return <a href={item.url} target="_blank" rel="noreferrer" key={item.key} onClick={() => {
+                        setOpen(null);
+                        setMobileNavOpen(false);
+                      }}>{item.label}<DI name="arrow-right" size={13}/></a>;
+                      const isActive = item.key === activePageKey || (item.key === "create::agents" && activeSection === "create");
                       const openAvailablePage = () => {
                         setOpen(null);
                         setMobileNavOpen(false);
                         goSection(id, item);
                       };
-                      return <button type="button" className={item.key === activePageKey ? "is-active" : ""} aria-current={item.key === activePageKey ? "page" : undefined} key={item.key} onPointerDown={(event) => {
+                      return <button type="button" className={isActive ? "is-active" : ""} aria-current={isActive ? "page" : undefined} key={item.key} onPointerDown={(event) => {
                         event.preventDefault();
                         openAvailablePage();
                       }} onClick={() => {

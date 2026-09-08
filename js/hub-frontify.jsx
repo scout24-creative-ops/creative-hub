@@ -47,8 +47,14 @@ function fExisting(portal, title, label) {
 function buildHubNavigation() {
   return {
     create: [
-      fGroup("AI Studio"),
-      ...["All Agents", "Campaign Studio", "Presentation Studio", "Brand Studio", "Content Studio", "Publishing Studio", "Automation Studio"].map(fPlaceholder),
+      fGroup("Create / AI Studio"),
+      { label: "All agents", key: "create::agents", source: "local" },
+      {
+        label: "Professionals Studio",
+        key: "github::professionals-studio",
+        source: "github",
+        url: "https://github.com/scout24-creative-ops/creative-hub/tree/main/.github/studios/professionals-studio",
+      },
     ],
     brand: [
       fGroup("Brand"),

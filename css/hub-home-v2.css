@@ -1152,7 +1152,7 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
   color: color-mix(in srgb, var(--home2-ink) 50%, transparent);
 }
 
-.hub-app[data-concept="d"] .dv-nav__drawer-links button {
+.hub-app[data-concept="d"] .dv-nav__drawer-links :is(button, a) {
   position: relative;
   min-height: 44px;
   padding: 9px 12px 9px 16px;
@@ -1162,7 +1162,7 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
   transition: background-color 160ms ease, color 160ms ease, padding 160ms ease;
 }
 
-.hub-app[data-concept="d"] .dv-nav__drawer-links button::before {
+.hub-app[data-concept="d"] .dv-nav__drawer-links :is(button, a)::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -1177,7 +1177,7 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
   pointer-events: none;
 }
 
-.hub-app[data-concept="d"] .dv-nav__drawer-links button:hover:not(:disabled) {
+.hub-app[data-concept="d"] .dv-nav__drawer-links :is(button, a):hover:not(:disabled) {
   padding-left: 18px;
   background: color-mix(in srgb, var(--is24-teal) 12%, white);
 }
@@ -1212,7 +1212,7 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
 }
 
 .hub-app[data-concept="d"] .dv-nav__drawer-close:focus-visible,
-.hub-app[data-concept="d"] .dv-nav__drawer-links button:focus-visible {
+.hub-app[data-concept="d"] .dv-nav__drawer-links :is(button, a):focus-visible {
   outline: 3px solid var(--home2-ink);
   outline-offset: 2px;
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--is24-teal) 38%, transparent);
@@ -1356,7 +1356,7 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
   .hub-app[data-concept="d"] .dv-nav__item > button::before,
   .hub-app[data-concept="d"] .dv-nav__item > button::after,
   .hub-app[data-concept="d"] .dv-menu-toggle::after,
-  .hub-app[data-concept="d"] .dv-nav__drawer-links button::before {
+  .hub-app[data-concept="d"] .dv-nav__drawer-links :is(button, a)::before {
     transition: opacity 180ms ease, transform 300ms cubic-bezier(.2, .8, .2, 1);
   }
 
@@ -1391,7 +1391,7 @@ html[lang="de"] .hub-app[data-concept="d"] .dv-nav__drawer-links button.is-disab
   .hub-app[data-concept="d"] .dv-nav__item > button::before,
   .hub-app[data-concept="d"] .dv-nav__item > button::after,
   .hub-app[data-concept="d"] .dv-menu-toggle::after,
-  .hub-app[data-concept="d"] .dv-nav__drawer-links button::before {
+  .hub-app[data-concept="d"] .dv-nav__drawer-links :is(button, a)::before {
     animation: none !important;
     transition: none !important;
   }
