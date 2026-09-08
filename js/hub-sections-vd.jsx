@@ -399,7 +399,7 @@ function DHeader({ goHome, goSection, activeSection, activePageKey, onNavigation
   const triggerRefs = React.useRef({});
   const nav = DFrontify.buildHubNavigation();
   const disabledSections = new Set(["assets"]);
-  const persistentSections = new Set(["brand", "community"]);
+  const persistentSections = new Set(["create", "brand", "community"]);
   const persistentSection = persistentSections.has(activeSection) && !sectionDrawerDismissed ? activeSection : null;
   const drawerSection = open || persistentSection;
   const brandOverview = { key: "hub::56", label: "Brand Overview", source: "hub" };
